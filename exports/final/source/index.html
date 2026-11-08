@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="fr" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>Mohamed Excel — Creative Test 01: Excel Transformation</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --color-bg-deep: #0B132B;
+        --color-excel-green: #107C41;
+        --color-excel-bright: #21A366;
+        --font-primary: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html, body {
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: var(--color-bg-deep);
+        font-family: var(--font-primary);
+      }
+
+      #root {
+        position: relative;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #0B132B;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="15"
+      data-width="1080"
+      data-height="1920"
+      data-fps="30"
+    >
+      <!-- Master Audio Track (BGM + Voiceover Femme) -->
+      <audio
+        id="soundtrack"
+        src="public/audio/master_audio_femme.mp3"
+        data-start="0"
+        data-duration="15"
+      ></audio>
+
+      <!-- Scene 1: 0.0s - 3.0s | Raw Data Overload -->
+      <div
+        id="scene1"
+        data-composition-id="scene1"
+        data-composition-src="compositions/scene1.html"
+        data-start="0"
+        data-duration="3.0"
+        data-track-index="1"
+        data-width="1080"
+        data-height="1920"
+      ></div>
+
+      <!-- Scene 2: 3.0s - 6.0s | PivotTable Transformation -->
+      <div
+        id="scene2"
+        data-composition-id="scene2"
+        data-composition-src="compositions/scene2.html"
+        data-start="3.0"
+        data-duration="3.0"
+        data-track-index="1"
+        data-width="1080"
+        data-height="1920"
+      ></div>
+
+      <!-- Scene 3: 6.0s - 9.0s | Dynamic Dashboard & KPIs -->
+      <div
+        id="scene3"
+        data-composition-id="scene3"
+        data-composition-src="compositions/scene3.html"
+        data-start="6.0"
+        data-duration="3.0"
+        data-track-index="1"
+        data-width="1080"
+        data-height="1920"
+      ></div>
+
+      <!-- Scene 4: 9.0s - 12.0s | Training Offer Details -->
+      <div
+        id="scene4"
+        data-composition-id="scene4"
+        data-composition-src="compositions/scene4.html"
+        data-start="9.0"
+        data-duration="3.0"
+        data-track-index="1"
+        data-width="1080"
+        data-height="1920"
+      ></div>
+
+      <!-- Scene 5: 12.0s - 15.0s | Final Offer, Price & CTA -->
+      <div
+        id="scene5"
+        data-composition-id="scene5"
+        data-composition-src="compositions/scene5.html"
+        data-start="12.0"
+        data-duration="3.0"
+        data-track-index="1"
+        data-width="1080"
+        data-height="1920"
+      ></div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>

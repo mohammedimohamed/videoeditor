@@ -1,0 +1,47 @@
+[
+  {
+    "scene": 1,
+    "start_time": "00:00:00.200",
+    "end_time": "00:00:02.500",
+    "start_seconds": 0.20,
+    "end_seconds": 2.50,
+    "text": "Analyser vos données sur Excel prend trop de temps ?",
+    "headline": "Vous utilisez Excel au quotidien ?"
+  },
+  {
+    "scene": 2,
+    "start_time": "00:00:03.250",
+    "end_time": "00:00:05.500",
+    "start_seconds": 3.25,
+    "end_seconds": 5.50,
+    "text": "Découvrez les Tableaux Croisés Dynamiques.",
+    "headline": "La solution rapide & efficace"
+  },
+  {
+    "scene": 3,
+    "start_time": "00:00:07.250",
+    "end_time": "00:00:10.500",
+    "start_seconds": 7.25,
+    "end_seconds": 10.50,
+    "text": "Visualisez vos résultats avec des graphiques clairs et précis.",
+    "headline": "Obtenez des analyses plus claires"
+  },
+  {
+    "scene": 4,
+    "start_time": "00:00:11.250",
+    "end_time": "00:00:14.500",
+    "start_seconds": 11.25,
+    "end_seconds": 14.50,
+    "text": "Profitez de 13 vidéos HD et de classeurs pratiques.",
+    "headline": "Avec Mohamed Excel"
+  },
+  {
+    "scene": 5,
+    "start_time": "00:00:15.200",
+    "end_time": "00:00:19.500",
+    "start_seconds": 15.20,
+    "end_seconds": 19.50,
+    "text": "Inscrivez-vous pour 1 500 dinars sur courses.techwise-dz.com.",
+    "headline": "Formation Excel — Tableaux Croisés Dynamiques"
+  }
+]

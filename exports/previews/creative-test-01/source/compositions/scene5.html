@@ -1,0 +1,274 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 30%, #152E58 0%, #0B132B 80%);
+      color: #FFFFFF;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      overflow: hidden;
+    }
+
+    .bg-grid {
+      position: absolute;
+      inset: 0;
+      background-size: 60px 60px;
+      background-image: 
+        linear-gradient(to right, rgba(58, 80, 107, 0.15) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(58, 80, 107, 0.15) 1px, transparent 1px);
+      pointer-events: none;
+    }
+
+    .safe-box {
+      position: absolute;
+      inset: 120px 90px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 28px;
+      background: rgba(28, 37, 65, 0.95);
+      border: 1px solid #3A506B;
+      border-radius: 999px;
+      align-self: flex-start;
+      opacity: 1;
+    }
+
+    .badge-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #21A366;
+      box-shadow: 0 0 16px #21A366;
+    }
+
+    .badge-text {
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #FFFFFF;
+    }
+
+    .hero-title {
+      font-size: 60px;
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+
+    .hero-title span.accent {
+      color: #21A366;
+    }
+
+    /* Course Specs Inclusions Bar */
+    .specs-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+    }
+
+    .spec-pill {
+      font-size: 28px;
+      font-weight: 600;
+      background: rgba(28, 37, 65, 0.9);
+      border: 1px solid #3A506B;
+      color: #E2E8F0;
+      padding: 8px 20px;
+      border-radius: 999px;
+    }
+
+    /* Price Hero Card */
+    .price-card {
+      background: #1C2541;
+      border: 2px solid #21A366;
+      border-radius: 28px;
+      padding: 30px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(16, 124, 65, 0.35);
+      margin-bottom: 20px;
+    }
+
+    .price-label {
+      font-size: 28px;
+      color: #CBD5E1;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+
+    .price-val {
+      font-family: 'Consolas', monospace;
+      font-size: 80px;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    .price-sub {
+      font-size: 28px;
+      color: #21A366;
+      font-weight: 600;
+    }
+
+    /* Trust Payment & Download Strip */
+    .payment-strip {
+      background: rgba(28, 37, 65, 0.95);
+      border: 1px solid #3A506B;
+      border-radius: 20px;
+      padding: 18px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 22px;
+      text-align: center;
+    }
+
+    .payment-line {
+      font-size: 28px;
+      font-weight: 600;
+      color: #E2E8F0;
+    }
+
+    .download-line {
+      font-size: 28px;
+      font-weight: 500;
+      color: #CBD5E1;
+    }
+
+    /* Primary CTA Button / URL */
+    .cta-card {
+      background: linear-gradient(135deg, #107C41 0%, #0A4524 100%);
+      border: 2px solid #21A366;
+      border-radius: 26px;
+      padding: 28px 24px;
+      text-align: center;
+      box-shadow: 0 24px 60px rgba(16, 124, 65, 0.45);
+    }
+
+    .cta-url-box {
+      font-family: 'Consolas', monospace;
+      font-size: 34px;
+      font-weight: 700;
+      color: #FFFFFF;
+      letter-spacing: 0.02em;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 28px;
+      color: #CBD5E1;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding-top: 16px;
+    }
+  </style>
+
+  <div id="root" data-composition-id="scene5" data-width="1080" data-height="1920">
+    <div class="bg-grid"></div>
+
+    <div class="safe-box">
+      <div class="badge" id="s5-badge">
+        <div class="badge-dot"></div>
+        <div class="badge-text">Mohamed Excel • Inscriptions Ouvertes</div>
+      </div>
+
+      <div id="s5-content">
+        <!-- Exact headline as requested -->
+        <h2 class="hero-title" id="s5-title">
+          Formation Excel — <span class="accent">Tableaux Croisés Dynamiques</span>
+        </h2>
+
+        <!-- Inclusions pills: 13 vidéos HD + Classeurs d'exercices -->
+        <div class="specs-row" id="s5-specs">
+          <span class="spec-pill">✓ 13 vidéos HD</span>
+          <span class="spec-pill">✓ Classeurs d'exercices</span>
+        </div>
+
+        <!-- Price Card: 1 500 DA -->
+        <div class="price-card" id="s5-price">
+          <div class="price-label">Formation complète à seulement</div>
+          <div class="price-val">1 500 DA</div>
+          <div class="price-sub">Programme complet avec exercices</div>
+        </div>
+
+        <!-- Payment & Download Strip -->
+        <div class="payment-strip" id="s5-payment">
+          <div class="payment-line">Paiement en ligne par CIB et Edahabia</div>
+          <div class="download-line">Téléchargement après confirmation du paiement</div>
+        </div>
+
+        <!-- CTA Action URL Card -->
+        <div class="cta-card" id="s5-cta">
+          <div class="cta-url-box">courses.techwise-dz.com</div>
+        </div>
+      </div>
+
+      <div class="footer" id="s5-footer">
+        TechWise Advisors — Creative Studio
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tl = gsap.timeline({ paused: true });
+
+    // Scene entrance: badge & title ready at time 0
+    tl.fromTo("#s5-badge", 
+      { opacity: 0.9, scale: 0.98 }, 
+      { opacity: 1, scale: 1, duration: 0.3, ease: "power2.out" }, 
+      0
+    );
+
+    tl.fromTo("#s5-title", 
+      { opacity: 0, y: 30 }, 
+      { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 
+      0.05
+    );
+
+    tl.fromTo("#s5-specs",
+      { opacity: 0, x: -20 },
+      { opacity: 1, x: 0, duration: 0.35, ease: "power2.out" },
+      0.2
+    );
+
+    // Price card enters at 0.3s
+    tl.fromTo("#s5-price",
+      { opacity: 0, scale: 0.92, y: 25 },
+      { opacity: 1, scale: 1, y: 0, duration: 0.45, ease: "back.out(1.2)" },
+      0.3
+    );
+
+    // Payment trust strip enters at 0.45s
+    tl.fromTo("#s5-payment",
+      { opacity: 0, y: 20 },
+      { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" },
+      0.45
+    );
+
+    // CTA button enters at 0.55s, staying on screen until 3.0s (2.45s hold time > 2.0s floor)
+    tl.fromTo("#s5-cta",
+      { opacity: 0, scale: 0.92, y: 25 },
+      { opacity: 1, scale: 1, y: 0, duration: 0.5, ease: "back.out(1.25)" },
+      0.55
+    );
+
+    tl.fromTo("#s5-footer", 
+      { opacity: 0 }, 
+      { opacity: 1, duration: 0.4, ease: "power2.out" }, 
+      0.35
+    );
+
+    window.__timelines = window.__timelines || {};
+    window.__timelines["scene5"] = tl;
+  </script>
+</template>

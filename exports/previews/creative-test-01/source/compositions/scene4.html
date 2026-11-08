@@ -1,0 +1,249 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 25%, #15244C 0%, #0B132B 80%);
+      color: #FFFFFF;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      overflow: hidden;
+    }
+
+    .bg-grid {
+      position: absolute;
+      inset: 0;
+      background-size: 60px 60px;
+      background-image: 
+        linear-gradient(to right, rgba(58, 80, 107, 0.15) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(58, 80, 107, 0.15) 1px, transparent 1px);
+      pointer-events: none;
+    }
+
+    .safe-box {
+      position: absolute;
+      inset: 120px 90px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 28px;
+      background: rgba(28, 37, 65, 0.95);
+      border: 1px solid #3A506B;
+      border-radius: 999px;
+      align-self: flex-start;
+      opacity: 1;
+    }
+
+    .badge-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #21A366;
+      box-shadow: 0 0 16px #21A366;
+    }
+
+    .badge-text {
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #FFFFFF;
+    }
+
+    .hero-title {
+      font-size: 68px;
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 18px;
+    }
+
+    .hero-title span.accent {
+      color: #21A366;
+    }
+
+    .hero-subtitle {
+      font-size: 32px;
+      font-weight: 400;
+      color: #CBD5E1;
+      line-height: 1.35;
+      margin-bottom: 34px;
+    }
+
+    /* Course Highlights List */
+    .features-list {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .feature-card {
+      background: #1C2541;
+      border: 1px solid #3A506B;
+      border-radius: 24px;
+      padding: 26px 30px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.35);
+    }
+
+    .feature-icon-box {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      background: #107C41;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 700;
+      color: #FFFFFF;
+      flex-shrink: 0;
+      box-shadow: 0 0 20px rgba(16, 124, 65, 0.5);
+    }
+
+    .feature-info {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .feature-title {
+      font-size: 30px;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+
+    .feature-desc {
+      font-size: 28px;
+      color: #CBD5E1;
+      font-weight: 400;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 28px;
+      color: #CBD5E1;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding-top: 16px;
+    }
+  </style>
+
+  <div id="root" data-composition-id="scene4" data-width="1080" data-height="1920">
+    <div class="bg-grid"></div>
+
+    <div class="safe-box">
+      <div class="badge" id="s4-badge">
+        <div class="badge-dot"></div>
+        <div class="badge-text">Mohamed Excel • Le Programme</div>
+      </div>
+
+      <div id="s4-content">
+        <h2 class="hero-title" id="s4-title">
+          La méthode complète <span class="accent">en ligne</span>
+        </h2>
+        <p class="hero-subtitle" id="s4-subtitle">
+          Maîtrisez les Tableaux Croisés Dynamiques pas à pas.
+        </p>
+
+        <div class="features-list">
+          <!-- Feature 1: 13 Vidéos HD -->
+          <div class="feature-card" id="s4-f1">
+            <div class="feature-icon-box">✓</div>
+            <div class="feature-info">
+              <span class="feature-title">13 Vidéos HD</span>
+              <span class="feature-desc">Formation progressive étape par étape</span>
+            </div>
+          </div>
+
+          <!-- Feature 2: Classeurs d'exercices -->
+          <div class="feature-card" id="s4-f2">
+            <div class="feature-icon-box">✓</div>
+            <div class="feature-info">
+              <span class="feature-title">Classeurs d'exercices</span>
+              <span class="feature-desc">Fichiers Excel d'entraînement inclus</span>
+            </div>
+          </div>
+
+          <!-- Feature 3: Exercices pratiques inclus -->
+          <div class="feature-card" id="s4-f3">
+            <div class="feature-icon-box">✓</div>
+            <div class="feature-info">
+              <span class="feature-title">Exercices pratiques inclus</span>
+              <span class="feature-desc">Mise en pratique sur données concrètes</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer" id="s4-footer">
+        TechWise Advisors — Creative Studio
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tl = gsap.timeline({ paused: true });
+
+    // Scene entrance: badge & title ready at time 0
+    tl.fromTo("#s4-badge", 
+      { opacity: 0.9, scale: 0.98 }, 
+      { opacity: 1, scale: 1, duration: 0.3, ease: "power2.out" }, 
+      0
+    );
+
+    tl.fromTo("#s4-title", 
+      { opacity: 0, y: 30 }, 
+      { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 
+      0.05
+    );
+
+    tl.fromTo("#s4-subtitle", 
+      { opacity: 0, y: 20 }, 
+      { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 
+      0.25
+    );
+
+    // Stagger feature cards
+    tl.fromTo("#s4-f1",
+      { opacity: 0, x: -30 },
+      { opacity: 1, x: 0, duration: 0.45, ease: "power2.out" },
+      0.45
+    );
+
+    tl.fromTo("#s4-f2",
+      { opacity: 0, x: -30 },
+      { opacity: 1, x: 0, duration: 0.45, ease: "power2.out" },
+      0.65
+    );
+
+    tl.fromTo("#s4-f3",
+      { opacity: 0, x: -30 },
+      { opacity: 1, x: 0, duration: 0.45, ease: "power2.out" },
+      0.85
+    );
+
+    tl.fromTo("#s4-footer", 
+      { opacity: 0 }, 
+      { opacity: 1, duration: 0.4, ease: "power2.out" }, 
+      0.5
+    );
+
+    // Out transition
+    tl.fromTo("#s4-content",
+      { opacity: 1, y: 0, scale: 1 },
+      { opacity: 0, y: -30, scale: 0.96, duration: 0.3, ease: "power2.in" },
+      2.7
+    );
+
+    window.__timelines = window.__timelines || {};
+    window.__timelines["scene4"] = tl;
+  </script>
+</template>

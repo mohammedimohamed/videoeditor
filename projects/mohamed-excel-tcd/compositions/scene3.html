@@ -1,0 +1,377 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 25%, #182B55 0%, #0B132B 80%);
+      color: #FFFFFF;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      overflow: hidden;
+    }
+
+    .bg-grid {
+      position: absolute;
+      inset: 0;
+      background-size: 60px 60px;
+      background-image: 
+        linear-gradient(to right, rgba(58, 80, 107, 0.15) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(58, 80, 107, 0.15) 1px, transparent 1px);
+      pointer-events: none;
+    }
+
+    .safe-box {
+      position: absolute;
+      inset: 120px 90px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 28px;
+      background: rgba(28, 37, 65, 0.95);
+      border: 1px solid #3A506B;
+      border-radius: 999px;
+      align-self: flex-start;
+      opacity: 1;
+    }
+
+    .badge-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #21A366;
+      box-shadow: 0 0 16px #21A366;
+    }
+
+    .badge-text {
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #FFFFFF;
+    }
+
+    .hero-title {
+      font-size: 68px;
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 18px;
+    }
+
+    .hero-title span.accent {
+      color: #21A366;
+    }
+
+    .hero-subtitle {
+      font-size: 32px;
+      font-weight: 400;
+      color: #CBD5E1;
+      line-height: 1.35;
+      margin-bottom: 24px;
+    }
+
+    /* KPI Grid */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 22px;
+    }
+
+    .kpi-card {
+      background: #1C2541;
+      border: 1px solid #3A506B;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .kpi-label {
+      font-size: 28px;
+      font-weight: 500;
+      color: #CBD5E1;
+      margin-bottom: 10px;
+    }
+
+    .kpi-value {
+      font-family: 'Consolas', monospace;
+      font-size: 36px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 8px;
+    }
+
+    .kpi-badge {
+      display: inline-block;
+      font-family: 'Consolas', monospace;
+      font-size: 28px;
+      font-weight: 600;
+      background: rgba(16, 124, 65, 0.3);
+      color: #21A366;
+      padding: 4px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(33, 163, 102, 0.4);
+    }
+
+    /* Interactive Chart Card */
+    .chart-card {
+      background: #1C2541;
+      border: 2px solid #3A506B;
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(58, 80, 107, 0.5);
+    }
+
+    .chart-title {
+      font-size: 30px;
+      font-weight: 600;
+      color: #FFFFFF;
+    }
+
+    .slicer-pill {
+      font-family: 'Consolas', monospace;
+      font-size: 28px;
+      font-weight: 600;
+      background: #107C41;
+      color: #FFFFFF;
+      padding: 6px 16px;
+      border-radius: 8px;
+    }
+
+    /* Vertical Bar Columns */
+    .bars-container {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      height: 280px;
+      align-items: end;
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+
+    .bar-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+      justify-content: flex-end;
+    }
+
+    .bar-col-val {
+      font-family: 'Consolas', monospace;
+      font-size: 28px;
+      font-weight: 600;
+      color: #CBD5E1;
+      margin-bottom: 8px;
+    }
+
+    .bar-col-rect {
+      width: 100%;
+      background: linear-gradient(180deg, #21A366 0%, #107C41 100%);
+      border-radius: 8px 8px 0 0;
+      transform-origin: bottom center;
+    }
+
+    .bar-col-label {
+      font-size: 28px;
+      font-weight: 600;
+      color: #CBD5E1;
+      margin-top: 12px;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .sample-disclaimer {
+      font-size: 28px;
+      color: #94A3B8;
+      font-style: italic;
+      margin-top: 24px;
+      text-align: right;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 28px;
+      color: #CBD5E1;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding-top: 16px;
+    }
+  </style>
+
+  <div id="root" data-composition-id="scene3" data-width="1080" data-height="1920">
+    <div class="bg-grid"></div>
+
+    <div class="safe-box">
+      <div class="badge" id="s3-badge">
+        <div class="badge-dot"></div>
+        <div class="badge-text">Mohamed Excel • Tableaux de Bord</div>
+      </div>
+
+      <div id="s3-content">
+        <h2 class="hero-title" id="s3-title">
+          Obtenez des <span class="accent">analyses plus claires</span>
+        </h2>
+        <p class="hero-subtitle" id="s3-subtitle" data-layout-ignore>
+          Visualisez vos résultats avec des graphiques clairs et précis.
+        </p>
+
+        <!-- KPI Cards matching the exact 3 800 000 DA dataset -->
+        <div class="kpi-row" id="s3-kpis">
+          <div class="kpi-card">
+            <div class="kpi-label">Chiffre d'Affaires</div>
+            <div class="kpi-value">3,80 M DA</div>
+            <span class="kpi-badge">Total 4 Wilayas</span>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Volume Ventes</div>
+            <div class="kpi-value">1 630</div>
+            <span class="kpi-badge">Lignes Synthèse</span>
+          </div>
+        </div>
+
+        <!-- Dynamic Chart with exact breakdown -->
+        <div class="chart-card" id="s3-chart">
+          <div class="chart-header">
+            <span class="chart-title">Ventes par Wilaya</span>
+            <span class="slicer-pill">Année : 2026</span>
+          </div>
+
+          <div class="bars-container">
+            <!-- Alger: 1 450 000 DA -->
+            <div class="bar-column">
+              <span class="bar-col-val">1,45M</span>
+              <div class="bar-col-rect" id="s3-c1" style="height: 150px;"></div>
+              <span class="bar-col-label">Alger</span>
+            </div>
+
+            <!-- Oran: 950 000 DA -->
+            <div class="bar-column">
+              <span class="bar-col-val">950k</span>
+              <div class="bar-col-rect" id="s3-c2" style="height: 98px;"></div>
+              <span class="bar-col-label">Oran</span>
+            </div>
+
+            <!-- Const.: 750 000 DA -->
+            <div class="bar-column">
+              <span class="bar-col-val">750k</span>
+              <div class="bar-col-rect" id="s3-c3" style="height: 78px;"></div>
+              <span class="bar-col-label">Const.</span>
+            </div>
+
+            <!-- Sétif: 650 000 DA -->
+            <div class="bar-column">
+              <span class="bar-col-val">650k</span>
+              <div class="bar-col-rect" id="s3-c4" style="height: 68px;"></div>
+              <span class="bar-col-label">Sétif</span>
+            </div>
+          </div>
+
+          <div class="sample-disclaimer" id="s3-disc">
+            * Données d'exemple illustratives
+          </div>
+        </div>
+      </div>
+
+      <div class="footer" id="s3-footer">
+        TechWise Advisors — Creative Studio
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tl = gsap.timeline({ paused: true });
+
+    // Scene entrance: immediate engagement at cut
+    tl.fromTo("#s3-badge", 
+      { opacity: 0.9, scale: 0.98 }, 
+      { opacity: 1, scale: 1, duration: 0.2, ease: "power2.out" }, 
+      0
+    );
+
+    tl.fromTo("#s3-title", 
+      { opacity: 0, y: 20 }, 
+      { opacity: 1, y: 0, duration: 0.25, ease: "power2.out" }, 
+      0.02
+    );
+
+    tl.fromTo("#s3-subtitle", 
+      { opacity: 0, y: 15 }, 
+      { opacity: 1, y: 0, duration: 0.25, ease: "power2.out" }, 
+      0.10
+    );
+
+    tl.fromTo("#s3-kpis",
+      { opacity: 0, scale: 0.96, y: 15 },
+      { opacity: 1, scale: 1, y: 0, duration: 0.35, ease: "back.out(1.15)" },
+      0.15
+    );
+
+    tl.fromTo("#s3-chart",
+      { opacity: 0, scale: 0.96, y: 18 },
+      { opacity: 1, scale: 1, y: 0, duration: 0.35, ease: "back.out(1.15)" },
+      0.25
+    );
+
+    // Rise vertical chart columns
+    tl.fromTo("#s3-c1",
+      { scaleY: 0 },
+      { scaleY: 1, duration: 0.4, ease: "power2.out" },
+      0.45
+    );
+
+    tl.fromTo("#s3-c2",
+      { scaleY: 0 },
+      { scaleY: 1, duration: 0.4, ease: "power2.out" },
+      0.55
+    );
+
+    tl.fromTo("#s3-c3",
+      { scaleY: 0 },
+      { scaleY: 1, duration: 0.4, ease: "power2.out" },
+      0.65
+    );
+
+    tl.fromTo("#s3-c4",
+      { scaleY: 0 },
+      { scaleY: 1, duration: 0.4, ease: "power2.out" },
+      0.75
+    );
+
+    tl.fromTo("#s3-disc",
+      { opacity: 0 },
+      { opacity: 1, duration: 0.3, ease: "power2.out" },
+      0.95
+    );
+
+    tl.fromTo("#s3-footer", 
+      { opacity: 0 }, 
+      { opacity: 1, duration: 0.3, ease: "power2.out" }, 
+      0.3
+    );
+
+    // Out transition (3.85s -> 4.0s swift handoff)
+    tl.fromTo("#s3-content",
+      { opacity: 1, y: 0, scale: 1 },
+      { opacity: 0.15, y: -15, scale: 0.98, duration: 0.15, ease: "power2.in" },
+      3.85
+    );
+
+    window.__timelines = window.__timelines || {};
+    window.__timelines["scene3"] = tl;
+  </script>
+</template>

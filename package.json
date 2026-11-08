@@ -1,0 +1,15 @@
+{
+  "name": "mohamed-excel-creative-studio",
+  "version": "1.0.0",
+  "description": "Creative video studio workspace for Mohamed Excel using HyperFrames",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "doctor": "hyperframes doctor",
+    "skills:check": "hyperframes skills check",
+    "skills:update": "hyperframes skills update"
+  },
+  "devDependencies": {
+    "hyperframes": "^0.9.19"
+  }
+}
