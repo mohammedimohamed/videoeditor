@@ -1,0 +1,333 @@
+{
+  "version": "2.2.0",
+  "metadata": {
+    "id": "benchmark-cinematic-camera",
+    "title": "Benchmark 5: Cinematic Office Camera Sequence",
+    "description": "Demonstrates full Camera & Cinematic Composition System: Establishing wide shot, medium push-in on Karim, close-up on spreadsheet, tracking Mohamed entering, balanced two-shot, hand-laptop interaction framing, and reaction close-up.",
+    "duration": 9.5,
+    "fps": 30,
+    "resolution": {
+      "width": 1080,
+      "height": 1920
+    }
+  },
+  "environment": {
+    "preset": "office",
+    "background": "office-modern"
+  },
+  "camera": {
+    "viewport": {
+      "width": 1080,
+      "height": 1920
+    },
+    "initial": {
+      "mode": "cinematic",
+      "position": {
+        "x": 540,
+        "y": 960
+      },
+      "zoom": 1.0,
+      "rotation": 0
+    },
+    "safeArea": {
+      "top": 140,
+      "bottom": 180,
+      "left": 80,
+      "right": 80
+    }
+  },
+  "actors": [
+    {
+      "id": "karim",
+      "template": "employee",
+      "name": "Karim",
+      "role": "Financial Analyst",
+      "initialState": {
+        "pose": "seated",
+        "position": {
+          "x": 320,
+          "y": 1120
+        },
+        "facing": 1,
+        "expression": "neutral"
+      }
+    },
+    {
+      "id": "mohamed",
+      "template": "mohamed",
+      "name": "Mohamed",
+      "role": "Excel Expert",
+      "initialState": {
+        "pose": "standing",
+        "position": {
+          "x": 1050,
+          "y": 1104
+        },
+        "facing": -1,
+        "expression": "confident"
+      }
+    }
+  ],
+  "props": [
+    {
+      "id": "desk",
+      "template": "desk",
+      "initialState": {
+        "state": "default"
+      }
+    },
+    {
+      "id": "laptop",
+      "template": "laptop",
+      "parent": "desk",
+      "initialState": {
+        "state": "raw-data"
+      }
+    },
+    {
+      "id": "clock",
+      "template": "clock",
+      "initialState": {
+        "state": "ticking"
+      }
+    }
+  ],
+  "events": [
+    {
+      "id": "evt-clock-ambient",
+      "prop": "clock",
+      "action": "propAction",
+      "timing": {
+        "start": 0,
+        "duration": 9.5
+      },
+      "params": {
+        "propId": "clock",
+        "action": "tick"
+      }
+    },
+
+    {
+      "id": "evt-shot1-establishing",
+      "action": "cameraSet",
+      "timing": {
+        "start": 0,
+        "duration": 1.0
+      },
+      "params": {
+        "x": 540,
+        "y": 960,
+        "zoom": 1.0,
+        "rotation": 0
+      },
+      "description": "Shot 1: Wide establishing shot of the modern office environment."
+    },
+    {
+      "id": "evt-karim-idle-intro",
+      "actor": "karim",
+      "action": "idle",
+      "timing": {
+        "start": 0,
+        "duration": 1.0
+      },
+      "params": {
+        "breathing": true,
+        "blinking": true
+      }
+    },
+
+    {
+      "id": "evt-shot2-karim-focus",
+      "action": "cameraFocus",
+      "timing": {
+        "start": 1.0,
+        "duration": 1.5
+      },
+      "params": {
+        "target": "karim",
+        "framing": "medium",
+        "ease": "power2.inOut"
+      },
+      "description": "Shot 2: Camera pushes in smoothly to a medium shot of Karim at his desk."
+    },
+    {
+      "id": "evt-karim-frustrated-expression",
+      "actor": "karim",
+      "action": "express",
+      "timing": {
+        "start": 1.2,
+        "duration": 1.3
+      },
+      "params": {
+        "emotion": "frustrated",
+        "intensity": 0.9
+      }
+    },
+
+    {
+      "id": "evt-shot3-laptop-focus",
+      "action": "cameraFocus",
+      "timing": {
+        "start": 2.5,
+        "duration": 1.5
+      },
+      "params": {
+        "target": "laptop.screen",
+        "framing": "object-close-up",
+        "ease": "power2.inOut"
+      },
+      "description": "Shot 3: Camera pushes in on the laptop screen showing complex Excel spreadsheet errors."
+    },
+    {
+      "id": "evt-laptop-error-state",
+      "prop": "laptop",
+      "action": "changeState",
+      "timing": {
+        "start": 3.0,
+        "duration": 1.0
+      },
+      "params": {
+        "objectId": "laptop",
+        "state": "error-highlight"
+      }
+    },
+
+    {
+      "id": "evt-mohamed-walk-in",
+      "actor": "mohamed",
+      "action": "walk",
+      "timing": {
+        "start": 4.0,
+        "duration": 1.5
+      },
+      "params": {
+        "startX": 1050,
+        "to": 855,
+        "mode": "foot-locked"
+      }
+    },
+    {
+      "id": "evt-shot4-track-mohamed",
+      "action": "cameraFollow",
+      "timing": {
+        "start": 4.0,
+        "duration": 1.5
+      },
+      "params": {
+        "target": "mohamed",
+        "framing": "medium",
+        "lookAhead": -60,
+        "targetX": 855,
+        "ease": "power1.inOut"
+      },
+      "description": "Shot 4: Camera tracks Mohamed as he walks smoothly into the office."
+    },
+
+    {
+      "id": "evt-shot5-two-shot",
+      "action": "frameGroup",
+      "timing": {
+        "start": 5.5,
+        "duration": 1.3
+      },
+      "params": {
+        "targets": ["mohamed", "karim"],
+        "framing": "two-shot",
+        "ease": "power2.inOut"
+      },
+      "description": "Shot 5: Camera frames both Mohamed and Karim in a balanced two-shot."
+    },
+    {
+      "id": "evt-mohamed-caption-speak",
+      "action": "caption",
+      "timing": {
+        "start": 5.6,
+        "duration": 1.2
+      },
+      "params": {
+        "speaker": "mohamed",
+        "text": "Regarde ici Karim, un simple tableau croisé dynamique règle le problème !"
+      }
+    },
+
+    {
+      "id": "evt-mohamed-point-laptop",
+      "actor": "mohamed",
+      "action": "pointAt",
+      "timing": {
+        "start": 6.8,
+        "duration": 1.4
+      },
+      "params": {
+        "target": "laptop.screen"
+      }
+    },
+    {
+      "id": "evt-shot6-interaction-framing",
+      "action": "frameInteraction",
+      "timing": {
+        "start": 6.8,
+        "duration": 1.4
+      },
+      "params": {
+        "targets": ["mohamed.rightHand", "laptop.screen"],
+        "framing": "interaction",
+        "ease": "power2.inOut"
+      },
+      "description": "Shot 6: Camera frames the active hand gesture and laptop interaction."
+    },
+    {
+      "id": "evt-laptop-pivot-state",
+      "prop": "laptop",
+      "action": "changeState",
+      "timing": {
+        "start": 7.2,
+        "duration": 1.0
+      },
+      "params": {
+        "objectId": "laptop",
+        "state": "pivot-table"
+      }
+    },
+
+    {
+      "id": "evt-shot7-reaction-karim",
+      "action": "cameraFocus",
+      "timing": {
+        "start": 8.2,
+        "duration": 1.3
+      },
+      "params": {
+        "target": "karim.head",
+        "framing": "close-up",
+        "ease": "power2.out"
+      },
+      "description": "Shot 7: Close-up reaction shot on Karim as he understands and smiles with relief."
+    },
+    {
+      "id": "evt-karim-happy-reaction",
+      "actor": "karim",
+      "action": "express",
+      "timing": {
+        "start": 8.3,
+        "duration": 1.2
+      },
+      "params": {
+        "emotion": "happy",
+        "intensity": 1.0
+      }
+    },
+    {
+      "id": "evt-karim-caption-reaction",
+      "action": "caption",
+      "timing": {
+        "start": 8.3,
+        "duration": 1.2
+      },
+      "params": {
+        "speaker": "karim",
+        "text": "Incroyable ! En 2 secondes le rapport est automatisé !"
+      }
+    }
+  ]
+}

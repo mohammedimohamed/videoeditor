@@ -161,13 +161,14 @@
       <div class="hud-title-wrap">
         <span class="hud-dot"></span>
         <span id="scene-label" class="hud-title">SDS SCENE PLAYER</span>
-        <span id="version-badge" class="hud-badge">SDS v2.1.0</span>
+        <span id="version-badge" class="hud-badge">SDS v2.2.0</span>
       </div>
       <div class="hud-controls">
         <a id="btn-scene-1" href="?scene=benchmark-interaction.json" class="hud-btn">Bench 1: Interaction</a>
         <a id="btn-scene-2" href="?scene=benchmark-second-scene.json" class="hud-btn">Bench 2: Coffee Talk</a>
         <a id="btn-scene-3" href="?scene=benchmark-cup-pickup.json" class="hud-btn">Bench 3: Cup Pick-Up</a>
         <a id="btn-scene-4" href="?scene=benchmark-object-motion.json" class="hud-btn">Bench 4: Object Motion</a>
+        <a id="btn-scene-5" href="?scene=benchmark-cinematic-camera.json" class="hud-btn">Bench 5: Cinematic Camera</a>
       </div>
     </div>
 
@@ -196,6 +197,8 @@
         document.getElementById('btn-scene-3')?.classList.add('active');
       } else if (sceneFile.includes('object-motion')) {
         document.getElementById('btn-scene-4')?.classList.add('active');
+      } else if (sceneFile.includes('cinematic-camera')) {
+        document.getElementById('btn-scene-5')?.classList.add('active');
       } else {
         document.getElementById('btn-scene-1')?.classList.add('active');
       }

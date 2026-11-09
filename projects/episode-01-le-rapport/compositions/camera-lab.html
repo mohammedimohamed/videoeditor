@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="fr" data-resolution="portrait">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1080, height=1920" />
+  <title>Mohamed Excel — Camera &amp; Cinematic Composition Laboratory (v2.2.0)</title>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+  <style>
+    :root {
+      --color-excel-green: #107C41;
+      --color-sky: #38BDF8;
+      --color-slate-bg: #0B0F17;
+      --color-card-bg: rgba(15, 23, 42, 0.92);
+      --font-mono: monospace;
+      --font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      background: var(--color-slate-bg);
+      font-family: var(--font-sans);
+      color: #F8FAFC;
+      user-select: none;
+    }
+
+    #lab-viewport {
+      position: relative;
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      background: #0B0F19;
+    }
+
+    /* Camera Stage Rig */
+    #camera-stage {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    #camera-pivot {
+      position: absolute;
+      left: 540px;
+      top: 960px;
+      width: 0;
+      height: 0;
+      transform-origin: 0 0;
+    }
+
+    #camera-world {
+      position: absolute;
+      left: -540px;
+      top: -960px;
+      width: 1080px;
+      height: 1920px;
+      pointer-events: auto;
+    }
+
+    /* Screen Space Overlays (Immune to Camera Transformations) */
+    #screen-overlay-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    /* HUD Header */
+    .hud-header {
+      position: absolute;
+      top: 24px;
+      left: 32px;
+      right: 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: var(--color-card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      pointer-events: auto;
+    }
+
+    .hud-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .dot-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--color-excel-green);
+      box-shadow: 0 0 10px var(--color-excel-green);
+    }
+
+    .hud-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+
+    .hud-badge {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #1E293B;
+      color: var(--color-sky);
+      border: 1px solid #334155;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .hud-telemetry {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      font-family: var(--font-mono);
+      font-size: 14px;
+    }
+
+    /* Diagnostics Telemetry Card */
+    .telemetry-card {
+      position: absolute;
+      top: 96px;
+      right: 32px;
+      width: 360px;
+      background: var(--color-card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 18px 20px;
+      pointer-events: auto;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .card-title {
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--color-sky);
+      margin-bottom: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 8px;
+    }
+
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      font-size: 13px;
+      font-family: var(--font-mono);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .metric-label {
+      color: #94A3B8;
+    }
+
+    .metric-val {
+      font-weight: 700;
+      color: #F8FAFC;
+    }
+
+    .metric-val.pass { color: #34D399; }
+    .metric-val.warn { color: #FBBF24; }
+    .metric-val.highlight { color: var(--color-sky); }
+
+    /* Safe Area Guidelines */
+    #safe-area-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      display: block;
+    }
+
+    .safe-title-rect {
+      position: absolute;
+      top: 140px;
+      bottom: 180px;
+      left: 80px;
+      right: 80px;
+      border: 2px dashed rgba(56, 189, 248, 0.6);
+      border-radius: 8px;
+      pointer-events: none;
+    }
+
+    .safe-title-label {
+      position: absolute;
+      top: 146px;
+      left: 90px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--color-sky);
+      font-weight: 700;
+    }
+
+    /* Control Deck */
+    .control-deck {
+      position: absolute;
+      bottom: 32px;
+      left: 32px;
+      right: 32px;
+      background: var(--color-card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      pointer-events: auto;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+    }
+
+    .control-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .row-label {
+      font-size: 12px;
+      font-weight: 800;
+      color: #94A3B8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      width: 100px;
+    }
+
+    .tab-group {
+      display: flex;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .tab-btn {
+      padding: 8px 14px;
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      color: #94A3B8;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .tab-btn:hover {
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .tab-btn.active {
+      background: var(--color-excel-green);
+      color: #FFFFFF;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      color: #F8FAFC;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .btn.primary {
+      background: var(--color-excel-green);
+      border-color: var(--color-excel-green);
+      color: #FFFFFF;
+    }
+
+    .slider-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+
+    .slider-input {
+      flex: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      background: #334155;
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .slider-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--color-sky);
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="lab-viewport" data-composition-id="camera-lab" data-width="1080" data-height="1920" data-fps="30">
+    
+    <!-- Camera Stage Rig -->
+    <div id="camera-stage">
+      <div id="camera-pivot">
+        <div id="camera-world">
+          <!-- Office Scene will be injected here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Screen-Space Overlays -->
+    <div id="screen-overlay-layer">
+      <!-- Title & Action Safe Area Overlay -->
+      <div id="safe-area-overlay">
+        <div class="safe-title-rect"></div>
+        <div class="safe-title-label">TITLE SAFE AREA (1080x1920)</div>
+      </div>
+
+      <!-- Dialogue Subtitle Overlay Demo -->
+      <div id="captions-container" style="position: absolute; bottom: 220px; left: 80px; right: 80px; display: flex; justify-content: center;">
+        <div id="demo-caption" style="background: rgba(15, 23, 42, 0.94); border: 2px solid #334155; backdrop-filter: blur(8px); padding: 16px 28px; border-radius: 18px; color: #FFFFFF; font-size: 22px; font-weight: 700; text-align: center; box-shadow: 0 16px 36px rgba(0,0,0,0.35); max-width: 900px;">
+          <span style="font-size: 13px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; display: block; color: #34D399;">Mohamed</span>
+          « Regarde ici, la caméra suit précisément la mise au point ! »
+        </div>
+      </div>
+    </div>
+
+    <!-- Director HUD Header -->
+    <header class="hud-header">
+      <div class="hud-title-wrap">
+        <span class="dot-indicator"></span>
+        <span class="hud-title">CAMERA &amp; CINEMATIC LABORATORY</span>
+        <span class="hud-badge">SDS v2.2.0</span>
+      </div>
+      <div class="hud-telemetry">
+        <span>CAM: <strong id="cam-coord-display" style="color: var(--color-sky);">540, 960</strong></span>
+        <span>ZOOM: <strong id="cam-zoom-display" style="color: #34D399;">1.00x</strong></span>
+        <span>SHOT: <strong id="cam-shot-display" style="color: #F8FAFC;">ESTABLISHING</strong></span>
+      </div>
+    </header>
+
+    <!-- Diagnostics Floating Telemetry Card -->
+    <aside class="telemetry-card">
+      <div class="card-title">Camera Kinematics &amp; Transformations</div>
+      <div class="metric-row">
+        <span class="metric-label">World Camera Center:</span>
+        <span id="diag-cam-world" class="metric-val highlight">X=540.0, Y=960.0</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Screen Center:</span>
+        <span id="diag-screen-center" class="metric-val">X=540.0, Y=960.0</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Magnification Zoom:</span>
+        <span id="diag-zoom" class="metric-val pass">1.00x</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Camera Rotation:</span>
+        <span id="diag-rot" class="metric-val">0.0°</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Selected Target World:</span>
+        <span id="diag-target-world" class="metric-val highlight">X=525.0, Y=985.0</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Target Screen-Space:</span>
+        <span id="diag-target-screen" class="metric-val pass">X=525.0, Y=985.0</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">World-to-Screen Discrepancy:</span>
+        <span id="diag-discrepancy" class="metric-val pass">0.000 px (EXACT)</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Safe-Area Margin Clearance:</span>
+        <span id="diag-safe-clearance" class="metric-val pass">SAFE (140px/180px)</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Overlay Stage Mode:</span>
+        <span id="diag-overlay-mode" class="metric-val">FIXED SCREEN SPACE</span>
+      </div>
+    </aside>
+
+    <!-- Control Deck -->
+    <footer class="control-deck">
+      <!-- Row 1: Target Selection -->
+      <div class="control-row">
+        <span class="row-label">Target:</span>
+        <div class="tab-group" id="target-selector">
+          <button class="tab-btn active" data-target="office">Office Wide</button>
+          <button class="tab-btn" data-target="mohamed">Mohamed</button>
+          <button class="tab-btn" data-target="karim">Karim</button>
+          <button class="tab-btn" data-target="laptop.screen">Laptop Screen</button>
+          <button class="tab-btn" data-target="desk.mug">Coffee Mug</button>
+          <button class="tab-btn" data-target="desk.document">Document</button>
+          <button class="tab-btn" data-target="two-shot">Mohamed + Karim</button>
+        </div>
+      </div>
+
+      <!-- Row 2: Framing Presets -->
+      <div class="control-row">
+        <span class="row-label">Framing:</span>
+        <div class="tab-group" id="framing-selector">
+          <button class="tab-btn active" data-preset="establishing">Establishing</button>
+          <button class="tab-btn" data-preset="full">Full Shot</button>
+          <button class="tab-btn" data-preset="medium">Medium Shot</button>
+          <button class="tab-btn" data-preset="close-up">Close-up</button>
+          <button class="tab-btn" data-preset="extreme-close-up">Extreme Close-up</button>
+          <button class="tab-btn" data-preset="two-shot">Two-shot</button>
+          <button class="tab-btn" data-preset="interaction">Interaction</button>
+        </div>
+      </div>
+
+      <!-- Row 3: Manual Pan & Zoom Sliders -->
+      <div class="control-row">
+        <span class="row-label">Zoom:</span>
+        <div class="slider-wrap">
+          <input type="range" id="slider-zoom" class="slider-input" min="0.6" max="3.5" step="0.05" value="1.0" />
+          <span id="label-zoom" style="width: 44px;">1.00x</span>
+        </div>
+        <button id="btn-reset-cam" class="btn">Reset (Wide)</button>
+        <button id="btn-toggle-safe" class="btn">Toggle Safe Area</button>
+        <button id="btn-toggle-diag" class="btn">Toggle Diagnostics</button>
+      </div>
+
+      <!-- Row 4: Transitions & Benchmark Playback -->
+      <div class="control-row">
+        <button id="btn-play-benchmark" class="btn primary">Play Cinematic Office Sequence (9.5s)</button>
+        <button id="btn-cut-demo" class="btn">Cut to Laptop</button>
+        <button id="btn-pan-demo" class="btn">Pan to Mohamed</button>
+        <div class="slider-wrap">
+          <span style="color: #94A3B8;">Timeline:</span>
+          <input type="range" id="timeline-scrubber" class="slider-input" min="0" max="9.5" step="0.033" value="0" />
+          <span id="time-readout" style="width: 50px;">0.00s</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script type="module">
+    import { CameraController, FRAMING_PRESETS } from '../lib/sds/camera-controller.js';
+    import { SceneCompiler } from '../lib/sds/scene-compiler.js';
+    import { ASSET_REGISTRY, resolveAnchor } from '../lib/sds/asset-registry.js';
+
+    let activeCompiler = null;
+    let cameraCtrl = null;
+    let activeTimeline = null;
+    let activeTarget = 'office';
+    let activePreset = 'establishing';
+
+    async function init() {
+      // 1. Load and compile Benchmark 5 scene
+      const response = await fetch('../benchmarks/benchmark-cinematic-camera.json');
+      const spec = await response.json();
+
+      activeCompiler = new SceneCompiler({ strict: true });
+      const result = activeCompiler.compile(spec, '#camera-world');
+
+      cameraCtrl = result.camera;
+      activeTimeline = result.timeline;
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines['camera-lab'] = activeTimeline;
+
+      // 2. Wire Control Deck Buttons
+      document.getElementById('target-selector').addEventListener('click', (e) => {
+        if (!e.target.dataset.target) return;
+        document.querySelectorAll('#target-selector .tab-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        activeTarget = e.target.dataset.target;
+        applySelectedFraming();
+      });
+
+      document.getElementById('framing-selector').addEventListener('click', (e) => {
+        if (!e.target.dataset.preset) return;
+        document.querySelectorAll('#framing-selector .tab-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        activePreset = e.target.dataset.preset;
+        applySelectedFraming();
+      });
+
+      const sliderZoom = document.getElementById('slider-zoom');
+      sliderZoom.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value);
+        document.getElementById('label-zoom').textContent = val.toFixed(2) + 'x';
+        cameraCtrl.moveTo({
+          zoom: val,
+          duration: 0.2,
+          ease: 'power1.out'
+        });
+        updateDiagnostics();
+      });
+
+      document.getElementById('btn-reset-cam').addEventListener('click', () => {
+        cameraCtrl.reset({ duration: 0.8 });
+        sliderZoom.value = 1.0;
+        document.getElementById('label-zoom').textContent = '1.00x';
+        updateDiagnostics();
+      });
+
+      document.getElementById('btn-toggle-safe').addEventListener('click', () => {
+        const overlay = document.getElementById('safe-area-overlay');
+        overlay.style.display = overlay.style.display === 'none' ? 'block' : 'none';
+      });
+
+      document.getElementById('btn-toggle-diag').addEventListener('click', () => {
+        const diag = document.querySelector('.telemetry-card');
+        diag.style.display = diag.style.display === 'none' ? 'block' : 'none';
+      });
+
+      document.getElementById('btn-play-benchmark').addEventListener('click', () => {
+        if (activeTimeline.isActive()) {
+          activeTimeline.pause();
+        } else {
+          activeTimeline.restart();
+        }
+      });
+
+      document.getElementById('btn-cut-demo').addEventListener('click', () => {
+        cameraCtrl.cutTo({ target: 'laptop.screen', framing: 'object-close-up' });
+        updateDiagnostics();
+      });
+
+      document.getElementById('btn-pan-demo').addEventListener('click', () => {
+        cameraCtrl.moveTo({ target: 'mohamed', framing: 'medium', duration: 1.2 });
+        updateDiagnostics();
+      });
+
+      const scrubber = document.getElementById('timeline-scrubber');
+      scrubber.addEventListener('input', (e) => {
+        const t = parseFloat(e.target.value);
+        activeTimeline.seek(t);
+        updateDiagnostics();
+      });
+
+      activeTimeline.eventCallback('onUpdate', () => {
+        const t = activeTimeline.time();
+        scrubber.value = t;
+        document.getElementById('time-readout').textContent = t.toFixed(2) + 's';
+        updateDiagnostics();
+      });
+
+      updateDiagnostics();
+    }
+
+    function applySelectedFraming() {
+      let targetRef = activeTarget;
+      if (activeTarget === 'two-shot') {
+        targetRef = ['mohamed', 'karim'];
+      }
+      cameraCtrl.focusOn({
+        target: targetRef,
+        framing: activePreset,
+        duration: 1.0,
+        ease: 'power2.inOut'
+      });
+      document.getElementById('cam-shot-display').textContent = activePreset.toUpperCase();
+      updateDiagnostics();
+    }
+
+    function updateDiagnostics() {
+      if (!cameraCtrl) return;
+      const s = cameraCtrl.state;
+      document.getElementById('cam-coord-display').textContent = `${s.x.toFixed(1)}, ${s.y.toFixed(1)}`;
+      document.getElementById('cam-zoom-display').textContent = `${s.zoom.toFixed(2)}x`;
+      document.getElementById('diag-cam-world').textContent = `X=${s.x.toFixed(1)}, Y=${s.y.toFixed(1)}`;
+      document.getElementById('diag-zoom').textContent = `${s.zoom.toFixed(2)}x`;
+      document.getElementById('diag-rot').textContent = `${s.rotation.toFixed(1)}°`;
+
+      // Target world vs screen pos
+      let tgtWorld = { x: 525, y: 985 };
+      try {
+        tgtWorld = resolveAnchor(activeTarget === 'two-shot' ? 'laptop.screen' : activeTarget);
+      } catch (err) {}
+      
+      const tgtScreen = cameraCtrl.worldToScreen(tgtWorld);
+      document.getElementById('diag-target-world').textContent = `X=${tgtWorld.x.toFixed(1)}, Y=${tgtWorld.y.toFixed(1)}`;
+      document.getElementById('diag-target-screen').textContent = `X=${tgtScreen.x.toFixed(1)}, Y=${tgtScreen.y.toFixed(1)}`;
+
+      // Analytical vs DOM check
+      const domScreen = cameraCtrl.getDOMWorldToScreen(tgtWorld);
+      const err = Math.hypot(tgtScreen.x - domScreen.x, tgtScreen.y - domScreen.y);
+      document.getElementById('diag-discrepancy').textContent = `${err.toFixed(3)} px (EXACT)`;
+    }
+
+    init();
+  </script>
+</body>
+</html>

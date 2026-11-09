@@ -17,6 +17,7 @@
 import { CharacterRig } from '../rigging/character-rig.js';
 import { CharacterController } from '../rigging/character-controller.js';
 import { ObjectController } from './object-controller.js';
+import { CameraController } from './camera-controller.js';
 import { getEmployeeSVG, getMohamedSVG } from '../rigging/character-templates.js';
 import { getOfficeEnvironmentSVG } from '../rigging/environment-templates.js';
 import { setupSittingPose, animateFrustrationSequence } from '../rigging/behavior-library.js';
@@ -58,23 +59,62 @@ export class SceneCompiler {
     rootEl.style.height = `${spec.metadata.resolution?.height || 1920}px`;
     rootEl.style.overflow = 'hidden';
 
-    // Environment Layer (z-index 1)
+    // Camera Rig & World Container Hierarchy (Transformed by CameraController)
+    const cameraStage = document.createElement('div');
+    cameraStage.id = 'camera-stage';
+    cameraStage.style.position = 'absolute';
+    cameraStage.style.inset = '0';
+    cameraStage.style.overflow = 'hidden';
+    cameraStage.style.pointerEvents = 'none';
+
+    const cameraPivot = document.createElement('div');
+    cameraPivot.id = 'camera-pivot';
+    cameraPivot.style.position = 'absolute';
+    cameraPivot.style.left = '540px';
+    cameraPivot.style.top = '960px';
+    cameraPivot.style.width = '0';
+    cameraPivot.style.height = '0';
+    cameraPivot.style.transformOrigin = '0 0';
+
+    const cameraWorld = document.createElement('div');
+    cameraWorld.id = 'camera-world';
+    cameraWorld.style.position = 'absolute';
+    cameraWorld.style.left = '-540px';
+    cameraWorld.style.top = '-960px';
+    cameraWorld.style.width = `${spec.metadata.resolution?.width || 1080}px`;
+    cameraWorld.style.height = `${spec.metadata.resolution?.height || 1920}px`;
+    cameraWorld.style.pointerEvents = 'auto';
+
+    cameraPivot.appendChild(cameraWorld);
+    cameraStage.appendChild(cameraPivot);
+    rootEl.appendChild(cameraStage);
+
+    // Screen-Space Overlay Container (Strictly immune to camera transforms)
+    const screenOverlayLayer = document.createElement('div');
+    screenOverlayLayer.id = 'screen-overlay-layer';
+    screenOverlayLayer.style.position = 'absolute';
+    screenOverlayLayer.style.inset = '0';
+    screenOverlayLayer.style.pointerEvents = 'none';
+    screenOverlayLayer.style.zIndex = '100';
+    rootEl.appendChild(screenOverlayLayer);
+
+    // Environment Layer (z-index 1 inside cameraWorld)
     const envLayer = document.createElement('div');
     envLayer.id = 'env-layer';
     envLayer.style.position = 'absolute';
     envLayer.style.inset = '0';
     envLayer.style.zIndex = '1';
     envLayer.innerHTML = getOfficeEnvironmentSVG();
-    rootEl.appendChild(envLayer);
+    cameraWorld.appendChild(envLayer);
 
-    // Desk Layer (z-index 3) - Split desk from env so characters can sit behind it
+    // Desk Layer (z-index 3 inside cameraWorld) - Split desk from env so characters can sit behind it
     const deskLayer = document.createElement('div');
     deskLayer.id = 'desk-layer';
     deskLayer.style.position = 'absolute';
     deskLayer.style.inset = '0';
     deskLayer.style.pointerEvents = 'none';
     deskLayer.style.zIndex = '3';
-    rootEl.appendChild(deskLayer);
+    cameraWorld.appendChild(deskLayer);
 
     let deskSvg = null;
     const deskGroup = envLayer.querySelector('#office-desk');
@@ -113,7 +153,7 @@ export class SceneCompiler {
       // Layering: seated employees behind desk (z=2), standing visitors in front (z=4)
       const isSeated = actorDef.initialState?.pose === 'seated';
       actorContainer.style.zIndex = isSeated ? '2' : '4';
-      rootEl.appendChild(actorContainer);
+      cameraWorld.appendChild(actorContainer);
 
       // Render Template SVG
       const domId = `rig-${actorDef.id}`;
@@ -224,7 +264,7 @@ export class SceneCompiler {
       }
     }
 
-    // 5. Captions Overlay Container (z-index 10)
+    // 5. Captions Overlay Container (z-index 10 inside screenOverlayLayer)
     const captionsContainer = document.createElement('div');
     captionsContainer.id = 'captions-container';
     captionsContainer.style.position = 'absolute';
@@ -237,9 +277,35 @@ export class SceneCompiler {
     captionsContainer.style.alignItems = 'center';
     captionsContainer.style.gap = '16px';
     captionsContainer.style.pointerEvents = 'none';
-    rootEl.appendChild(captionsContainer);
+    screenOverlayLayer.appendChild(captionsContainer);
 
-    // 6. Construct Master GSAP Timeline
+    // 6. Initialize Camera Controller
+    const cameraConfig = spec.camera || {};
+    const cameraCtrl = new CameraController(rootEl, {
+      viewportWidth: spec.metadata.resolution?.width || 1080,
+      viewportHeight: spec.metadata.resolution?.height || 1920,
+      x: cameraConfig.initial?.position?.x !== undefined ? cameraConfig.initial.position.x : 540,
+      y: cameraConfig.initial?.position?.y !== undefined ? cameraConfig.initial.position.y : 960,
+      zoom: cameraConfig.initial?.zoom !== undefined ? cameraConfig.initial.zoom : 1.0,
+      rotation: cameraConfig.initial?.rotation !== undefined ? cameraConfig.initial.rotation : 0,
+      bounds: cameraConfig.bounds,
+      safeArea: cameraConfig.safeArea
+    });
+
+    if (cameraConfig.initial?.target || cameraConfig.initial?.framing) {
+      const framing = cameraCtrl.calculateFraming(
+        cameraConfig.initial.target || 'stage',
+        cameraConfig.initial.framing || 'medium',
+        controllers,
+        objects
+      );
+      cameraCtrl.state.x = framing.x;
+      cameraCtrl.state.y = framing.y;
+      cameraCtrl.state.zoom = framing.zoom;
+      cameraCtrl.applyTransform();
+    }
+
+    // 7. Construct Master GSAP Timeline
     const masterTimeline = gsap.timeline({ paused: true });
 
     // Sort events by resolved start time
@@ -746,6 +812,159 @@ export class SceneCompiler {
           break;
         }
 
+        // --- Camera & Cinematic Composition Actions (Milestone 4) ---
+        case 'cameraSet': {
+          cameraCtrl.cutTo({
+            tl: masterTimeline,
+            atTime,
+            x: params.x,
+            y: params.y,
+            zoom: params.zoom,
+            rotation: params.rotation
+          });
+          break;
+        }
+
+        case 'cameraMoveTo': {
+          cameraCtrl.moveTo({
+            tl: masterTimeline,
+            atTime,
+            duration,
+            x: params.x,
+            y: params.y,
+            zoom: params.zoom,
+            rotation: params.rotation,
+            target: params.target || evt.target,
+            framing: params.framing || evt.framing,
+            ease: params.ease || evt.ease,
+            controllers,
+            objects
+          });
+          break;
+        }
+
+        case 'cameraPanTo': {
+          cameraCtrl.moveTo({
+            tl: masterTimeline,
+            atTime,
+            duration,
+            x: params.x,
+            y: params.y,
+            target: params.target || evt.target,
+            ease: params.ease || evt.ease,
+            controllers,
+            objects
+          });
+          break;
+        }
+
+        case 'cameraZoomTo': {
+          cameraCtrl.moveTo({
+            tl: masterTimeline,
+            atTime,
+            duration,
+            zoom: params.zoom,
+            target: params.target || evt.target,
+            ease: params.ease || evt.ease,
+            controllers,
+            objects
+          });
+          break;
+        }
+
+        case 'cameraReset': {
+          cameraCtrl.reset({
+            tl: masterTimeline,
+            atTime,
+            duration,
+            ease: params.ease || evt.ease
+          });
+          break;
+        }
+
+        case 'cameraFocus':
+        case 'frameCharacter':
+        case 'frameObject':
+        case 'frameGroup':
+        case 'frameInteraction': {
+          const target = params.target || evt.target || params.actor || evt.actor || params.object || evt.object || params.targets || params.group;
+          const framing = params.framing || evt.framing || (evt.action === 'frameObject' ? 'object-close-up' : (evt.action === 'frameGroup' ? 'two-shot' : (evt.action === 'frameInteraction' ? 'interaction' : 'medium')));
+          cameraCtrl.focusOn({
+            tl: masterTimeline,
+            atTime,
+            duration,
+            target,
+            framing,
+            x: params.x,
+            y: params.y,
+            zoom: params.zoom,
+            rotation: params.rotation,
+            ease: params.ease || evt.ease,
+            controllers,
+            objects
+          });
+          break;
+        }
+
+        case 'cameraFollow':
+        case 'cameraTrack': {
+          const target = params.target || evt.target || params.actor || evt.actor;
+          cameraCtrl.follow({
+            tl: masterTimeline,
+            atTime,
+            duration,
+            target,
+            framing: params.framing || evt.framing || 'medium',
+            toX: params.to !== undefined ? (typeof params.to === 'number' ? params.to : resolveAnchor(params.to, controllers, objects).x) : params.targetX,
+            lookAhead: params.lookAhead,
+            direction: params.direction,
+            zoom: params.zoom,
+            ease: params.ease || evt.ease,
+            controllers,
+            objects
+          });
+          break;
+        }
+
+        case 'cutTo': {
+          const target = params.target || evt.target;
+          cameraCtrl.cutTo({
+            tl: masterTimeline,
+            atTime,
+            target,
+            framing: params.framing || evt.framing,
+            x: params.x,
+            y: params.y,
+            zoom: params.zoom,
+            rotation: params.rotation,
+            controllers,
+            objects
+          });
+          break;
+        }
+
+        case 'dissolveTo':
+        case 'zoomTransition':
+        case 'panTransition': {
+          const target = params.target || evt.target;
+          const framing = params.framing || evt.framing || 'medium';
+          cameraCtrl.moveTo({
+            tl: masterTimeline,
+            atTime,
+            duration,
+            target,
+            framing,
+            x: params.x,
+            y: params.y,
+            zoom: params.zoom,
+            rotation: params.rotation,
+            ease: params.ease || evt.ease || 'power2.inOut',
+            controllers,
+            objects
+          });
+          break;
+        }
+
         default:
           console.warn(`[SceneCompiler] Unhandled action: "${evt.action}".`);
       }
@@ -768,6 +987,7 @@ export class SceneCompiler {
       spec,
       controllers,
       objects,
+      camera: cameraCtrl,
       timeline: masterTimeline,
       validation
     };
@@ -777,6 +997,7 @@ export class SceneCompiler {
       tracer,
       controllers,
       objects,
+      camera: cameraCtrl,
       validation
     };
   }

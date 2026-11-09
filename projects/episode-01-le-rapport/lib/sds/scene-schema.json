@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://mohamed-excel.com/schemas/scene-direction/v2.1.0/scene-schema.json",
-  "title": "Mohamed Excel — Scene Direction Specification Schema (v2.1.0)",
-  "description": "Formal schema for declarative 2D character and interactive object animation scene specifications.",
+  "$id": "https://mohamed-excel.com/schemas/scene-direction/v2.2.0/scene-schema.json",
+  "title": "Mohamed Excel — Scene Direction Specification Schema (v2.2.0)",
+  "description": "Formal schema for declarative 2D character, interactive object, and camera animation scene specifications.",
   "type": "object",
   "required": ["version", "metadata", "actors", "events"],
   "additionalProperties": false,
@@ -38,6 +38,56 @@
         "props": {
           "type": "array",
           "items": { "type": "string" }
+        }
+      }
+    },
+    "camera": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "viewport": {
+          "type": "object",
+          "properties": {
+            "width": { "type": "number", "default": 1080 },
+            "height": { "type": "number", "default": 1920 }
+          }
+        },
+        "initial": {
+          "type": "object",
+          "properties": {
+            "mode": { "type": "string", "enum": ["fixed", "follow", "cinematic"] },
+            "position": {
+              "type": "object",
+              "properties": {
+                "x": { "type": "number" },
+                "y": { "type": "number" }
+              }
+            },
+            "target": { "type": "string" },
+            "framing": { "type": "string" },
+            "zoom": { "type": "number", "minimum": 0.1, "maximum": 10.0 },
+            "rotation": { "type": "number" }
+          }
+        },
+        "bounds": {
+          "type": "object",
+          "properties": {
+            "minX": { "type": "number" },
+            "maxX": { "type": "number" },
+            "minY": { "type": "number" },
+            "maxY": { "type": "number" },
+            "minZoom": { "type": "number" },
+            "maxZoom": { "type": "number" }
+          }
+        },
+        "safeArea": {
+          "type": "object",
+          "properties": {
+            "top": { "type": "number" },
+            "bottom": { "type": "number" },
+            "left": { "type": "number" },
+            "right": { "type": "number" }
+          }
         }
       }
     },
@@ -159,6 +209,17 @@
         "actor": { "type": "string" },
         "prop": { "type": "string" },
         "object": { "type": "string" },
+        "camera": { "type": "string" },
+        "target": {
+          "oneOf": [
+            { "type": "string" },
+            { "type": "array", "items": { "type": "string" } }
+          ]
+        },
+        "framing": { "type": "string" },
+        "at": { "type": "number", "minimum": 0 },
+        "duration": { "type": "number", "minimum": 0 },
+        "ease": { "type": "string" },
         "action": { "type": "string" },
         "timing": {
           "type": "object",

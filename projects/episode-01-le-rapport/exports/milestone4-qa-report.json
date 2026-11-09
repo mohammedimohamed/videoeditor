@@ -1,0 +1,252 @@
+{
+  "milestone": "Milestone 4 — Camera & Cinematic Composition System",
+  "version": "2.2.0",
+  "generatedAt": "2026-11-09T15:04:59.149Z",
+  "tests": {
+    "coordinateTransformations": {
+      "status": "PASS",
+      "cases": [
+        {
+          "testCase": "Default Wide (540, 960, z=1.0)",
+          "targetWorld": {
+            "x": 525,
+            "y": 985
+          },
+          "analyticalScreen": {
+            "x": 525,
+            "y": 985
+          },
+          "domScreen": {
+            "x": 525,
+            "y": 985
+          },
+          "domDiscrepancyPx": 0,
+          "roundTripErrorPx": 0,
+          "pass": true
+        },
+        {
+          "testCase": "Pan Offset (700, 1100, z=1.0)",
+          "targetWorld": {
+            "x": 525,
+            "y": 985
+          },
+          "analyticalScreen": {
+            "x": 365,
+            "y": 845
+          },
+          "domScreen": {
+            "x": 365,
+            "y": 845
+          },
+          "domDiscrepancyPx": 0,
+          "roundTripErrorPx": 0,
+          "pass": true
+        },
+        {
+          "testCase": "Center Zoom (540, 960, z=2.2)",
+          "targetWorld": {
+            "x": 525,
+            "y": 985
+          },
+          "analyticalScreen": {
+            "x": 507,
+            "y": 1015
+          },
+          "domScreen": {
+            "x": 507,
+            "y": 1015
+          },
+          "domDiscrepancyPx": 0,
+          "roundTripErrorPx": 0,
+          "pass": true
+        },
+        {
+          "testCase": "Pan + Zoom (420, 1020, z=1.8)",
+          "targetWorld": {
+            "x": 684,
+            "y": 1079
+          },
+          "analyticalScreen": {
+            "x": 1015.2,
+            "y": 1066.2
+          },
+          "domScreen": {
+            "x": 1015.2,
+            "y": 1066.2
+          },
+          "domDiscrepancyPx": 0.0001,
+          "roundTripErrorPx": 0,
+          "pass": true
+        },
+        {
+          "testCase": "Pan + Zoom + Rotation (500, 1000, z=1.5, r=10deg)",
+          "targetWorld": {
+            "x": 320,
+            "y": 1120
+          },
+          "analyticalScreen": {
+            "x": 242.85,
+            "y": 1090.38
+          },
+          "domScreen": {
+            "x": 242.85,
+            "y": 1090.38
+          },
+          "domDiscrepancyPx": 0,
+          "roundTripErrorPx": 0,
+          "pass": true
+        }
+      ]
+    },
+    "framingPresets": {
+      "status": "PASS",
+      "cases": [
+        {
+          "preset": "establishing",
+          "target": "office",
+          "framing": {
+            "x": 540,
+            "y": 960,
+            "zoom": 1
+          },
+          "zoomPass": true,
+          "withinViewport": true,
+          "pass": true
+        },
+        {
+          "preset": "full",
+          "target": "mohamed",
+          "framing": {
+            "x": 855,
+            "y": 954,
+            "zoom": 1.6
+          },
+          "zoomPass": true,
+          "withinViewport": true,
+          "pass": true
+        },
+        {
+          "preset": "medium",
+          "target": "karim",
+          "framing": {
+            "x": 320,
+            "y": 794.09,
+            "zoom": 2.2
+          },
+          "zoomPass": true,
+          "withinViewport": true,
+          "pass": true
+        },
+        {
+          "preset": "close-up",
+          "target": "karim.head",
+          "framing": {
+            "x": 320,
+            "y": 793,
+            "zoom": 3.2
+          },
+          "zoomPass": true,
+          "withinViewport": true,
+          "pass": true
+        },
+        {
+          "preset": "two-shot",
+          "target": [
+            "mohamed",
+            "karim"
+          ],
+          "framing": {
+            "x": 587.5,
+            "y": 826.33,
+            "zoom": 1.15
+          },
+          "zoomPass": true,
+          "withinViewport": true,
+          "pass": true
+        },
+        {
+          "preset": "object-close-up",
+          "target": "laptop.screen",
+          "framing": {
+            "x": 525,
+            "y": 985,
+            "zoom": 3.5
+          },
+          "zoomPass": true,
+          "withinViewport": true,
+          "pass": true
+        },
+        {
+          "preset": "interaction",
+          "target": [
+            "mohamed.rightHand",
+            "laptop.screen"
+          ],
+          "framing": {
+            "x": 705,
+            "y": 1034.5,
+            "zoom": 1.5
+          },
+          "zoomPass": true,
+          "withinViewport": true,
+          "pass": true
+        }
+      ]
+    },
+    "overlayStability": {
+      "status": "PASS",
+      "maxDriftPx": 0
+    },
+    "deterministicRendering": {
+      "status": "PASS"
+    },
+    "regression": {
+      "status": "PASS",
+      "benchmarks": {
+        "benchmark-interaction.json": {
+          "valid": true,
+          "errors": []
+        },
+        "benchmark-second-scene.json": {
+          "valid": true,
+          "errors": []
+        },
+        "benchmark-cup-pickup.json": {
+          "valid": true,
+          "errors": []
+        },
+        "benchmark-object-motion.json": {
+          "valid": true,
+          "errors": []
+        }
+      }
+    }
+  },
+  "measurements": {
+    "subtitleStability": {
+      "maxScreenDriftPx": 0,
+      "pass": true
+    },
+    "deterministicSeek": {
+      "match": true,
+      "pass": true
+    }
+  },
+  "exports": {
+    "benchmark5": {
+      "path": "C:\\source\\repos\\perso\\TWA\\videoEditing\\projects\\episode-01-le-rapport\\exports\\previews\\benchmark-cinematic-camera.mp4",
+      "duration": 9.5,
+      "fps": "30/1",
+      "frameCount": 285,
+      "codec": "h264",
+      "width": 540,
+      "height": 960,
+      "valid": true
+    }
+  },
+  "summary": {
+    "status": "PASSED_100_PERCENT",
+    "allTestsPassed": true,
+    "benchmarkVideo": "benchmark-cinematic-camera.mp4"
+  }
+}

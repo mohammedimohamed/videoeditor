@@ -31,12 +31,15 @@ export const SUBSYSTEMS = {
   OBJECT_ATTACHMENT: 'object-attachment', // Holding / parent attachment state
   OBJECT_VISIBILITY: 'object-visibility', // Opacity fade in/out
   
+  // Camera Subsystems
+  CAMERA: 'camera',               // Camera position, pan, zoom, framing, and tracking
+
   // Scene Subsystems
   CAPTION: 'caption'              // Scene overlay dialogue bubble
 };
 
 export const ACTION_REGISTRY = {
-  version: "2.1.0",
+  version: "2.2.0",
 
   actions: {
     // -------------------------------------------------------------
@@ -534,6 +537,280 @@ export const ACTION_REGISTRY = {
         if (!params.text) return "caption requires 'text'";
         return null;
       }
+    },
+
+    // -------------------------------------------------------------
+    // 5. CAMERA & CINEMATIC COMPOSITION ACTIONS (Milestone 4)
+    // -------------------------------------------------------------
+
+    // Direct camera configuration
+    cameraSet: {
+      name: "cameraSet",
+      targetType: "camera",
+      subsystems: [SUBSYSTEMS.CAMERA],
+      description: "Instantly configure camera position, zoom, and rotation without tweening.",
+      defaultParams: {
+        x: 540,
+        y: 960,
+        zoom: 1.0,
+        rotation: 0
+      },
+      validateParams(params) {
+        if (params.zoom !== undefined && params.zoom <= 0) return "zoom must be positive";
+        return null;
+      }
+    },
+
+    // Camera movement to coordinate or target
+    cameraMoveTo: {
+      name: "cameraMoveTo",
+      targetType: "camera",
+      subsystems: [SUBSYSTEMS.CAMERA],
+      description: "Smoothly interpolate camera position, zoom, and framing over time.",
+      defaultParams: {
+        x: null,
+        y: null,
+        zoom: null,
+        target: null,
+        framing: "medium",
+        duration: 1.0,
+        ease: "power2.inOut"
+      },
+      validateParams(params) {
+        if (params.duration !== undefined && params.duration <= 0) return "duration must be positive";
+        return null;
+      }
+    },
+
+    // Camera horizontal or vertical pan
+    cameraPanTo: {
+      name: "cameraPanTo",
+      targetType: "camera",
+      subsystems: [SUBSYSTEMS.CAMERA],
+      description: "Pan camera horizontally or vertically across the stage.",
+      defaultParams: {
+        x: null,
+        y: null,
+        target: null,
+        duration: 1.2,
+        ease: "power1.inOut"
+      },
+      validateParams(params) {
+        if (params.duration !== undefined && params.duration <= 0) return "duration must be positive";
+        return null;
+      }
+    },
+
+    // Camera zoom in/out around focal point
+    cameraZoomTo: {
+      name: "cameraZoomTo",
+      targetType: "camera",
+      subsystems: [SUBSYSTEMS.CAMERA],
+      description: "Magnify or pull back camera around a specified anchor or center.",
+      defaultParams: {
+        zoom: 1.5,
+        target: null,
+        duration: 1.0,
+        ease: "power2.inOut"
+      },
+      validateParams(params) {
+        if (params.zoom !== undefined && params.zoom <= 0) return "zoom must be positive";
+        return null;
+      }
+    },
+
+    // Camera reset to default wide view
+    cameraReset: {
+      name: "cameraReset",
+      targetType: "camera",
+      subsystems: [SUBSYSTEMS.CAMERA],
+      description: "Reset camera to default stage center (540, 960) and unit zoom 1.0.",
+      defaultParams: {
+        duration: 1.0,
+        ease: "power2.inOut"
+      },
+      validateParams() { return null; }
+    },
+
+    // Focus camera on subject with framing preset
+    cameraFocus: {
+      name: "cameraFocus",
+      targetType: "camera",
+      subsystems: [SUBSYSTEMS.CAMERA],
+      description: "Focus on character, object, or anchor using a cinematic framing preset.",
+      defaultParams: {
+        target: "office",
+        framing: "medium",
+        duration: 1.0,
+        ease: "power2.inOut"
+      },
+      validateParams(params) {
+        if (!params.target && !params.actor && !params.object) return "cameraFocus requires 'target'";
+        return null;
+      }
+    },
+
+    // Follow moving character or object
+    cameraFollow: {
+      name: "cameraFollow",
+      targetType: "camera",
+      subsystems: [SUBSYSTEMS.CAMERA],
+      description: "Dynamically follow a moving entity with lead look-ahead.",
+      defaultParams: {
+        target: null,
+        framing: "medium",
+        lookAhead: 80,
+        duration: 2.0,
+        ease: "power1.inOut"
+      },
+      validateParams(params) {
+        if (!params.target && !params.actor) return "cameraFollow requires 'target' or 'actor'";
+        return null;
+      }
+    },
+
+    cameraTrack: {
+      name: "cameraTrack",
+      targetType: "camera",
+      subsystems: [SUBSYSTEMS.CAMERA],
+      description: "Track moving target along continuous trajectory.",
+      defaultParams: {
+        target: null,
+        duration: 2.0,
+        ease: "none"
+      },
+      validateParams(params) {
+        if (!params.target && !params.actor) return "cameraTrack requires 'target'";
+        return null;
+      }
+    },
+
+    // Framing preset shortcuts
+    frameCharacter: {
+      name: "frameCharacter",
+      targetType: "camera",
+      subsystems: [SUBSYSTEMS.CAMERA],
+      description: "Frame character with shot preset (full, medium, close-up, extreme-close-up).",
+      defaultParams: {
+        actor: null,
+        target: null,
+        framing: "medium",
+        duration: 1.0,
+        ease: "power2.inOut"
+      },
+      validateParams(params) {
+        if (!params.actor && !params.target) return "frameCharacter requires 'actor' or 'target'";
+        return null;
+      }
+    },
+
+    frameObject: {
+      name: "frameObject",
+      targetType: "camera",
+      subsystems: [SUBSYSTEMS.CAMERA],
+      description: "Frame prop or object with high-legibility close-up.",
+      defaultParams: {
+        object: null,
+        target: null,
+        framing: "object-close-up",
+        duration: 1.0,
+        ease: "power2.inOut"
+      },
+      validateParams(params) {
+        if (!params.object && !params.target) return "frameObject requires 'object' or 'target'";
+        return null;
+      }
+    },
+
+    frameGroup: {
+      name: "frameGroup",
+      targetType: "camera",
+      subsystems: [SUBSYSTEMS.CAMERA],
+      description: "Frame multiple characters or objects together (e.g. two-shot).",
+      defaultParams: {
+        targets: [],
+        framing: "two-shot",
+        duration: 1.0,
+        ease: "power2.inOut"
+      },
+      validateParams(params) {
+        if (!params.targets && !params.group) return "frameGroup requires 'targets' array";
+        return null;
+      }
+    },
+
+    frameInteraction: {
+      name: "frameInteraction",
+      targetType: "camera",
+      subsystems: [SUBSYSTEMS.CAMERA],
+      description: "Frame character hand and interactive prop contact zone.",
+      defaultParams: {
+        targets: [],
+        framing: "interaction",
+        duration: 1.0,
+        ease: "power2.inOut"
+      },
+      validateParams(params) {
+        if (!params.targets && !params.actor && !params.object) return "frameInteraction requires targets or actor/object";
+        return null;
+      }
+    },
+
+    // Shot transitions
+    cutTo: {
+      name: "cutTo",
+      targetType: "camera",
+      subsystems: [SUBSYSTEMS.CAMERA],
+      description: "Instant camera cut (duration 0) to new framing or coordinate.",
+      defaultParams: {
+        target: null,
+        framing: "medium",
+        x: null,
+        y: null,
+        zoom: null
+      },
+      validateParams() { return null; }
+    },
+
+    dissolveTo: {
+      name: "dissolveTo",
+      targetType: "camera",
+      subsystems: [SUBSYSTEMS.CAMERA],
+      description: "Smooth cinematic transition between two framing states.",
+      defaultParams: {
+        target: null,
+        framing: "medium",
+        duration: 1.2,
+        ease: "power2.inOut"
+      },
+      validateParams() { return null; }
+    },
+
+    zoomTransition: {
+      name: "zoomTransition",
+      targetType: "camera",
+      subsystems: [SUBSYSTEMS.CAMERA],
+      description: "Dynamic zoom push or pull transition.",
+      defaultParams: {
+        zoom: 2.0,
+        target: null,
+        duration: 1.0,
+        ease: "power2.out"
+      },
+      validateParams() { return null; }
+    },
+
+    panTransition: {
+      name: "panTransition",
+      targetType: "camera",
+      subsystems: [SUBSYSTEMS.CAMERA],
+      description: "Linear or eased horizontal/vertical camera pan between positions.",
+      defaultParams: {
+        target: null,
+        duration: 1.5,
+        ease: "power2.inOut"
+      },
+      validateParams() { return null; }
     }
   }
 };

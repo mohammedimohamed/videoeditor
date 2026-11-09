@@ -29,6 +29,20 @@ export const ASSET_REGISTRY = {
 
   // Hierarchical Scene Objects & Interactive Props
   objects: {
+    stage: {
+      id: "stage",
+      name: "Main Stage",
+      parent: null,
+      selector: "#camera-world, #root",
+      localTransform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+      dimensions: { width: 1080, height: 1920 },
+      localAnchors: {
+        origin: { x: 0, y: 0 },
+        center: { x: 540, y: 960 },
+        floor: { x: 540, y: 1386.0 }
+      }
+    },
+
     office: {
       id: "office",
       name: "Office Stage",
@@ -173,6 +187,8 @@ export const ASSET_REGISTRY = {
         shoulderR: { relativeX: 25, relativeY: -140 },
         handR: { relativeX: 65, relativeY: -40 },
         handL: { relativeX: 45, relativeY: -40 },
+        rightHand: { relativeX: 65, relativeY: -40 },
+        leftHand: { relativeX: 45, relativeY: -40 },
         palm: { relativeX: 65, relativeY: -40 },
         grip: { relativeX: 65, relativeY: -40 }
       }
@@ -195,6 +211,8 @@ export const ASSET_REGISTRY = {
         palm: { relativeX: -120, relativeY: -95 },
         grip: { relativeX: -120, relativeY: -95 },
         handR: { relativeX: 30, relativeY: -20 },
+        rightHand: { relativeX: 30, relativeY: -20 },
+        leftHand: { relativeX: -120, relativeY: -100 },
         feet: { relativeX: 0, relativeY: 282 }
       }
     }
@@ -504,12 +522,12 @@ export function resolveAnchor(ref, runtimeControllers = null, runtimeObjects = n
       const pt = pointWorld(headEl);
       return { x: pt.x, y: pt.y, name: ref, type: 'actorSocket' };
     }
-    if (sub === 'handL' || sub === 'indexFingerL' || sub === 'palm' || sub === 'grip') {
+    if (sub === 'handL' || sub === 'leftHand' || sub === 'indexFingerL' || sub === 'palm' || sub === 'grip') {
       const handEl = p.handL || p.forearmL;
       const pt = pointWorld(handEl);
       return { x: pt.x, y: pt.y, name: ref, type: 'actorSocket' };
     }
-    if (sub === 'handR') {
+    if (sub === 'handR' || sub === 'rightHand') {
       const handEl = p.handR || p.forearmR;
       const pt = pointWorld(handEl);
       return { x: pt.x, y: pt.y, name: ref, type: 'actorSocket' };
