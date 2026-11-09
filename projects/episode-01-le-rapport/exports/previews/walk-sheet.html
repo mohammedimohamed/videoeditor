@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      margin: 0;
+      padding: 32px;
+      background: #0B0F19;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+      color: #F8FAFC;
+      width: 1920px;
+      box-sizing: border-box;
+    }
+    .header {
+      border-bottom: 2px solid #1E293B;
+      padding-bottom: 20px;
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    h1 { margin: 0; font-size: 30px; font-weight: 800; color: #FFF; }
+    .subtitle { color: #94A3B8; font-size: 15px; margin-top: 4px; }
+    .badge { background: #107C41; color: #FFF; padding: 6px 16px; border-radius: 999px; font-weight: 700; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+    }
+    .card {
+      background: #131B2E;
+      border: 1.5px solid #1E293B;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .card-img {
+      width: 100%;
+      height: 340px;
+      background: #0F172A;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card-img img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: cover;
+    }
+    .card-label {
+      padding: 14px 16px;
+      background: #0F172A;
+      border-top: 1px solid #1E293B;
+      font-weight: 700;
+      font-size: 14px;
+      color: #F1F5F9;
+    }
+    .stat {
+      color: #38BDF8;
+      font-size: 13px;
+      font-family: monospace;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <h1>Mohamed Excel — Locomotion Kinematic Trajectory</h1>
+      <div class="subtitle">Bidirectional Stance Phase Anchoring, 30 FPS Dense Sampling, Swing Clearance (20.77px), and Flat Floor Settlement (Test B2)</div>
+    </div>
+    <div class="badge">BIDIRECTIONAL MAX DRIFT: 0.003px</div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-img"><img src="crop-walk-strike.png"></div>
+      <div class="card-label">
+        <div>1. Heel Strike / Stance Plant (t=8.0s)</div>
+        <div class="stat">Target Ankle: Y = 1365.2 (Floor: 1386.0)</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-img"><img src="crop-walk-midstance.png"></div>
+      <div class="card-label">
+        <div>2. Midstance Zero-Drift (t=8.5s)</div>
+        <div class="stat">Right Stance Drift: 0.003px &lt;= 3.0px</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-img"><img src="crop-walk-pushoff.png"></div>
+      <div class="card-label">
+        <div>3. Push-Off &amp; Swing (t=8.9s)</div>
+        <div class="stat">Swing Clearance: 20.77px &gt;= 8.0px</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-img"><img src="crop-walk-left-stance.png"></div>
+      <div class="card-label">
+        <div>4. Leftward Walk Stance (t=10.5s)</div>
+        <div class="stat">Left Stance Drift: 0.003px &lt;= 3.0px</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-img"><img src="crop-walk-settle.png"></div>
+      <div class="card-label">
+        <div>5. Terminal Settle (t=11.8s)</div>
+        <div class="stat">Both Flat: Y = 1386.0 (0.00px)</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mohamed Excel — Animation Prototype: Interaction Benchmark (Revision 3)</title>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+</head>
+<body>
+  <style>
+    :root {
+      --color-excel-green: #107C41;
+      --color-dark-slate: #1E293B;
+      --font-primary: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    #root {
+      position: absolute;
+      inset: 0;
+      width: 1080px;
+      height: 1920px;
+      background: #F8FAFC;
+      font-family: var(--font-primary);
+      overflow: hidden;
+    }
+
+    /* Environment Container */
+    #env-layer {
+      position: absolute;
+      inset: 0;
+      width: 1080px;
+      height: 1920px;
+      z-index: 1;
+    }
+
+    /* Character Layering:
+       - Chair is in env SVG (behind employee)
+       - Employee is at z-index 2 (seated at desk)
+       - Desk is at z-index 3 (covers employee's lap and legs)
+       - Mohamed is at z-index 4 (stands beside desk, pointing across it)
+       - Overlay UI / Dialogue subtitles at z-index 10
+    */
+    #employee-container {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1080px;
+      height: 1920px;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    #desk-layer {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1080px;
+      height: 1920px;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    #mohamed-container {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1080px;
+      height: 1920px;
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    /* Overlay Dialogue & Action Callouts */
+    #captions-container {
+      position: absolute;
+      bottom: 80px;
+      left: 60px;
+      right: 60px;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      pointer-events: none;
+    }
+
+    .dialogue-bubble {
+      background: rgba(15, 23, 42, 0.92);
+      border: 2px solid #334155;
+      backdrop-filter: blur(8px);
+      padding: 18px 28px;
+      border-radius: 20px;
+      color: #FFFFFF;
+      font-size: 26px;
+      font-weight: 700;
+      text-align: center;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.35);
+      max-width: 900px;
+      opacity: 0;
+      transform: translateY(16px);
+    }
+
+    .speaker-tag {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .speaker-mohamed {
+      color: #34D399;
+    }
+
+    .speaker-employee {
+      color: #60A5FA;
+    }
+
+    /* Top Story Stage Banner */
+    #scene-indicator {
+      position: absolute;
+      top: 48px;
+      left: 48px;
+      background: #FFFFFF;
+      border: 2px solid #1E293B;
+      padding: 10px 22px;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 800;
+      color: #1E293B;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      background: #107C41;
+      border-radius: 50%;
+    }
+  </style>
+
+  <div id="root" data-composition-id="prototype" data-width="1080" data-height="1920">
+    <!-- Top Stage Indicator -->
+    <div id="scene-indicator" data-layout-ignore="true">
+      <span class="status-dot"></span>
+      <span>EPISODE 01 : PROTOTYPE ANIMATION (REVISION 3)</span>
+    </div>
+
+    <!-- 1. Background & Environment (Walls, Window, Clock, Chair) -->
+    <div id="env-layer" data-layout-allow-overflow="true"></div>
+
+    <!-- 2. Employee (Karim) seated at desk -->
+    <div id="employee-container" data-layout-allow-overflow="true" data-layout-ignore="true"></div>
+
+    <!-- 3. Desk Layer (Oak desk, laptop, accessories overlaying employee lap) -->
+    <div id="desk-layer" data-layout-allow-overflow="true" data-layout-ignore="true"></div>
+
+    <!-- 4. Mohamed entering from right, stopping & pointing -->
+    <div id="mohamed-container" data-layout-allow-overflow="true" data-layout-ignore="true"></div>
+
+    <!-- 5. Captions & Dialogue Performance Feedback -->
+    <div id="captions-container" data-layout-ignore="true">
+      <div id="caption-frustration" class="dialogue-bubble">
+        <span class="speaker-tag speaker-employee">Karim (Employé)</span>
+        « Des centaines de lignes dans Excel… et très peu de temps pour les analyser. »
+      </div>
+      <div id="caption-mohamed-greet" class="dialogue-bubble">
+        <span class="speaker-tag speaker-mohamed">Mohamed</span>
+        « Tu as besoin d'un coup de main ? »
+      </div>
+      <div id="caption-mohamed-solution" class="dialogue-bubble">
+        <span class="speaker-tag speaker-mohamed">Mohamed</span>
+        « Regarde, avec un Tableau Croisé Dynamique, on peut synthétiser toutes ces lignes rapidement. »
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { CharacterRig } from '../lib/rigging/character-rig.js';
+    import { getEmployeeSVG, getMohamedSVG } from '../lib/rigging/character-templates.js';
+    import { getOfficeEnvironmentSVG } from '../lib/rigging/environment-templates.js';
+    import { 
+      setupSittingPose, 
+      animateFrustrationSequence, 
+      animateWalkCycle, 
+      animateMohamedApproachAndGreet, 
+      animateMohamedPointAtScreen 
+    } from '../lib/rigging/behavior-library.js';
+
+    // 1. Inject Vector Assets
+    const envContainer = document.getElementById('env-layer');
+    envContainer.innerHTML = getOfficeEnvironmentSVG();
+
+    const empContainer = document.getElementById('employee-container');
+    empContainer.innerHTML = getEmployeeSVG('proto-employee', { pose: 'seated' });
+
+    const mohamedContainer = document.getElementById('mohamed-container');
+    mohamedContainer.innerHTML = getMohamedSVG('proto-mohamed', { facing: '3/4-left' });
+
+    // Split desk from env so proper layering is maintained
+    // Move the desk SVG group to #desk-layer so it clips in front of the employee's lap!
+    const deskGroup = envContainer.querySelector('#office-desk');
+    if (deskGroup) {
+      const deskSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      deskSvg.setAttribute("viewBox", "0 0 1080 1920");
+      deskSvg.setAttribute("width", "1080");
+      deskSvg.setAttribute("height", "1920");
+      deskSvg.setAttribute("data-layout-allow-overflow", "true");
+      deskSvg.setAttribute("data-layout-ignore", "true");
+      deskSvg.appendChild(deskGroup);
+      document.getElementById('desk-layer').appendChild(deskSvg);
+    }
+
+    // 2. Initialize Rigs
+    const employeeRig = new CharacterRig('#proto-employee', { name: 'Karim', type: 'employee' });
+    const mohamedRig = new CharacterRig('#proto-mohamed', { name: 'Mohamed', type: 'mohamed' });
+
+    // Setup initial poses
+    // Employee seated behind desk (pelvis at chair seat y=1120)
+    setupSittingPose(employeeRig, { x: 320, y: 1120 });
+
+    // Mohamed initially off-screen to the right (x=1180, y=1104, native 3/4 left facing, scaleX=1)
+    gsap.set(mohamedRig.parts.characterGroup, { x: 1180, y: 1104, scaleX: 1, transformOrigin: "0 0" });
+
+    // 3. Build Deterministic Master Timeline
+    const tl = gsap.timeline({ paused: true });
+
+    // ==========================================
+    // BEAT 1: Wall Clock Second Hand Ticking (0.0s - 8.8s)
+    // ==========================================
+    const secondHand = document.querySelector('#clock-second-hand');
+    if (secondHand) {
+      for (let s = 0; s < 10; s++) {
+        tl.to(secondHand, {
+          rotation: s * 18,
+          transformOrigin: "0 0",
+          duration: 0.1,
+          ease: "back.out(2)"
+        }, s);
+      }
+    }
+
+    // Subtle biological breathing for employee during initial idle
+    employeeRig.addIdleBreathing(tl, 0, 1.2, 1.2);
+    // Natural blinks
+    employeeRig.addBlink(tl, 1.2);
+    employeeRig.addBlink(tl, 3.8);
+    employeeRig.addBlink(tl, 6.2);
+
+    // ==========================================
+    // BEAT 2 & 3: Employee Frustration Sequence (0.6s - 3.4s)
+    // Strict 6-beat progression: typing -> scanning -> worry -> pause -> hand to temple -> slump
+    // ==========================================
+    animateFrustrationSequence(tl, employeeRig, 0.6);
+
+    // Laptop raw data rows scroll upwards rapidly
+    const laptopRows = document.querySelector('#laptop-scrolling-rows');
+    if (laptopRows) {
+      tl.to(laptopRows, {
+        y: -24,
+        duration: 2.2,
+        ease: "power1.inOut"
+      }, 0.8);
+    }
+
+    // Show frustration subtitle
+    tl.to("#caption-frustration", {
+      opacity: 1,
+      y: 0,
+      duration: 0.35,
+      ease: "power2.out"
+    }, 1.2);
+    tl.to("#caption-frustration", {
+      opacity: 0,
+      y: -10,
+      duration: 0.3,
+      ease: "power2.in"
+    }, 4.0);
+
+    // ==========================================
+    // BEAT 4: Mohamed Enters & Walks with Zero Foot Sliding (2.4s - 4.8s)
+    // Walk from x=1180 to x=855 across 4 strides (grounded at y=1104)
+    // ==========================================
+    animateWalkCycle(tl, mohamedRig, 1180, 855, 2.4, 2.4, 1104);
+    mohamedRig.addBlink(tl, 4.2);
+
+    // ==========================================
+    // BEAT 5: Mohamed Stops, Greets & Karim Reacts (4.9s - 6.5s)
+    // ==========================================
+    animateMohamedApproachAndGreet(tl, mohamedRig, employeeRig, 4.9);
+
+    // Show greeting subtitle
+    tl.to("#caption-mohamed-greet", {
+      opacity: 1,
+      y: 0,
+      duration: 0.3,
+      ease: "power2.out"
+    }, 5.0);
+    tl.to("#caption-mohamed-greet", {
+      opacity: 0,
+      y: -10,
+      duration: 0.25,
+      ease: "power2.in"
+    }, 6.5);
+
+    // ==========================================
+    // BEAT 6 & 7: Target-Driven Pointing at Laptop Screen (6.6s - 8.8s)
+    // Mohamed points directly at spreadsheet via 2-Bone IK
+    // Karim follows gesture to the screen with growing curiosity
+    // ==========================================
+    animateMohamedPointAtScreen(tl, mohamedRig, employeeRig, 6.6);
+
+    // Show solution subtitle
+    tl.to("#caption-mohamed-solution", {
+      opacity: 1,
+      y: 0,
+      duration: 0.35,
+      ease: "power2.out"
+    }, 6.7);
+
+    // End state settle
+    tl.to("#root", { duration: 0.1 }, 8.8);
+
+    // Register with HyperFrames runtime
+    window.__timelines = window.__timelines || {};
+    window.__timelines["prototype"] = tl;
+  </script>
+</body>
+</html>

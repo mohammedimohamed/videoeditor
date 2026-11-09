@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      margin: 0;
+      padding: 32px;
+      background: #0B0F19;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+      color: #F8FAFC;
+      width: 1920px;
+      box-sizing: border-box;
+    }
+    .header {
+      border-bottom: 2px solid #1E293B;
+      padding-bottom: 20px;
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    h1 { margin: 0; font-size: 30px; font-weight: 800; color: #FFF; }
+    .subtitle { color: #94A3B8; font-size: 15px; margin-top: 4px; }
+    .badge { background: #8B5CF6; color: #FFF; padding: 6px 16px; border-radius: 999px; font-weight: 700; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .card {
+      background: #131B2E;
+      border: 1.5px solid #1E293B;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .card-img {
+      width: 100%;
+      height: 320px;
+      background: #0F172A;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .card-label {
+      padding: 14px 16px;
+      background: #0F172A;
+      border-top: 1px solid #1E293B;
+      font-weight: 700;
+      font-size: 14px;
+      color: #F1F5F9;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <h1>Mohamed Excel — Consecutive Transition Sequence (Pointing &amp; Gaze)</h1>
+      <div class="subtitle">Micro-Step Transition Progression: Arm IK Unfolding, Target Locking, and Partner Attention Follow</div>
+    </div>
+    <div class="badge">TEST C1 &amp; E CONSECUTIVE FRAMES</div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-img"><img src="crop-trans-0.png"></div>
+      <div class="card-label">1. t = 12.0s: Rest Pose (Arm idle at side)</div>
+    </div>
+    <div class="card">
+      <div class="card-img"><img src="crop-trans-1.png"></div>
+      <div class="card-label">2. t = 12.2s: IK Initiation (Shoulder lifts, elbow flexes)</div>
+    </div>
+    <div class="card">
+      <div class="card-img"><img src="crop-trans-2.png"></div>
+      <div class="card-label">3. t = 12.4s: Extension Phase (Forearm projects towards laptop)</div>
+    </div>
+    <div class="card">
+      <div class="card-img"><img src="crop-trans-3.png"></div>
+      <div class="card-label">4. t = 12.6s: Target Alignment (Hand &amp; index orienting)</div>
+    </div>
+    <div class="card">
+      <div class="card-img"><img src="crop-trans-4.png"></div>
+      <div class="card-label">5. t = 12.8s: Target Locked (Error: 2.24°, Flexion: 32.8°)</div>
+    </div>
+    <div class="card">
+      <div class="card-img"><img src="crop-trans-5.png"></div>
+      <div class="card-label">6. t = 13.0s: Karim Attentive (Gaze converges on laptop screen)</div>
+    </div>
+  </div>
+</body>
+</html>

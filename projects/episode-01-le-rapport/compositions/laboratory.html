@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="fr" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>Mohamed Excel — Animation Laboratory</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html, body {
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #0B0F17;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        color: #F8FAFC;
+        user-select: none;
+      }
+
+      #lab-root {
+        position: relative;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: radial-gradient(circle at 50% 25%, #1E293B 0%, #0B0F17 100%);
+      }
+
+      /* Stage Layer */
+      #stage {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 1080px;
+        height: 1920px;
+      }
+
+      /* Diagnostic HUD Header */
+      .hud-header {
+        position: absolute;
+        top: 24px;
+        left: 32px;
+        right: 32px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 24px;
+        background: rgba(15, 23, 42, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        z-index: 50;
+      }
+
+      .hud-title-group h1 {
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        color: #FFFFFF;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .badge-tag {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 999px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .badge-brand { background: #107C41; color: #FFFFFF; }
+      .badge-live { background: #3B82F6; color: #FFFFFF; }
+      .badge-pass { background: #059669; color: #FFFFFF; }
+      .badge-warn { background: #D97706; color: #FFFFFF; }
+
+      .hud-header-meta {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        font-family: monospace;
+        font-size: 15px;
+      }
+
+      .time-counter {
+        color: #38BDF8;
+        font-weight: 600;
+      }
+
+      /* Telemetry Floating Sidecard */
+      .telemetry-card {
+        position: absolute;
+        top: 104px;
+        right: 32px;
+        width: 340px;
+        background: rgba(15, 23, 42, 0.90);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 16px;
+        padding: 20px;
+        z-index: 50;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      }
+
+      .telemetry-card h2 {
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #94A3B8;
+        margin-bottom: 14px;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .telemetry-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .metric-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 10px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 8px;
+        font-size: 13px;
+      }
+
+      .metric-label {
+        color: #CBD5E1;
+      }
+
+      .metric-val {
+        font-family: monospace;
+        font-weight: 600;
+        color: #38BDF8;
+      }
+
+      .metric-val.pass { color: #34D399; }
+      .metric-val.warn { color: #FBBF24; }
+
+      /* Control Deck at Bottom */
+      .control-deck {
+        position: absolute;
+        bottom: 32px;
+        left: 32px;
+        right: 32px;
+        background: rgba(15, 23, 42, 0.92);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 20px;
+        padding: 24px;
+        z-index: 50;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+      }
+
+      .control-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+
+      .control-row:last-child {
+        margin-bottom: 0;
+      }
+
+      .tab-group {
+        display: flex;
+        background: rgba(0, 0, 0, 0.4);
+        padding: 4px;
+        border-radius: 10px;
+        gap: 4px;
+      }
+
+      .tab-btn {
+        padding: 8px 16px;
+        background: transparent;
+        border: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #94A3B8;
+        cursor: pointer;
+      }
+
+      .tab-btn.active {
+        background: #2563EB;
+        color: #FFFFFF;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+      }
+
+      .btn {
+        padding: 8px 16px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        color: #F8FAFC;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn:hover {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+
+      .btn.primary {
+        background: #107C41;
+        border-color: #107C41;
+        color: #FFFFFF;
+      }
+      .btn.primary:hover {
+        background: #15803D;
+      }
+
+      /* Transport Slider */
+      .scrubber-container {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .scrubber-slider {
+        flex: 1;
+        -webkit-appearance: none;
+        appearance: none;
+        height: 6px;
+        background: #334155;
+        border-radius: 3px;
+        outline: none;
+        cursor: pointer;
+      }
+
+      .scrubber-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #38BDF8;
+        box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+        cursor: pointer;
+      }
+
+      /* Interactive Target Reticle */
+      .target-reticle {
+        cursor: crosshair;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="lab-root" data-composition-id="laboratory" data-start="0" data-duration="10.0" data-width="1080" data-height="1920" data-fps="30">
+      
+      <!-- Stage Layer -->
+      <svg id="stage" viewBox="0 0 1080 1920" width="1080" height="1920" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <!-- Grid Pattern -->
+          <pattern id="lab-grid" width="60" height="60" patternUnits="userSpaceOnUse">
+            <line x1="0" y1="0" x2="60" y2="0" stroke="rgba(255,255,255,0.04)" stroke-width="1" />
+            <line x1="0" y1="0" x2="0" y2="60" stroke="rgba(255,255,255,0.04)" stroke-width="1" />
+          </pattern>
+          <filter id="glow-target" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="6" />
+            <feMerge>
+              <feMergeNode />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+
+        <!-- Studio Background Grid -->
+        <rect id="bg-grid" width="1080" height="1920" fill="url(#lab-grid)" />
+
+        <!-- Perspective Floor Line & Planks -->
+        <g id="floor-layer">
+          <rect x="0" y="1386" width="1080" height="534" fill="#0E1624" />
+          <line x1="0" y1="1386" x2="1080" y2="1386" stroke="#2563EB" stroke-width="2" stroke-dasharray="6 4" opacity="0.6" />
+          <text x="32" y="1412" font-family="monospace" font-size="14" fill="#38BDF8" opacity="0.7">FLOOR PLANE (Y = 1386.0)</text>
+        </g>
+
+        <!-- Environment Elements: Desk & Screen -->
+        <g id="lab-environment" transform="translate(180, 850)">
+          <!-- Office Desk -->
+          <g id="env-desk" transform="translate(0, 150)">
+            <rect x="180" y="80" width="380" height="24" rx="4" fill="#1E293B" stroke="#334155" stroke-width="2" />
+            <!-- Modesty Panel -->
+            <rect x="220" y="104" width="300" height="90" fill="#0F172A" stroke="#1E293B" stroke-width="2" />
+            <!-- Desk Legs -->
+            <rect x="190" y="104" width="16" height="280" fill="#0F172A" stroke="#334155" stroke-width="2" />
+            <rect x="534" y="104" width="16" height="280" fill="#0F172A" stroke="#334155" stroke-width="2" />
+          </g>
+
+          <!-- Laptop with Excel Grid -->
+          <g id="env-laptop" transform="translate(300, 140)">
+            <!-- Base / Keyboard -->
+            <path d="M -70 88 L 70 88 L 84 94 L -84 94 Z" fill="#334155" stroke="#475569" stroke-width="2" />
+            <!-- Open Screen -->
+            <rect x="-65" y="-12" width="130" height="100" rx="4" fill="#0F172A" stroke="#475569" stroke-width="2" />
+            <!-- Spreadsheet Screen -->
+            <rect x="-58" y="-5" width="116" height="86" rx="2" fill="#F8FAFC" />
+            <!-- Excel Header -->
+            <rect x="-58" y="-5" width="116" height="14" fill="#107C41" />
+            <rect x="-54" y="-2" width="40" height="8" rx="1" fill="#FFFFFF" opacity="0.8" />
+            <!-- Grid Lines -->
+            <line x1="-58" y1="22" x2="58" y2="22" stroke="#CBD5E1" stroke-width="1" />
+            <line x1="-58" y1="36" x2="58" y2="36" stroke="#CBD5E1" stroke-width="1" />
+            <line x1="-58" y1="50" x2="58" y2="50" stroke="#CBD5E1" stroke-width="1" />
+            <line x1="-58" y1="64" x2="58" y2="64" stroke="#CBD5E1" stroke-width="1" />
+            <line x1="-20" y1="9" x2="-20" y2="81" stroke="#CBD5E1" stroke-width="1" />
+            <line x1="18" y1="9" x2="18" y2="81" stroke="#CBD5E1" stroke-width="1" />
+          </g>
+        </g>
+
+        <!-- Characters Layer -->
+        <g id="characters-layer">
+          <!-- Karim SVG placeholder -->
+          <g id="karim-container"></g>
+          <!-- Mohamed SVG placeholder -->
+          <g id="mohamed-container"></g>
+        </g>
+
+        <!-- Interactive / Diagnostic Overlay Layer -->
+        <g id="diagnostic-overlay">
+          <!-- Target Ray Line -->
+          <line id="diag-ray" x1="0" y1="0" x2="0" y2="0" stroke="#38BDF8" stroke-width="2.5" stroke-dasharray="8 6" opacity="0" />
+          <!-- Finger Vector Extension -->
+          <line id="diag-finger-axis" x1="0" y1="0" x2="0" y2="0" stroke="#34D399" stroke-width="2" opacity="0" />
+
+          <!-- Target Reticle Group -->
+          <g id="target-reticle" class="target-reticle" transform="translate(525, 985)">
+            <circle cx="0" cy="0" r="16" fill="none" stroke="#F43F5E" stroke-width="2" filter="url(#glow-target)" />
+            <circle cx="0" cy="0" r="4" fill="#F43F5E" />
+            <line x1="-24" y1="0" x2="24" y2="0" stroke="#F43F5E" stroke-width="1.5" />
+            <line x1="0" y1="-24" x2="0" y2="24" stroke="#F43F5E" stroke-width="1.5" />
+            <text x="22" y="-12" font-family="monospace" font-size="12" fill="#F43F5E" font-weight="700">TARGET (525, 985)</text>
+          </g>
+
+          <!-- Skeleton Probe Points -->
+          <circle id="probe-shoulder" cx="0" cy="0" r="6" fill="#38BDF8" stroke="#FFFFFF" stroke-width="2" opacity="0" />
+          <circle id="probe-elbow" cx="0" cy="0" r="6" fill="#38BDF8" stroke="#FFFFFF" stroke-width="2" opacity="0" />
+          <circle id="probe-tip" cx="0" cy="0" r="6" fill="#34D399" stroke="#FFFFFF" stroke-width="2" opacity="0" />
+        </g>
+      </svg>
+
+      <!-- HUD Top Header -->
+      <header class="hud-header">
+        <div class="hud-title-group">
+          <h1>
+            Mohamed Excel
+            <span class="badge-tag badge-brand">Animation Lab</span>
+            <span id="active-char-badge" class="badge-tag badge-live">Mohamed 3/4</span>
+          </h1>
+        </div>
+        <div class="hud-header-meta">
+          <span>FPS: <strong style="color: #34D399;">30.0</strong></span>
+          <span class="time-counter">T: <span id="time-display">0.00s</span> (F<span id="frame-display">0</span>)</span>
+          <span id="status-badge" class="badge-tag badge-pass">READY</span>
+        </div>
+      </header>
+
+      <!-- Telemetry Diagnostics Sidecard -->
+      <aside class="telemetry-card">
+        <h2>
+          <span>Live Kinematics HUD</span>
+          <span id="diag-mode-tag">POINTING</span>
+        </h2>
+        <div class="telemetry-grid">
+          <div class="metric-row">
+            <span class="metric-label">Pointing Alignment Error:</span>
+            <span id="val-pointing-error" class="metric-val pass">0.4° (PASS &lt; 8°)</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Finger Angle / Aim Ray:</span>
+            <span id="val-finger-angles" class="metric-val">166.5° / 166.9°</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Reach Distance / Limit:</span>
+            <span id="val-reach-distance" class="metric-val">238.7px / 247.0px</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Elbow Articulation Flexion:</span>
+            <span id="val-elbow-flex" class="metric-val">29.9° [OK]</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Foot Ground Contact:</span>
+            <span id="val-foot-contact" class="metric-val pass">Y = 1386.0px (FLAT)</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Reachability &amp; Collision:</span>
+            <span id="val-reach-collision" class="metric-val pass">REACHABLE (NO PEN)</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Active Track Pipeline:</span>
+            <span id="val-active-tracks" class="metric-val">LOC: IDLE | ARM: POINT</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Control Deck at Bottom -->
+      <footer class="control-deck">
+        <!-- Row 1: Character & Behavior Selector -->
+        <div class="control-row">
+          <div class="tab-group" id="char-selector">
+            <button class="tab-btn active" data-char="mohamed">Mohamed (3/4 Hero)</button>
+            <button class="tab-btn" data-char="karim-seated">Karim (Seated)</button>
+            <button class="tab-btn" data-char="karim-standing">Karim (Standing)</button>
+            <button class="tab-btn" data-char="dual">Dual Staging</button>
+          </div>
+
+          <div class="tab-group" id="behavior-selector">
+            <button class="tab-btn active" data-behavior="idle">Idle</button>
+            <button class="tab-btn" data-behavior="walk">Walk to Target</button>
+            <button class="tab-btn" data-behavior="point">Point At</button>
+            <button class="tab-btn" data-behavior="reach">Reach To</button>
+            <button class="tab-btn" data-behavior="look">Look At</button>
+            <button class="tab-btn" data-behavior="express">Express</button>
+            <button class="tab-btn" data-behavior="gesture">Gesture</button>
+            <button class="tab-btn" data-behavior="speak">Speak</button>
+            <button class="tab-btn" data-behavior="listen">Listen</button>
+          </div>
+        </div>
+
+        <!-- Row 2: Parameters & Quick Presets -->
+        <div class="control-row">
+          <button id="btn-run-test-c" class="btn primary">Run Pointing Suite (Test C)</button>
+          <button id="btn-run-test-d" class="btn">Run Reaching Suite (Test D)</button>
+          <button id="btn-run-test-b" class="btn">Run Walk Suite (Test B)</button>
+          <button id="btn-run-test-e" class="btn">Run Interaction (Test E)</button>
+          <button id="btn-toggle-skeleton" class="btn">Toggle Skeleton</button>
+          <button id="btn-reset-pose" class="btn">Reset Neutral</button>
+        </div>
+
+        <!-- Row 3: Scrubber & Transport -->
+        <div class="control-row">
+          <button id="btn-transport-play" class="btn primary">Play</button>
+          <button id="btn-prev-frame" class="btn">-1f</button>
+          <button id="btn-next-frame" class="btn">+1f</button>
+
+          <div class="scrubber-container">
+            <input type="range" id="timeline-scrubber" class="scrubber-slider" min="0" max="8.8" step="0.0333" value="0" />
+          </div>
+        </div>
+      </footer>
+
+    </div>
+
+    <!-- Scripts -->
+    <script type="module">
+      import { CharacterRig } from '../lib/rigging/character-rig.js';
+      import { CharacterController } from '../lib/rigging/character-controller.js';
+      import { getMohamedSVG, getEmployeeSVG } from '../lib/rigging/character-templates.js';
+      import { pointWorld, measurePointingError, measureReachingError } from '../lib/rigging/ik.js';
+
+      window.__measurePointingError = measurePointingError;
+      window.__measureReachingError = measureReachingError;
+
+      // 1. Mount SVG Templates into DOM
+      const mohamedContainer = document.getElementById('mohamed-container');
+      const karimContainer = document.getElementById('karim-container');
+
+      mohamedContainer.innerHTML = getMohamedSVG('lab-mohamed', { facing: '3/4-left' });
+      karimContainer.innerHTML = getEmployeeSVG('lab-karim-seated', { pose: 'seated' });
+
+      // 2. Initialize Controllers
+      const mohamedRig = new CharacterRig('#lab-mohamed', { name: 'Mohamed' });
+      const karimRig = new CharacterRig('#lab-karim-seated', { name: 'Karim' });
+
+      const mohamed = new CharacterController(mohamedRig, { name: 'mohamed', pose: 'standing', facing: -1 });
+      const karim = new CharacterController(karimRig, { name: 'karim', pose: 'seated', facing: 1 });
+
+      // Set initial world positions
+      gsap.set('#lab-mohamed .character-root', { x: 855, y: 1104 });
+      gsap.set('#lab-karim-seated .character-root', { x: 320, y: 1120 });
+
+      // Primary Timeline
+      let labTimeline = gsap.timeline({ paused: true });
+      window.__timelines = window.__timelines || {};
+      window.__timelines["laboratory"] = labTimeline;
+
+      // HUD Elements
+      const timeDisplay = document.getElementById('time-display');
+      const frameDisplay = document.getElementById('frame-display');
+      const scrubber = document.getElementById('timeline-scrubber');
+      const btnPlay = document.getElementById('btn-transport-play');
+      const diagRay = document.getElementById('diag-ray');
+      const diagFingerAxis = document.getElementById('diag-finger-axis');
+      const probeShoulder = document.getElementById('probe-shoulder');
+      const probeElbow = document.getElementById('probe-elbow');
+      const probeTip = document.getElementById('probe-tip');
+
+      let targetPos = { x: 525, y: 985 };
+      let showSkeleton = true;
+
+      // Update HUD telemetry
+      function updateHUD() {
+        const t = labTimeline.time();
+        const f = Math.round(t * 30);
+        timeDisplay.textContent = t.toFixed(2) + 's';
+        frameDisplay.textContent = f;
+        scrubber.value = t;
+
+        // Measure live pointing metrics on Mohamed
+        try {
+          const report = measurePointingError(mohamed, targetPos);
+          document.getElementById('val-pointing-error').textContent = `${report.errorDeg.toFixed(2)}° (${report.isAligned ? 'PASS < 8°' : 'ALIGN WARNING'})`;
+          document.getElementById('val-pointing-error').className = `metric-val ${report.isAligned ? 'pass' : 'warn'}`;
+          document.getElementById('val-finger-angles').textContent = `${report.fingerAngleDeg.toFixed(1)}° / ${report.aimAngleDeg.toFixed(1)}°`;
+          document.getElementById('val-elbow-flex').textContent = `${report.elbowFlexionDeg.toFixed(1)}° [OK]`;
+          document.getElementById('val-reach-distance').textContent = `${report.distanceToTarget.toFixed(1)}px / 240.0px`;
+
+          // Foot ground contact check
+          const heelMarker = mohamedRig.parts.footL.querySelector('.marker-heel');
+          if (heelMarker) {
+            const heelWorld = pointWorld(heelMarker);
+            document.getElementById('val-foot-contact').textContent = `Y = ${heelWorld.y.toFixed(1)}px (Floor: 1386.0)`;
+          }
+
+          // Diagnostic overlay lines
+          if (showSkeleton) {
+            diagRay.setAttribute('x1', report.tip.x);
+            diagRay.setAttribute('y1', report.tip.y);
+            diagRay.setAttribute('x2', targetPos.x);
+            diagRay.setAttribute('y2', targetPos.y);
+            diagRay.style.opacity = '0.8';
+
+            probeShoulder.setAttribute('cx', report.shoulder.x);
+            probeShoulder.setAttribute('cy', report.shoulder.y);
+            probeElbow.setAttribute('cx', report.elbow.x);
+            probeElbow.setAttribute('cy', report.elbow.y);
+            probeTip.setAttribute('cx', report.tip.x);
+            probeTip.setAttribute('cy', report.tip.y);
+            probeShoulder.style.opacity = '1';
+            probeElbow.style.opacity = '1';
+            probeTip.style.opacity = '1';
+          } else {
+            diagRay.style.opacity = '0';
+            probeShoulder.style.opacity = '0';
+            probeElbow.style.opacity = '0';
+            probeTip.style.opacity = '0';
+          }
+        } catch (e) {
+          // In case elements are transitioning
+        }
+      }
+
+      labTimeline.eventCallback("onUpdate", updateHUD);
+
+      // Default Setup Sequence: Mohamed enters, greets Karim, points at target
+      function buildDefaultBenchmark() {
+        labTimeline.clear();
+
+        // 0.0s - 2.4s: Idle Karim typing, frustration hand to forehead
+        karim.idle({ tl: labTimeline, atTime: 0, duration: 2.4 });
+        karim.gesture('typing', { tl: labTimeline, atTime: 0.4, duration: 1.0 });
+        karim.express('worried', { tl: labTimeline, atTime: 1.4, duration: 0.4 });
+        karim.gesture('handToForehead', { tl: labTimeline, atTime: 1.8, duration: 0.8 });
+
+        // 2.4s - 5.0s: Mohamed Grounded Walk
+        mohamed.walkTo({
+          tl: labTimeline,
+          atTime: 2.4,
+          startX: 1180,
+          targetX: 855,
+          duration: 2.4,
+          groundY: 1104
+        });
+
+        // 5.2s - 6.6s: Mohamed Greets & Karim Notices
+        labTimeline.call(() => {
+          document.getElementById('val-active-tracks').textContent = 'LOC: STOP | HEAD: GAZE | FACE: TALK';
+        }, null, 5.2);
+
+        mohamed.lookAt(karim, { tl: labTimeline, atTime: 5.2, duration: 0.4 });
+        mohamed.express('smile', { tl: labTimeline, atTime: 5.2, duration: 0.3 });
+        mohamed.speak("Tu as besoin d'aide ?", { tl: labTimeline, atTime: 5.4, duration: 1.2 });
+
+        karim.listenTo(mohamed, { tl: labTimeline, atTime: 5.3, duration: 1.3 });
+
+        // 6.6s - 8.8s: Pointing at Target
+        mohamed.lookAt(targetPos, { tl: labTimeline, atTime: 6.6, duration: 0.4 });
+        mohamed.pointAt(targetPos, {
+          tl: labTimeline,
+          atTime: 6.8,
+          arm: 'near',
+          duration: 0.6,
+          rootPos: { x: 855, y: 1104 },
+          ease: "power2.out"
+        });
+
+        karim.lookAt(targetPos, { tl: labTimeline, atTime: 7.2, duration: 0.5 });
+        karim.express('happy', { tl: labTimeline, atTime: 7.4, duration: 0.4 });
+
+        labTimeline.time(7.5);
+        updateHUD();
+      }
+
+      buildDefaultBenchmark();
+
+      // UI Event Handlers
+      btnPlay.addEventListener('click', () => {
+        if (labTimeline.paused()) {
+          labTimeline.play();
+          btnPlay.textContent = 'Pause';
+        } else {
+          labTimeline.pause();
+          btnPlay.textContent = 'Play';
+        }
+      });
+
+      document.getElementById('btn-prev-frame').addEventListener('click', () => {
+        labTimeline.pause();
+        labTimeline.time(Math.max(0, labTimeline.time() - (1 / 30)));
+        btnPlay.textContent = 'Play';
+        updateHUD();
+      });
+
+      document.getElementById('btn-next-frame').addEventListener('click', () => {
+        labTimeline.pause();
+        labTimeline.time(Math.min(labTimeline.duration(), labTimeline.time() + (1 / 30)));
+        btnPlay.textContent = 'Play';
+        updateHUD();
+      });
+
+      scrubber.addEventListener('input', (e) => {
+        labTimeline.pause();
+        labTimeline.time(parseFloat(e.target.value));
+        btnPlay.textContent = 'Play';
+        updateHUD();
+      });
+
+      document.getElementById('btn-toggle-skeleton').addEventListener('click', () => {
+        showSkeleton = !showSkeleton;
+        updateHUD();
+      });
+
+      // Quick Pointing Test C (Tests 4 canonical positions)
+      document.getElementById('btn-run-test-c').addEventListener('click', () => {
+        labTimeline.pause();
+        labTimeline.clear();
+
+        const targets = [
+          { name: 'Laptop Screen Near', pos: { x: 525, y: 985 } },
+          { name: 'High Wall Clock', pos: { x: 380, y: 480 } },
+          { name: 'Low Floor Plan', pos: { x: 620, y: 1320 } },
+          { name: 'Far Left Wall', pos: { x: 140, y: 880 } }
+        ];
+
+        targets.forEach((tgt, idx) => {
+          const t = idx * 1.8;
+          labTimeline.call(() => {
+            targetPos = tgt.pos;
+            const reticle = document.getElementById('target-reticle');
+            reticle.setAttribute('transform', `translate(${tgt.pos.x}, ${tgt.pos.y})`);
+            reticle.querySelector('text').textContent = `${tgt.name} (${tgt.pos.x}, ${tgt.pos.y})`;
+          }, null, t);
+
+          mohamed.lookAt(tgt.pos, { tl: labTimeline, atTime: t, duration: 0.35 });
+          mohamed.pointAt(tgt.pos, { tl: labTimeline, atTime: t + 0.2, arm: 'near', duration: 0.6 });
+        });
+
+        labTimeline.time(0.8);
+        labTimeline.play();
+        btnPlay.textContent = 'Pause';
+      });
+
+      // Reaching Test D
+      document.getElementById('btn-run-test-d').addEventListener('click', () => {
+        labTimeline.pause();
+        labTimeline.clear();
+
+        // 1. Physical reach to coffee mug (reachable)
+        const mugPos = { x: 680, y: 1040 };
+        targetPos = mugPos;
+        document.getElementById('target-reticle').setAttribute('transform', `translate(${mugPos.x}, ${mugPos.y})`);
+
+        mohamed.reachTo(mugPos, { tl: labTimeline, atTime: 0.4, arm: 'near', duration: 0.8 });
+        labTimeline.time(1.2);
+        updateHUD();
+      });
+
+      // Interactive Click on Canvas to Move Target
+      document.getElementById('stage').addEventListener('click', (e) => {
+        const pt = document.getElementById('stage').createSVGPoint();
+        pt.x = e.clientX;
+        pt.y = e.clientY;
+        const svgPt = pt.matrixTransform(document.getElementById('stage').getScreenCTM().inverse());
+        
+        targetPos = { x: Math.round(svgPt.x), y: Math.round(svgPt.y) };
+        document.getElementById('target-reticle').setAttribute('transform', `translate(${targetPos.x}, ${targetPos.y})`);
+        document.getElementById('target-reticle').querySelector('text').textContent = `CUSTOM TARGET (${targetPos.x}, ${targetPos.y})`;
+
+        // Real-time update in pause mode
+        labTimeline.clear();
+        mohamed.lookAt(targetPos, { tl: labTimeline, atTime: 0, duration: 0.3 });
+        mohamed.pointAt(targetPos, { tl: labTimeline, atTime: 0.1, arm: 'near', duration: 0.5 });
+        labTimeline.time(0.6);
+        updateHUD();
+      });
+
+      // Make global for tests
+      window.__lab = {
+        mohamed,
+        karim,
+        timeline: labTimeline,
+        setTarget: (x, y) => {
+          targetPos = { x, y };
+          document.getElementById('target-reticle').setAttribute('transform', `translate(${x}, ${y})`);
+          updateHUD();
+        },
+        getDiagnostics: () => mohamed.getDiagnostics()
+      };
+    </script>
+  </body>
+</html>

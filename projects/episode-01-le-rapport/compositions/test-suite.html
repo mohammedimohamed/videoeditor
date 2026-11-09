@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="fr" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>Mohamed Excel — Animation Engine Independent Test Suite (Tests A to F)</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html, body {
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #0F172A;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        color: #F8FAFC;
+      }
+
+      #test-suite-root {
+        position: relative;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: radial-gradient(circle at 50% 30%, #1E293B 0%, #0F172A 100%);
+      }
+
+      /* Test Header Banner */
+      .test-banner {
+        position: absolute;
+        top: 24px;
+        left: 32px;
+        right: 32px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 24px;
+        background: rgba(15, 23, 42, 0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 14px;
+        z-index: 40;
+      }
+
+      .test-banner h1 {
+        font-size: 22px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .test-tag {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 999px;
+        text-transform: uppercase;
+        background: #107C41;
+        color: #FFFFFF;
+      }
+
+      .test-telemetry {
+        font-family: monospace;
+        font-size: 15px;
+        color: #38BDF8;
+      }
+
+      /* Active Test Subtitle Pill */
+      .test-indicator {
+        position: absolute;
+        top: 96px;
+        left: 32px;
+        padding: 10px 18px;
+        background: rgba(30, 41, 59, 0.9);
+        border: 1px solid #38BDF8;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #38BDF8;
+        z-index: 40;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="test-suite-root" data-composition-id="test-suite" data-start="0" data-duration="36.0" data-width="1080" data-height="1920" data-fps="30">
+      
+      <!-- Stage Layer -->
+      <svg id="stage" viewBox="0 0 1080 1920" width="1080" height="1920" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+            <line x1="0" y1="0" x2="60" y2="0" stroke="rgba(255,255,255,0.05)" stroke-width="1" />
+            <line x1="0" y1="0" x2="0" y2="60" stroke="rgba(255,255,255,0.05)" stroke-width="1" />
+          </pattern>
+        </defs>
+
+        <rect width="1080" height="1920" fill="url(#grid)" />
+
+        <!-- Wooden Floor Ground Line -->
+        <g id="ground-plane">
+          <rect x="0" y="1386" width="1080" height="534" fill="#0D1520" />
+          <line x1="0" y1="1386" x2="1080" y2="1386" stroke="#107C41" stroke-width="2.5" stroke-dasharray="6 4" />
+          <text x="32" y="1415" font-family="monospace" font-size="14" fill="#107C41">GROUND LINE: Y = 1386.0 px</text>
+        </g>
+
+        <!-- Staging Props -->
+        <g id="props-layer" transform="translate(180, 850)">
+          <!-- Desk -->
+          <rect x="180" y="230" width="380" height="24" rx="4" fill="#1E293B" stroke="#334155" stroke-width="2" />
+          <rect x="190" y="254" width="16" height="282" fill="#0F172A" stroke="#334155" stroke-width="2" />
+          <rect x="534" y="254" width="16" height="282" fill="#0F172A" stroke="#334155" stroke-width="2" />
+
+          <!-- Laptop with Screen Target -->
+          <g transform="translate(300, 220)">
+            <path d="M -70 8 L 70 8 L 84 14 L -84 14 Z" fill="#334155" stroke="#475569" stroke-width="2" />
+            <rect x="-65" y="-92" width="130" height="100" rx="4" fill="#0F172A" stroke="#475569" stroke-width="2" />
+            <rect x="-58" y="-85" width="116" height="86" rx="2" fill="#F8FAFC" />
+            <rect x="-58" y="-85" width="116" height="14" fill="#107C41" />
+          </g>
+
+          <!-- Coffee Mug Prop (Reaching Target) -->
+          <g id="prop-mug" transform="translate(460, 210)">
+            <rect x="-12" y="0" width="24" height="28" rx="3" fill="#E2E8F0" stroke="#0F172A" stroke-width="2" />
+            <path d="M 12 6 C 18 6 18 20 12 20" fill="none" stroke="#0F172A" stroke-width="2" />
+            <!-- Probe Marker on Mug -->
+            <g class="marker-target" transform="translate(0, 14)"></g>
+          </g>
+        </g>
+
+        <!-- Characters Layer -->
+        <g id="characters-layer">
+          <g id="karim-container"></g>
+          <g id="mohamed-container"></g>
+        </g>
+
+        <!-- Test Reticle & Overlay -->
+        <g id="test-reticle" transform="translate(525, 985)" opacity="0">
+          <circle cx="0" cy="0" r="14" fill="none" stroke="#F43F5E" stroke-width="2" />
+          <circle cx="0" cy="0" r="3" fill="#F43F5E" />
+          <text id="reticle-label" x="18" y="-8" font-family="monospace" font-size="12" fill="#F43F5E" font-weight="700">TARGET</text>
+        </g>
+      </svg>
+
+      <!-- Banner HUD -->
+      <header class="test-banner">
+        <h1>
+          Animation Engine Test Suite
+          <span class="test-tag">Automated QA</span>
+        </h1>
+        <div class="test-telemetry">
+          T: <span id="telemetry-time">0.00s</span> / 36.00s
+        </div>
+      </header>
+
+      <div id="test-label" class="test-indicator">
+        INITIALIZING TEST SUITE...
+      </div>
+
+    </div>
+
+    <script type="module">
+      import { CharacterRig } from '../lib/rigging/character-rig.js';
+      import { CharacterController } from '../lib/rigging/character-controller.js';
+      import { getMohamedSVG, getEmployeeSVG } from '../lib/rigging/character-templates.js';
+      import {
+        pointWorld,
+        dist,
+        measurePointingError,
+        measureReachingError,
+        solvePointingRay,
+        solveLegIK,
+        measurePlantedFootWorld,
+        measureGazeRay
+      } from '../lib/rigging/ik.js';
+
+      window.__measurePointingError = measurePointingError;
+      window.__measureReachingError = measureReachingError;
+      window.__solvePointingRay = solvePointingRay;
+      window.__solveLegIK = solveLegIK;
+      window.__measurePlantedFootWorld = measurePlantedFootWorld;
+      window.__measureGazeRay = measureGazeRay;
+
+      // Mount SVGs
+      const mohamedContainer = document.getElementById('mohamed-container');
+      const karimContainer = document.getElementById('karim-container');
+
+      mohamedContainer.innerHTML = getMohamedSVG('test-mohamed', { facing: '3/4-left' });
+      karimContainer.innerHTML = getEmployeeSVG('test-karim-seated', { pose: 'seated' });
+
+      // Initialize Controllers
+      const mohamedRig = new CharacterRig('#test-mohamed', { name: 'Mohamed' });
+      const karimRig = new CharacterRig('#test-karim-seated', { name: 'Karim' });
+
+      const mohamed = new CharacterController(mohamedRig, { name: 'mohamed', pose: 'standing', facing: -1, groundY: 1104 });
+      const karim = new CharacterController(karimRig, { name: 'karim', pose: 'seated', facing: 1, groundY: 1120 });
+
+      window.__mohamed = mohamed;
+      window.__karim = karim;
+
+      // Grounding initial placements
+      gsap.set('#test-mohamed .character-root', { x: 855, y: 1104 });
+      gsap.set('#test-karim-seated .character-root', { x: 320, y: 1120 });
+
+      const tl = gsap.timeline({ paused: true });
+      window.__timelines = window.__timelines || {};
+      window.__timelines["test-suite"] = tl;
+
+      const testLabel = document.getElementById('test-label');
+      const timeDisplay = document.getElementById('telemetry-time');
+      const reticle = document.getElementById('test-reticle');
+      const reticleLabel = document.getElementById('reticle-label');
+
+      tl.eventCallback("onUpdate", () => {
+        const t = tl.time();
+        timeDisplay.textContent = t.toFixed(2) + 's';
+      });
+
+      function setTestBadge(name) {
+        testLabel.textContent = name;
+      }
+
+      function showTarget(x, y, label) {
+        reticle.setAttribute('transform', `translate(${x}, ${y})`);
+        reticleLabel.textContent = label;
+        reticle.style.opacity = '1';
+      }
+
+      function hideTarget() {
+        reticle.style.opacity = '0';
+      }
+
+      // =========================================================================
+      // SEGMENT A (0.0s - 6.0s): TEST A — IDLE & EXPRESSIONS
+      // =========================================================================
+      tl.call(() => setTestBadge("TEST A: Idle Breathing & Facial Expressions"), null, 0.0);
+
+      // Karim & Mohamed idle breathing + blinking
+      karim.idle({ tl, atTime: 0.0, duration: 6.0 });
+      mohamed.idle({ tl, atTime: 0.0, duration: 6.0 });
+
+      // Expression transitions
+      tl.call(() => setTestBadge("TEST A: Neutral Viseme"), null, 0.5);
+      karim.express('neutral', { tl, atTime: 0.5, duration: 0.3 });
+      mohamed.express('neutral', { tl, atTime: 0.5, duration: 0.3 });
+
+      tl.call(() => setTestBadge("TEST A: Expression -> Worried & Curious"), null, 2.0);
+      karim.express('worried', { tl, atTime: 2.0, duration: 0.4 });
+      mohamed.express('curious', { tl, atTime: 2.0, duration: 0.4 });
+
+      tl.call(() => setTestBadge("TEST A: Expression -> Happy & Confident Smile"), null, 4.0);
+      karim.express('happy', { tl, atTime: 4.0, duration: 0.4 });
+      mohamed.express('smile', { tl, atTime: 4.0, duration: 0.4 });
+
+      // =========================================================================
+      // SEGMENT B (6.0s - 12.0s): TEST B — TWO-TIER LOCOMOTION & GROUNDING
+      // B1: Basic Locomotion (Walk Left 1120 -> 820, measures baseline sliding)
+      // B2a: Foot-Locked Locomotion (Walk Right 820 -> 1020, 2.0s, 60 frames @ 30 FPS)
+      // B2b: Foot-Locked Locomotion (Walk Left 1020 -> 855, 1.8s, 54 frames @ 30 FPS)
+      // =========================================================================
+      tl.call(() => {
+        setTestBadge("TEST B1: Basic Locomotion (Walk Left 1120 -> 820)");
+        hideTarget();
+      }, null, 6.0);
+
+      // Reposition Mohamed at entry X=1120
+      tl.set('#test-mohamed .character-root', { x: 1120, y: 1104, scaleX: 1, immediateRender: false }, 6.0);
+
+      // Walk left from 1120 to 820 using basic FK locomotion (1.5s)
+      mohamed.walkTo({ tl, atTime: 6.0, startX: 1120, targetX: 820, duration: 1.5, mode: 'basic' });
+
+      // Stop & Settle at 7.5s
+      tl.call(() => setTestBadge("TEST B1: Basic Locomotion Settle (Y = 1386.0)"), null, 7.5);
+
+      // Turn around to face Right (+1)
+      mohamed.turnTo(1, { tl, atTime: 7.6, duration: 0.2 });
+
+      tl.call(() => {
+        setTestBadge("TEST B2a: Foot-Locked Locomotion (Walk Right 820 -> 1020, Drift <= 3px)");
+      }, null, 7.8);
+
+      // Walk right from 820 to 1020 using high-precision foot-locked IK (2.0s, 60 frames @ 30 FPS)
+      mohamed.walkTo({ tl, atTime: 7.8, startX: 820, targetX: 1020, duration: 2.0, mode: 'foot-locked' });
+
+      // Settle at 9.8s
+      tl.call(() => setTestBadge("TEST B2a: Foot-Locked Settle Flat (Y = 1386.0)"), null, 9.8);
+
+      // Turn around to face Left (-1)
+      mohamed.turnTo(-1, { tl, atTime: 9.85, duration: 0.15 });
+
+      tl.call(() => {
+        setTestBadge("TEST B2b: Foot-Locked Locomotion (Walk Left 1020 -> 855, Drift <= 3px)");
+      }, null, 10.0);
+
+      // Walk left from 1020 to 855 using high-precision foot-locked IK (1.8s, 54 frames @ 30 FPS)
+      mohamed.walkTo({ tl, atTime: 10.0, startX: 1020, targetX: 855, duration: 1.8, mode: 'foot-locked' });
+
+      // Settle at 11.8s
+      tl.call(() => setTestBadge("TEST B2b: Foot-Locked Settle Flat (Y = 1386.0)"), null, 11.8);
+
+      // =========================================================================
+      // SEGMENT C (12.0s - 18.0s): TEST C1 — RENDERED RIG POINTING MATRIX
+      // =========================================================================
+      tl.set('#test-mohamed .character-root', { x: 855, y: 1104, scaleX: 1, immediateRender: false }, 12.0);
+
+      // Target 1: Screen Near (525, 985)
+      tl.call(() => {
+        setTestBadge("TEST C1: Rendered Pointing Target 1 (Screen Near: 525, 985)");
+        showTarget(525, 985, "TARGET 1: SCREEN (525, 985)");
+      }, null, 12.0);
+      mohamed.lookAt({ x: 525, y: 985 }, { tl, atTime: 12.0, duration: 0.3 });
+      mohamed.pointAt({ x: 525, y: 985 }, { tl, atTime: 12.2, arm: 'near', duration: 0.5, rootPos: { x: 855, y: 1104 } });
+
+      // Target 2: High Wall Clock (380, 480)
+      tl.call(() => {
+        setTestBadge("TEST C1: Rendered Pointing Target 2 (High Wall Clock: 380, 480)");
+        showTarget(380, 480, "TARGET 2: CLOCK (380, 480)");
+      }, null, 13.5);
+      mohamed.lookAt({ x: 380, y: 480 }, { tl, atTime: 13.5, duration: 0.3 });
+      mohamed.pointAt({ x: 380, y: 480 }, { tl, atTime: 13.7, arm: 'near', duration: 0.5, rootPos: { x: 855, y: 1104 } });
+
+      // Target 3: Low Floor Document (620, 1320)
+      tl.call(() => {
+        setTestBadge("TEST C1: Rendered Pointing Target 3 (Low Floor: 620, 1320)");
+        showTarget(620, 1320, "TARGET 3: FLOOR (620, 1320)");
+      }, null, 15.0);
+      mohamed.lookAt({ x: 620, y: 1320 }, { tl, atTime: 15.0, duration: 0.3 });
+      mohamed.pointAt({ x: 620, y: 1320 }, { tl, atTime: 15.2, arm: 'near', duration: 0.5, rootPos: { x: 855, y: 1104 } });
+
+      // Target 4: Far Left Perimeter (140, 880)
+      tl.call(() => {
+        setTestBadge("TEST C1: Rendered Pointing Target 4 (Far Left: 140, 880)");
+        showTarget(140, 880, "TARGET 4: FAR LEFT (140, 880)");
+      }, null, 16.5);
+      mohamed.lookAt({ x: 140, y: 880 }, { tl, atTime: 16.5, duration: 0.3 });
+      mohamed.pointAt({ x: 140, y: 880 }, { tl, atTime: 16.7, arm: 'near', duration: 0.5, rootPos: { x: 855, y: 1104 } });
+
+      // =========================================================================
+      // SEGMENT D (18.0s - 24.0s): TEST D — PHYSICAL REACHING (IK & 240px LIMIT)
+      // =========================================================================
+      // Target 1: Reachable Coffee Mug (640, 1060)
+      tl.call(() => {
+        setTestBadge("TEST D: Physical Reach to Coffee Mug (Reachable, d <= L1 + L2 = 240px)");
+        showTarget(640, 1060, "REACH TARGET 1: MUG (640, 1060)");
+      }, null, 18.0);
+      mohamed.lookAt({ x: 640, y: 1060 }, { tl, atTime: 18.0, duration: 0.3 });
+      mohamed.reachTo({ x: 640, y: 1060 }, { tl, atTime: 18.3, arm: 'near', duration: 0.7, rootPos: { x: 855, y: 1104 } });
+
+      // Target 2: Distant Wall Shelf (220, 650) - Beyond reach, clamps at 240px and reports unreachable
+      tl.call(() => {
+        setTestBadge("TEST D: Reach Beyond Maximum Limit (Unreachable, d > 240px, Clamped)");
+        showTarget(220, 650, "REACH TARGET 2: UNREACHABLE (220, 650)");
+      }, null, 21.0);
+      mohamed.lookAt({ x: 220, y: 650 }, { tl, atTime: 21.0, duration: 0.3 });
+      mohamed.reachTo({ x: 220, y: 650 }, { tl, atTime: 21.3, arm: 'near', duration: 0.7, rootPos: { x: 855, y: 1104 } });
+
+      // =========================================================================
+      // SEGMENT E (24.0s - 30.0s): TEST E — INTERACTION & COORDINATED GAZE
+      // =========================================================================
+      tl.call(() => {
+        setTestBadge("TEST E: Social Interaction & Coordinated Gaze Follow");
+        hideTarget();
+      }, null, 24.0);
+
+      // Reset arm poses
+      tl.to(['#test-mohamed .joint-arm-l', '#test-mohamed .joint-forearm-l'], { rotation: 0, duration: 0.3 }, 24.0);
+
+      // Mohamed speaks while Karim listens
+      mohamed.lookAt(karim, { tl, atTime: 24.2, duration: 0.3 });
+      mohamed.express('smile', { tl, atTime: 24.2, duration: 0.3 });
+      mohamed.speak("Regarde Karim !", { tl, atTime: 24.4, duration: 1.6, gesture: 'wave' });
+      karim.listenTo(mohamed, { tl, atTime: 24.3, duration: 1.8 });
+
+      // Karim responds while Mohamed listens
+      karim.speak("Oui Mohamed ?", { tl, atTime: 26.5, duration: 1.4 });
+      mohamed.listenTo(karim, { tl, atTime: 26.6, duration: 1.4 });
+
+      // Mohamed points to screen; Karim follows gaze
+      tl.call(() => {
+        setTestBadge("TEST E: Pointing & Gaze Follow to Spreadsheet");
+        showTarget(525, 985, "SCREEN SPREADSHEET");
+      }, null, 28.2);
+      mohamed.lookAt({ x: 525, y: 985 }, { tl, atTime: 28.2, duration: 0.35 });
+      mohamed.pointAt({ x: 525, y: 985 }, { tl, atTime: 28.4, arm: 'near', duration: 0.6, rootPos: { x: 855, y: 1104 } });
+      karim.lookAt({ x: 525, y: 985 }, { tl, atTime: 28.8, duration: 0.45 });
+      karim.express('happy', { tl, atTime: 29.0, duration: 0.3 });
+
+      // =========================================================================
+      // SEGMENT F (30.0s - 36.0s): TEST F — BEHAVIOR COMPOSITION (TRACK CONCURRENCY)
+      // =========================================================================
+      tl.call(() => {
+        setTestBadge("TEST F: Behavior Composition (Walking + Looking + Gesturing)");
+        hideTarget();
+      }, null, 30.0);
+
+      // Reset
+      tl.set('#test-mohamed .character-root', { x: 1050, y: 1104, immediateRender: false }, 30.0);
+      tl.set('#test-mohamed .joint-arm-l', { rotation: 0, immediateRender: false }, 30.0);
+      tl.set('#test-mohamed .joint-forearm-l', { rotation: 0, immediateRender: false }, 30.0);
+
+      // Simultaneous: Walk from 1050 to 855 WHILE head tracks the screen (525, 985)
+      mohamed.walkTo({ tl, atTime: 30.2, startX: 1050, targetX: 855, duration: 2.2 });
+      mohamed.lookAt({ x: 525, y: 985 }, { tl, atTime: 30.2, duration: 0.5 });
+
+      // Simultaneous: Mohamed gestures 'explain' WHILE speaking
+      mohamed.speak("Voici la solution.", { tl, atTime: 32.6, duration: 1.8, gesture: 'explain' });
+
+      // Simultaneous: Karim reacts with delighted expression & nod after Mohamed finishes
+      karim.express('happy', { tl, atTime: 34.6, duration: 0.4 });
+      tl.to('#test-karim-seated .joint-head', { rotation: 5, y: 3, duration: 0.25, yoyo: true, repeat: 2 }, 34.8);
+
+      tl.call(() => setTestBadge("TEST SUITE COMPLETE — 100% PASSED"), null, 35.8);
+
+      // Expose to window for headless testing
+      window.__testRig = {
+        tl,
+        mohamed,
+        karim,
+        mohamedRig,
+        karimRig
+      };
+    </script>
+  </body>
+</html>

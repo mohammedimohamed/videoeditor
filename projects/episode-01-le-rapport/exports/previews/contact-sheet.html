@@ -1,0 +1,260 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      margin: 0;
+      padding: 32px;
+      background: #0B0F19;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+      color: #F8FAFC;
+      width: 2560px;
+      box-sizing: border-box;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #1E293B;
+      margin-bottom: 28px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 34px;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: -0.5px;
+    }
+    .subtitle {
+      color: #94A3B8;
+      font-size: 16px;
+      margin-top: 6px;
+    }
+    .badge-all-pass {
+      background: #107C41;
+      color: #FFFFFF;
+      font-weight: 800;
+      font-size: 18px;
+      padding: 8px 22px;
+      border-radius: 999px;
+      box-shadow: 0 0 20px rgba(16, 124, 65, 0.45);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+    .card {
+      background: #131B2E;
+      border: 1.5px solid #1E293B;
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .card-img-wrap {
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      background: #0B0F19;
+      overflow: hidden;
+    }
+    .card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .card-meta {
+      padding: 16px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #0F172A;
+      border-top: 1px solid #1E293B;
+    }
+    .card-title {
+      font-weight: 700;
+      font-size: 15px;
+      color: #F1F5F9;
+      line-height: 1.3;
+    }
+    .card-tag {
+      background: #1E293B;
+      color: #38BDF8;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-family: monospace;
+      white-space: nowrap;
+      margin-left: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <h1>Mohamed Excel — Animation Engine Master QA Contact Sheet</h1>
+      <div class="subtitle">
+        Independent Headless Automated Verification (Tests A to F) • Dense 30 FPS Bidirectional Locomotion • Analytical IK • Gaze Convergence • 100% PASS
+      </div>
+    </div>
+    <div class="badge-all-pass">8/8 TEST CATEGORIES PASS (100%)</div>
+  </div>
+
+  <div class="grid">
+    
+      <div class="card">
+        <div class="card-img-wrap">
+          <img src="frame-test-a-expressions.png" alt="Test A: Expressions (Worried Karim & Curious Mohamed)">
+        </div>
+        <div class="card-meta">
+          <span class="card-title">Test A: Expressions (Worried Karim & Curious Mohamed)</span>
+          <span class="card-tag">T = 2.2s</span>
+        </div>
+      </div>
+    
+      <div class="card">
+        <div class="card-img-wrap">
+          <img src="frame-test-b1-locomotion.png" alt="Test B1: Basic Locomotion (Walk Left, Sliding Baseline)">
+        </div>
+        <div class="card-meta">
+          <span class="card-title">Test B1: Basic Locomotion (Walk Left, Sliding Baseline)</span>
+          <span class="card-tag">T = 6.8s</span>
+        </div>
+      </div>
+    
+      <div class="card">
+        <div class="card-img-wrap">
+          <img src="frame-test-b1-settle.png" alt="Test B1: Basic Settle (Both Feet Flat Y=1386.0)">
+        </div>
+        <div class="card-meta">
+          <span class="card-title">Test B1: Basic Settle (Both Feet Flat Y=1386.0)</span>
+          <span class="card-tag">T = 7.5s</span>
+        </div>
+      </div>
+    
+      <div class="card">
+        <div class="card-img-wrap">
+          <img src="frame-test-b2-footlocked.png" alt="Test B2a: Foot-Locked Walk Right (Drift: 0.003px)">
+        </div>
+        <div class="card-meta">
+          <span class="card-title">Test B2a: Foot-Locked Walk Right (Drift: 0.003px)</span>
+          <span class="card-tag">T = 8.5s</span>
+        </div>
+      </div>
+    
+      <div class="card">
+        <div class="card-img-wrap">
+          <img src="frame-test-b2-settle.png" alt="Test B2a: Foot-Locked Settle Right (Y=1386.0)">
+        </div>
+        <div class="card-meta">
+          <span class="card-title">Test B2a: Foot-Locked Settle Right (Y=1386.0)</span>
+          <span class="card-tag">T = 9.8s</span>
+        </div>
+      </div>
+    
+      <div class="card">
+        <div class="card-img-wrap">
+          <img src="frame-test-b2-left.png" alt="Test B2b: Foot-Locked Walk Left (Drift: 0.003px)">
+        </div>
+        <div class="card-meta">
+          <span class="card-title">Test B2b: Foot-Locked Walk Left (Drift: 0.003px)</span>
+          <span class="card-tag">T = 10.8s</span>
+        </div>
+      </div>
+    
+      <div class="card">
+        <div class="card-img-wrap">
+          <img src="frame-test-b2-settle-left.png" alt="Test B2b: Foot-Locked Settle Left (Y=1386.0)">
+        </div>
+        <div class="card-meta">
+          <span class="card-title">Test B2b: Foot-Locked Settle Left (Y=1386.0)</span>
+          <span class="card-tag">T = 11.8s</span>
+        </div>
+      </div>
+    
+      <div class="card">
+        <div class="card-img-wrap">
+          <img src="frame-test-c-pointing-t1.png" alt="Test C1: Rendered Pointing (Screen Target: 525, 985)">
+        </div>
+        <div class="card-meta">
+          <span class="card-title">Test C1: Rendered Pointing (Screen Target: 525, 985)</span>
+          <span class="card-tag">T = 12.8s</span>
+        </div>
+      </div>
+    
+      <div class="card">
+        <div class="card-img-wrap">
+          <img src="frame-test-c-pointing-t2.png" alt="Test C1: Rendered Pointing (Wall Clock: 380, 480)">
+        </div>
+        <div class="card-meta">
+          <span class="card-title">Test C1: Rendered Pointing (Wall Clock: 380, 480)</span>
+          <span class="card-tag">T = 14.3s</span>
+        </div>
+      </div>
+    
+      <div class="card">
+        <div class="card-img-wrap">
+          <img src="frame-test-c-pointing-t3.png" alt="Test C1: Rendered Pointing (Floor Low: 620, 1320)">
+        </div>
+        <div class="card-meta">
+          <span class="card-title">Test C1: Rendered Pointing (Floor Low: 620, 1320)</span>
+          <span class="card-tag">T = 15.8s</span>
+        </div>
+      </div>
+    
+      <div class="card">
+        <div class="card-img-wrap">
+          <img src="frame-test-d-reaching-mug.png" alt="Test D: Physical Reach (Coffee Mug Contact IK <= 15px)">
+        </div>
+        <div class="card-meta">
+          <span class="card-title">Test D: Physical Reach (Coffee Mug Contact IK <= 15px)</span>
+          <span class="card-tag">T = 19.5s</span>
+        </div>
+      </div>
+    
+      <div class="card">
+        <div class="card-img-wrap">
+          <img src="frame-test-d-reach-clamp.png" alt="Test D: Reach Clamped (Unreachable Shelf Target <= 241px)">
+        </div>
+        <div class="card-meta">
+          <span class="card-title">Test D: Reach Clamped (Unreachable Shelf Target <= 241px)</span>
+          <span class="card-tag">T = 22.5s</span>
+        </div>
+      </div>
+    
+      <div class="card">
+        <div class="card-img-wrap">
+          <img src="frame-test-e-interaction.png" alt="Test E: Coordinated Gaze & Social Listening">
+        </div>
+        <div class="card-meta">
+          <span class="card-title">Test E: Coordinated Gaze & Social Listening</span>
+          <span class="card-tag">T = 25.0s</span>
+        </div>
+      </div>
+    
+      <div class="card">
+        <div class="card-img-wrap">
+          <img src="frame-test-e-gaze-follow.png" alt="Test E: Pointing & Gaze Follow to Spreadsheet">
+        </div>
+        <div class="card-meta">
+          <span class="card-title">Test E: Pointing & Gaze Follow to Spreadsheet</span>
+          <span class="card-tag">T = 29.2s</span>
+        </div>
+      </div>
+    
+      <div class="card">
+        <div class="card-img-wrap">
+          <img src="frame-test-f-composition.png" alt="Test F: Multi-Track Concurrency (Walk + Look + Speak)">
+        </div>
+        <div class="card-meta">
+          <span class="card-title">Test F: Multi-Track Concurrency (Walk + Look + Speak)</span>
+          <span class="card-tag">T = 33.2s</span>
+        </div>
+      </div>
+    
+  </div>
+</body>
+</html>

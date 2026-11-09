@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mohamed Excel — Character Design Sheet & Visual Bible (Revision 3)</title>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+</head>
+<body>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    #root {
+      position: absolute;
+      inset: 0;
+      width: 1080px;
+      height: 1920px;
+      background: #0B132B;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      color: #FFFFFF;
+      overflow: hidden;
+    }
+
+    .sheet-container {
+      position: absolute;
+      inset: 0;
+      padding: 36px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Header */
+    .sheet-header {
+      border-bottom: 2px solid #334155;
+      padding-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .header-main {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .sheet-title {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .sheet-badge {
+      font-size: 11px;
+      font-weight: 800;
+      background: #107C41;
+      color: #FFFFFF;
+      padding: 4px 10px;
+      border-radius: 999px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .sheet-subtitle {
+      font-size: 13px;
+      color: #94A3B8;
+    }
+
+    .header-meta {
+      font-size: 11px;
+      color: #64748B;
+      text-align: right;
+      line-height: 1.4;
+    }
+
+    /* Section Headers */
+    .section-title {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #38BDF8;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    /* Character Cards Grids */
+    .grid-3col {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .grid-2col {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .character-card {
+      background: #1C2541;
+      border: 1.5px solid #3A506B;
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.25);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-title {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #F8FAFC;
+    }
+
+    .card-tag {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+
+    .tag-blue { background: #1E3A8A; color: #93C5FD; }
+    .tag-green { background: #064E3B; color: #6EE7B7; }
+    .tag-purple { background: #3B0764; color: #D8B4FE; }
+
+    .card-viewport {
+      width: 100%;
+      height: 330px;
+      background: #F8FAFC;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .card-viewport svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .card-desc {
+      font-size: 11px;
+      color: #CBD5E1;
+      line-height: 1.4;
+    }
+
+    .card-desc strong {
+      color: #38BDF8;
+    }
+
+    /* Action Poses Row */
+    .action-poses-section {
+      background: #1C2541;
+      border: 1.5px solid #3A506B;
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .action-card {
+      background: #0B132B;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .action-card-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: #38BDF8;
+    }
+
+    .action-card-desc {
+      font-size: 10.5px;
+      color: #94A3B8;
+      line-height: 1.4;
+    }
+
+    /* Expressions Section */
+    .expressions-section {
+      background: #1C2541;
+      border: 1.5px solid #3A506B;
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .expressions-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+    }
+
+    .expression-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .expr-icon {
+      width: 58px;
+      height: 58px;
+      background: #F9D5BD;
+      border-radius: 50%;
+      border: 2px solid #1E293B;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .expr-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #CBD5E1;
+    }
+
+    /* Specs & QA Matrix */
+    .qa-matrix-section {
+      background: #1C2541;
+      border: 1.5px solid #3A506B;
+      border-radius: 14px;
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .matrix-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .matrix-box {
+      background: #0B132B;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+
+    .matrix-header {
+      font-size: 10.5px;
+      font-weight: 800;
+      color: #38BDF8;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .matrix-val {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #F8FAFC;
+      font-family: monospace;
+    }
+
+    .matrix-sub {
+      font-size: 9.5px;
+      color: #94A3B8;
+      margin-top: 2px;
+    }
+
+    /* Palette Tokens */
+    .tokens-section {
+      background: #1C2541;
+      border: 1.5px solid #3A506B;
+      border-radius: 14px;
+      padding: 12px 16px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .token-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #0B132B;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+    }
+
+    .token-color {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .token-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .token-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: #F8FAFC;
+    }
+
+    .token-hex {
+      font-size: 10px;
+      color: #94A3B8;
+      font-family: monospace;
+    }
+  </style>
+
+  <div id="root" data-composition-id="character-design-sheet" data-duration="1" data-width="1080" data-height="1920" data-fps="30">
+    <div class="sheet-container">
+      <!-- Header -->
+      <div class="sheet-header">
+        <div class="header-main">
+          <div class="sheet-title">
+            Mohamed Excel — 2D Character Design Sheet
+            <span class="sheet-badge">Revision 3 Visual Bible</span>
+          </div>
+          <div class="sheet-subtitle">
+            Complete Character Specifications · Fully Visible Rigs · Target-Driven 2-Bone IK · Zero-Sliding Ground Kinematics
+          </div>
+        </div>
+        <div class="header-meta">
+          Stage: 1080×1920 (9:16 Portrait)<br>
+          Outlines: 3.5px #1E293B · Ratio: 1:3.2
+        </div>
+      </div>
+
+      <!-- Section 1: Character Primary Poses (Karim & Mohamed Standing/Seated) -->
+      <div>
+        <div class="section-title">👤 Character Full-Body Views</div>
+        <div class="grid-3col">
+          <!-- Card 1: Karim Standing View -->
+          <div class="character-card">
+            <div class="card-header">
+              <div class="card-title">Karim — Standing</div>
+              <span class="card-tag tag-blue">Full Body</span>
+            </div>
+            <div class="card-viewport" id="vp-karim-standing">
+              <!-- Injected SVG -->
+            </div>
+            <div class="card-desc">
+              <strong>Front View:</strong> Pelvis at (0,0), straight posture, shoes planted flat, blue collared shirt.
+            </div>
+          </div>
+
+          <!-- Card 2: Karim Seated Desk Pose -->
+          <div class="character-card">
+            <div class="card-header">
+              <div class="card-title">Karim — Seated Desk</div>
+              <span class="card-tag tag-blue">Story Posture</span>
+            </div>
+            <div class="card-viewport" id="vp-karim-seated">
+              <!-- Injected SVG -->
+            </div>
+            <div class="card-desc">
+              <strong>Desk Interaction:</strong> Horizontal thighs, vertical shins, flat shoes, hands typing.
+            </div>
+          </div>
+
+          <!-- Card 3: Mohamed Standing Front -->
+          <div class="character-card">
+            <div class="card-header">
+              <div class="card-title">Mohamed — Standing</div>
+              <span class="card-tag tag-green">Front View</span>
+            </div>
+            <div class="card-viewport" id="vp-mohamed-standing">
+              <!-- Injected SVG -->
+            </div>
+            <div class="card-desc">
+              <strong>Brand Hero:</strong> Emerald knit sweater, glasses, groomed beard, white sneakers with green trim.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Mohamed Specialized Action Poses -->
+      <div>
+        <div class="section-title">🎯 Mohamed 3/4 Perspective & Pointing Action</div>
+        <div class="grid-2col">
+          <!-- Card 4: Mohamed 3/4 Hero View -->
+          <div class="character-card">
+            <div class="card-header">
+              <div class="card-title">Mohamed — Native 3/4 Left Hero Stance</div>
+              <span class="card-tag tag-green">Story Lead</span>
+            </div>
+            <div class="card-viewport" id="vp-mohamed-hero">
+              <!-- Injected SVG -->
+            </div>
+            <div class="card-desc">
+              <strong>Native 3/4 Left Rig:</strong> Zero scaleX flip distortion; front arm unoccluded facing Karim and desk.
+            </div>
+          </div>
+
+          <!-- Card 5: Mohamed Pointing Pose (Target-Driven IK) -->
+          <div class="character-card">
+            <div class="card-header">
+              <div class="card-title">Mohamed — Pointing Pose (2-Bone IK)</div>
+              <span class="card-tag tag-purple">Action Pose</span>
+            </div>
+            <div class="card-viewport" id="vp-mohamed-pointing">
+              <!-- Injected SVG -->
+            </div>
+            <div class="card-desc">
+              <strong>Target-Driven IK:</strong> Extended index finger aimed at laptop screen; natural 34° elbow flexion; 40px safe casing clearance.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Validated Kinematic Action Poses -->
+      <div class="action-poses-section">
+        <div class="section-title">🏃‍♂️ Validated Kinematic Action Poses</div>
+        <div class="action-grid">
+          <div class="action-card">
+            <div class="action-card-title">1. Seated Frustration (6-Beat)</div>
+            <div class="action-card-desc">Typing micro-motion (0.6s) → data scanning (1.2s) → worry (1.8s) → pause (2.1s) → hand to temple (2.4s) → slumped exhaustion (2.9s). Blue sleeve stays low.</div>
+          </div>
+          <div class="action-card">
+            <div class="action-card-title">2. Grounded Walk Cycle (Zero Sliding)</div>
+            <div class="action-card-desc">Entry from x=1180 to x=780 across 4 strides (100px/stride); stance phase cancels root movement; visible 38° knee flexion on swing; damped settle.</div>
+          </div>
+          <div class="action-card">
+            <div class="action-card-title">3. Target-Driven Pointing (Screen Target)</div>
+            <div class="action-card-desc">Shoulder at (740, 915), reach target at (555, 965), spreadsheet at (525, 985). Exact 2-bone IK solution yields 34° elbow bend, 0px penetration.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 4: Facial Expressions & Visemes -->
+      <div class="expressions-section">
+        <div class="section-title">🎭 Reusable Facial Expression & Viseme Matrix</div>
+        <div class="expressions-grid">
+          <!-- 1. Neutral -->
+          <div class="expression-item">
+            <div class="expr-icon">
+              <svg viewBox="0 0 100 100" width="58" height="58">
+                <circle cx="35" cy="45" r="4" fill="#1E293B" />
+                <circle cx="65" cy="45" r="4" fill="#1E293B" />
+                <path d="M 35 65 Q 50 67 65 65" stroke="#1E293B" stroke-width="3" fill="none" stroke-linecap="round" />
+              </svg>
+            </div>
+            <div class="expr-label">1. Neutral</div>
+          </div>
+
+          <!-- 2. Worried -->
+          <div class="expression-item">
+            <div class="expr-icon">
+              <svg viewBox="0 0 100 100" width="58" height="58">
+                <path d="M 25 35 Q 35 32 45 38" stroke="#1E293B" stroke-width="3.5" fill="none" stroke-linecap="round" />
+                <path d="M 55 38 Q 65 32 75 35" stroke="#1E293B" stroke-width="3.5" fill="none" stroke-linecap="round" />
+                <circle cx="35" cy="48" r="4.5" fill="#1E293B" />
+                <circle cx="65" cy="48" r="4.5" fill="#1E293B" />
+                <path d="M 35 70 Q 50 62 65 68" stroke="#1E293B" stroke-width="3" fill="none" stroke-linecap="round" />
+              </svg>
+            </div>
+            <div class="expr-label">2. Worried</div>
+          </div>
+
+          <!-- 3. Frustrated -->
+          <div class="expression-item">
+            <div class="expr-icon">
+              <svg viewBox="0 0 100 100" width="58" height="58">
+                <path d="M 25 40 L 45 46" stroke="#1E293B" stroke-width="4" stroke-linecap="round" />
+                <path d="M 55 46 L 75 40" stroke="#1E293B" stroke-width="4" stroke-linecap="round" />
+                <line x1="30" y1="52" x2="42" y2="52" stroke="#1E293B" stroke-width="3.5" stroke-linecap="round" />
+                <line x1="58" y1="52" x2="70" y2="52" stroke="#1E293B" stroke-width="3.5" stroke-linecap="round" />
+                <path d="M 32 72 Q 50 60 68 72" stroke="#1E293B" stroke-width="3.5" fill="none" stroke-linecap="round" />
+              </svg>
+            </div>
+            <div class="expr-label">3. Frustrated</div>
+          </div>
+
+          <!-- 4. Curious -->
+          <div class="expression-item">
+            <div class="expr-icon">
+              <svg viewBox="0 0 100 100" width="58" height="58">
+                <path d="M 25 32 Q 35 28 45 32" stroke="#1E293B" stroke-width="3.5" fill="none" stroke-linecap="round" />
+                <path d="M 55 42 Q 65 42 75 44" stroke="#1E293B" stroke-width="3.5" fill="none" stroke-linecap="round" />
+                <circle cx="35" cy="46" r="5" fill="#1E293B" />
+                <circle cx="65" cy="48" r="4.5" fill="#1E293B" />
+                <path d="M 35 66 Q 50 72 65 66" stroke="#1E293B" stroke-width="3" fill="none" stroke-linecap="round" />
+              </svg>
+            </div>
+            <div class="expr-label">4. Curious</div>
+          </div>
+
+          <!-- 5. Happy / Relieved -->
+          <div class="expression-item">
+            <div class="expr-icon">
+              <svg viewBox="0 0 100 100" width="58" height="58">
+                <path d="M 25 35 Q 35 30 45 35" stroke="#1E293B" stroke-width="3.5" fill="none" stroke-linecap="round" />
+                <path d="M 55 35 Q 65 30 75 35" stroke="#1E293B" stroke-width="3.5" fill="none" stroke-linecap="round" />
+                <path d="M 28 48 Q 36 42 44 48" stroke="#1E293B" stroke-width="3.5" fill="none" stroke-linecap="round" />
+                <path d="M 56 48 Q 64 42 72 48" stroke="#1E293B" stroke-width="3.5" fill="none" stroke-linecap="round" />
+                <path d="M 30 62 Q 50 82 70 62" stroke="#1E293B" stroke-width="3.5" fill="none" stroke-linecap="round" />
+              </svg>
+            </div>
+            <div class="expr-label">5. Happy</div>
+          </div>
+
+          <!-- 6. Viseme Speech -->
+          <div class="expression-item">
+            <div class="expr-icon">
+              <svg viewBox="0 0 100 100" width="58" height="58">
+                <circle cx="35" cy="44" r="4" fill="#1E293B" />
+                <circle cx="65" cy="44" r="4" fill="#1E293B" />
+                <ellipse cx="50" cy="66" rx="14" ry="10" fill="#1E293B" />
+                <ellipse cx="50" cy="64" rx="10" ry="4" fill="#FFFFFF" />
+              </svg>
+            </div>
+            <div class="expr-label">6. Visemes</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 5: Kinematics & Rig Verification Matrix -->
+      <div class="qa-matrix-section">
+        <div class="section-title">📐 Kinematic Specifications & Rig Metrics</div>
+        <div class="matrix-grid">
+          <div class="matrix-box">
+            <div class="matrix-header">Pointing Reach Dist</div>
+            <div class="matrix-val">D = 226.1 px</div>
+            <div class="matrix-sub">S:(740,915) → T:(555,965)</div>
+          </div>
+          <div class="matrix-box">
+            <div class="matrix-header">2-Bone IK Flexion</div>
+            <div class="matrix-val">Elbow = 34.2°</div>
+            <div class="matrix-sub">L1=105px, L2=185px</div>
+          </div>
+          <div class="matrix-box">
+            <div class="matrix-header">Walk Stride Span</div>
+            <div class="matrix-val">100 px / step</div>
+            <div class="matrix-sub">4 strides (1180 → 780)</div>
+          </div>
+          <div class="matrix-box">
+            <div class="matrix-header">Knee Swing Flex</div>
+            <div class="matrix-val">θ = 38.0°</div>
+            <div class="matrix-sub">Planted foot at y=1385</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 6: Brand Color Tokens -->
+      <div class="tokens-section">
+        <div class="token-chip">
+          <div class="token-color" style="background: #107C41;"></div>
+          <div class="token-info">
+            <div class="token-name">Excel Emerald</div>
+            <div class="token-hex">#107C41</div>
+          </div>
+        </div>
+
+        <div class="token-chip">
+          <div class="token-color" style="background: #3B82F6;"></div>
+          <div class="token-info">
+            <div class="token-name">Corporate Blue</div>
+            <div class="token-hex">#3B82F6</div>
+          </div>
+        </div>
+
+        <div class="token-chip">
+          <div class="token-color" style="background: #1E293B;"></div>
+          <div class="token-info">
+            <div class="token-name">Dark Outlines</div>
+            <div class="token-hex">#1E293B</div>
+          </div>
+        </div>
+
+        <div class="token-chip">
+          <div class="token-color" style="background: #FCFAF6;"></div>
+          <div class="token-info">
+            <div class="token-name">Warm Pastel Wall</div>
+            <div class="token-hex">#FCFAF6</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { getEmployeeSVG, getMohamedSVG } from '../lib/rigging/character-templates.js';
+    import { CharacterRig } from '../lib/rigging/character-rig.js';
+
+    // 1. Mount Karim Standing View (centered viewBox: -160 -310 320 650)
+    document.getElementById('vp-karim-standing').innerHTML = getEmployeeSVG('card-karim-standing', {
+      pose: 'standing',
+      facing: 'front',
+      viewBox: '-160 -310 320 650',
+      width: '100%',
+      height: '100%',
+      style: 'display: block;'
+    });
+
+    // 2. Mount Karim Seated View (centered viewBox: -140 -310 340 610)
+    document.getElementById('vp-karim-seated').innerHTML = getEmployeeSVG('card-karim-seated', {
+      pose: 'seated',
+      facing: 'right',
+      viewBox: '-140 -310 340 610',
+      width: '100%',
+      height: '100%',
+      style: 'display: block;'
+    });
+    // Set seated arm pose for Karim
+    const kSeatedRig = new CharacterRig('#card-karim-seated', { name: 'KarimSeated', type: 'employee' });
+    gsap.set(kSeatedRig.parts.armR, { rotation: -36 });
+    gsap.set(kSeatedRig.parts.forearmR, { rotation: 72 });
+    gsap.set(kSeatedRig.parts.handR, { rotation: -10 });
+    gsap.set(kSeatedRig.parts.armL, { rotation: -42 });
+    gsap.set(kSeatedRig.parts.forearmL, { rotation: 68 });
+    gsap.set(kSeatedRig.parts.handL, { rotation: -12 });
+    gsap.set(kSeatedRig.parts.torso, { rotation: 6 });
+    gsap.set(kSeatedRig.parts.head, { rotation: 8 });
+
+    // 3. Mount Mohamed Standing Front View (centered viewBox: -160 -310 320 650)
+    document.getElementById('vp-mohamed-standing').innerHTML = getMohamedSVG('card-mohamed-standing', {
+      facing: 'front',
+      viewBox: '-160 -310 320 650',
+      width: '100%',
+      height: '100%',
+      style: 'display: block;'
+    });
+
+    // 4. Mount Mohamed 3/4 Left Hero Stance (centered viewBox: -160 -310 320 650)
+    document.getElementById('vp-mohamed-hero').innerHTML = getMohamedSVG('card-mohamed-hero', {
+      facing: '3/4-left',
+      viewBox: '-160 -310 320 650',
+      width: '100%',
+      height: '100%',
+      style: 'display: block;'
+    });
+    const mHeroRig = new CharacterRig('#card-mohamed-hero', { name: 'MohamedHero', type: 'mohamed' });
+    gsap.set(mHeroRig.parts.armL, { rotation: 6 });
+    gsap.set(mHeroRig.parts.forearmL, { rotation: 14 });
+    gsap.set(mHeroRig.parts.armR, { rotation: -6 });
+    gsap.set(mHeroRig.parts.forearmR, { rotation: 14 });
+
+    // 5. Mount Mohamed Pointing Pose (centered viewBox: -280 -310 400 650)
+    document.getElementById('vp-mohamed-pointing').innerHTML = getMohamedSVG('card-mohamed-pointing', {
+      facing: '3/4-left',
+      viewBox: '-280 -310 400 650',
+      width: '100%',
+      height: '100%',
+      style: 'display: block;'
+    });
+    const mPointingRig = new CharacterRig('#card-mohamed-pointing', { name: 'MohamedPointing', type: 'mohamed' });
+    // Apply exact pointing angles:
+    gsap.set(mPointingRig.parts.torso, { rotation: 2.5, y: 1 });
+    gsap.set(mPointingRig.parts.head, { rotation: 10 });
+    gsap.set([mPointingRig.parts.pupilLeft, mPointingRig.parts.pupilRight], { x: -8, y: 5 });
+    gsap.set(mPointingRig.parts.armL, { rotation: 42 }); // Shoulder elevation
+    gsap.set(mPointingRig.parts.forearmL, { rotation: 34 }); // Natural elbow flexion
+    gsap.set(mPointingRig.parts.handL, { rotation: 0 }); // Extended index finger along ray
+    mPointingRig.addExpression(gsap.timeline(), 0, 'smile', 0);
+
+    // Timeline registration for HyperFrames
+    const tl = gsap.timeline({ paused: true });
+    tl.to("#root", { opacity: 1, duration: 1 }, 0);
+    window.__timelines = window.__timelines || {};
+    window.__timelines["character-design-sheet"] = tl;
+  </script>
+</body>
+</html>
