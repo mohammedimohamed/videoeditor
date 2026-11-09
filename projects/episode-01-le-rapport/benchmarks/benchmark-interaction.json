@@ -1,0 +1,214 @@
+{
+  "version": "2.0.0",
+  "metadata": {
+    "id": "benchmark-interaction",
+    "title": "Episode 01: Le rapport pour demain matin (Beats 1 to 7 Benchmark)",
+    "description": "Declarative scene specification reproducing the Mohamed & Karim office interaction without custom JavaScript.",
+    "duration": 8.8,
+    "fps": 30,
+    "resolution": {
+      "width": 1080,
+      "height": 1920
+    }
+  },
+  "environment": {
+    "preset": "office",
+    "background": "office-modern"
+  },
+  "actors": [
+    {
+      "id": "karim",
+      "template": "employee",
+      "name": "Karim",
+      "role": "Financial Analyst",
+      "initialState": {
+        "pose": "seated",
+        "position": { "x": 320, "y": 1120 },
+        "facing": 1,
+        "expression": "neutral"
+      }
+    },
+    {
+      "id": "mohamed",
+      "template": "mohamed",
+      "name": "Mohamed",
+      "role": "Excel Expert",
+      "initialState": {
+        "pose": "standing",
+        "position": { "x": 1180, "y": 1104 },
+        "facing": -1,
+        "expression": "neutral"
+      }
+    }
+  ],
+  "props": [
+    {
+      "id": "desk",
+      "template": "desk",
+      "initialState": { "state": "default" }
+    },
+    {
+      "id": "laptop",
+      "template": "laptop",
+      "initialState": { "state": "raw-data" }
+    },
+    {
+      "id": "clock",
+      "template": "clock",
+      "initialState": { "state": "ticking" }
+    }
+  ],
+  "events": [
+    {
+      "id": "evt-clock-ticking",
+      "prop": "clock",
+      "action": "propAction",
+      "timing": { "start": 0.0, "duration": 8.8 },
+      "params": {
+        "propId": "clock",
+        "action": "tick"
+      },
+      "description": "Wall clock second hand ticking throughout the scene."
+    },
+    {
+      "id": "evt-karim-idle-start",
+      "actor": "karim",
+      "action": "idle",
+      "timing": { "start": 0.0, "duration": 0.6 },
+      "params": {
+        "breathing": true,
+        "blinking": false
+      },
+      "description": "Karim initial seated breath before frustration begins."
+    },
+    {
+      "id": "evt-karim-frustration",
+      "actor": "karim",
+      "action": "frustrationSequence",
+      "timing": { "start": 0.6, "duration": 2.8 },
+      "params": {
+        "duration": 2.8
+      },
+      "description": "Karim 6-beat frustration progression: typing, scanning, worry, hand to temple, slump."
+    },
+    {
+      "id": "evt-laptop-scroll-data",
+      "prop": "laptop",
+      "action": "propAction",
+      "timing": { "start": 0.8, "duration": 2.2 },
+      "params": {
+        "propId": "laptop",
+        "action": "scroll"
+      },
+      "description": "Laptop raw data rows scrolling upwards rapidly."
+    },
+    {
+      "id": "evt-caption-frustration",
+      "action": "caption",
+      "actor": "karim",
+      "timing": { "start": 1.2, "duration": 2.8 },
+      "params": {
+        "text": "Des centaines de lignes dans Excel… et très peu de temps pour les analyser."
+      },
+      "description": "Frustration subtitle dialogue."
+    },
+    {
+      "id": "evt-mohamed-enter-walk",
+      "actor": "mohamed",
+      "action": "walk",
+      "timing": { "start": 2.4, "duration": 2.4 },
+      "params": {
+        "to": 855,
+        "startX": 1180,
+        "mode": "foot-locked"
+      },
+      "description": "Mohamed walks into office from x=1180 to x=855 using foot-locked IK."
+    },
+    {
+      "id": "evt-mohamed-greet",
+      "actor": "mohamed",
+      "action": "speak",
+      "timing": { "start": 4.9, "duration": 1.6 },
+      "params": {
+        "text": "Tu as besoin d'un coup de main ?",
+        "gesture": "wave"
+      },
+      "description": "Mohamed stops, delivers friendly greeting wave and dialogue."
+    },
+    {
+      "id": "evt-caption-greet",
+      "action": "caption",
+      "actor": "mohamed",
+      "timing": { "start": 5.0, "duration": 1.5 },
+      "params": {
+        "text": "Tu as besoin d'un coup de main ?"
+      },
+      "description": "Mohamed greeting subtitle."
+    },
+    {
+      "id": "evt-karim-listen-greet",
+      "actor": "karim",
+      "action": "listenTo",
+      "timing": { "start": 4.9, "duration": 1.6 },
+      "params": {
+        "speaker": "mohamed",
+        "responsiveNods": true
+      },
+      "description": "Karim turns to look at Mohamed, expressing relief and curiosity."
+    },
+    {
+      "id": "evt-mohamed-point-screen",
+      "actor": "mohamed",
+      "action": "pointAt",
+      "timing": { "start": 6.6, "duration": 2.2 },
+      "params": {
+        "target": "laptop.screen",
+        "duration": 0.55
+      },
+      "description": "Mohamed points index finger at laptop spreadsheet via 2-bone IK."
+    },
+    {
+      "id": "evt-karim-look-screen",
+      "actor": "karim",
+      "action": "lookAt",
+      "timing": { "start": 6.8, "duration": 2.0 },
+      "params": {
+        "target": "laptop.screen",
+        "duration": 0.4
+      },
+      "description": "Karim follows Mohamed's pointing gesture with his eyes towards the screen."
+    },
+    {
+      "id": "evt-laptop-solution-state",
+      "prop": "laptop",
+      "action": "propAction",
+      "timing": { "start": 6.7, "duration": 2.0 },
+      "params": {
+        "propId": "laptop",
+        "action": "setState",
+        "state": "pivot-table"
+      },
+      "description": "Spreadsheet illuminates with Pivot Table solution."
+    },
+    {
+      "id": "evt-mohamed-speak-solution",
+      "actor": "mohamed",
+      "action": "speak",
+      "timing": { "start": 6.7, "duration": 2.1 },
+      "params": {
+        "text": "Regarde, avec un Tableau Croisé Dynamique, on peut synthétiser toutes ces lignes rapidement."
+      },
+      "description": "Mohamed explains the Pivot Table solution."
+    },
+    {
+      "id": "evt-caption-solution",
+      "action": "caption",
+      "actor": "mohamed",
+      "timing": { "start": 6.7, "duration": 2.1 },
+      "params": {
+        "text": "Regarde, avec un Tableau Croisé Dynamique, on peut synthétiser toutes ces lignes rapidement."
+      },
+      "description": "Solution subtitle."
+    }
+  ]
+}

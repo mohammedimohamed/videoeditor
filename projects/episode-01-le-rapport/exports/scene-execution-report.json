@@ -1,0 +1,976 @@
+{
+  "system": "Mohamed Excel — Scene Direction System (SDS)",
+  "version": "2.0.0",
+  "generatedAt": "2026-11-09T12:45:03.772Z",
+  "gitCommitBaseline": "9ba790341ba93a374e16094ea7ea52e3ea1476e4",
+  "verificationStatus": "PASSED_100_PERCENT",
+  "tests": {
+    "schemaValidation": "PASS",
+    "intentionalRejection": {
+      "unknownAnchor": "PASS",
+      "cyclicDependency": "PASS",
+      "concurrencyCollision": "PASS"
+    },
+    "benchmark1Compilation": {
+      "status": "PASS",
+      "sceneId": "benchmark-interaction",
+      "eventsCompiled": 14,
+      "duration": 8.8
+    },
+    "benchmark2Compilation": {
+      "status": "PASS",
+      "sceneId": "benchmark-second-scene",
+      "eventsCompiled": 15,
+      "duration": 8.8
+    }
+  },
+  "benchmarks": {
+    "benchmark1": {
+      "version": "2.0.0",
+      "sceneId": "benchmark-interaction",
+      "sceneTitle": "Episode 01: Le rapport pour demain matin (Beats 1 to 7 Benchmark)",
+      "generatedAt": "2026-11-09T12:44:56.359Z",
+      "compilationTimeMs": 63,
+      "summary": {
+        "totalEvents": 14,
+        "compiledEvents": 14,
+        "validationStatus": "PASSED",
+        "errorsCount": 0,
+        "warningsCount": 0
+      },
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": []
+      },
+      "instructionsExecutionMap": [
+        {
+          "id": "evt-clock-ticking",
+          "actor": null,
+          "prop": "clock",
+          "action": "propAction",
+          "scheduled": {
+            "start": 0,
+            "end": 8.8,
+            "duration": 8.8
+          },
+          "subsystems": [
+            "prop-state"
+          ],
+          "params": {
+            "propId": "clock",
+            "action": "tick"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-karim-idle-start",
+          "actor": "karim",
+          "prop": null,
+          "action": "idle",
+          "scheduled": {
+            "start": 0,
+            "end": 0.6,
+            "duration": 0.6
+          },
+          "subsystems": [
+            "breathing",
+            "blinking"
+          ],
+          "params": {
+            "breathing": true,
+            "blinking": false
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-karim-frustration",
+          "actor": "karim",
+          "prop": null,
+          "action": "frustrationSequence",
+          "scheduled": {
+            "start": 0.6,
+            "end": 3.4,
+            "duration": 2.8
+          },
+          "subsystems": [
+            "arm-near",
+            "arm-far",
+            "head",
+            "expression"
+          ],
+          "params": {
+            "duration": 2.8
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-laptop-scroll-data",
+          "actor": null,
+          "prop": "laptop",
+          "action": "propAction",
+          "scheduled": {
+            "start": 0.8,
+            "end": 3,
+            "duration": 2.2
+          },
+          "subsystems": [
+            "prop-state"
+          ],
+          "params": {
+            "propId": "laptop",
+            "action": "scroll"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-caption-frustration",
+          "actor": "karim",
+          "prop": null,
+          "action": "caption",
+          "scheduled": {
+            "start": 1.2,
+            "end": 4,
+            "duration": 2.8
+          },
+          "subsystems": [
+            "caption"
+          ],
+          "params": {
+            "text": "Des centaines de lignes dans Excel… et très peu de temps pour les analyser."
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-mohamed-enter-walk",
+          "actor": "mohamed",
+          "prop": null,
+          "action": "walk",
+          "scheduled": {
+            "start": 2.4,
+            "end": 4.8,
+            "duration": 2.4
+          },
+          "subsystems": [
+            "locomotion"
+          ],
+          "params": {
+            "to": 855,
+            "startX": 1180,
+            "mode": "foot-locked"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-mohamed-greet",
+          "actor": "mohamed",
+          "prop": null,
+          "action": "speak",
+          "scheduled": {
+            "start": 4.9,
+            "end": 6.5,
+            "duration": 1.6
+          },
+          "subsystems": [
+            "speech",
+            "head"
+          ],
+          "params": {
+            "text": "Tu as besoin d'un coup de main ?",
+            "gesture": "wave"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-karim-listen-greet",
+          "actor": "karim",
+          "prop": null,
+          "action": "listenTo",
+          "scheduled": {
+            "start": 4.9,
+            "end": 6.5,
+            "duration": 1.6
+          },
+          "subsystems": [
+            "gaze",
+            "head",
+            "expression"
+          ],
+          "params": {
+            "speaker": "mohamed",
+            "responsiveNods": true
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-caption-greet",
+          "actor": "mohamed",
+          "prop": null,
+          "action": "caption",
+          "scheduled": {
+            "start": 5,
+            "end": 6.5,
+            "duration": 1.5
+          },
+          "subsystems": [
+            "caption"
+          ],
+          "params": {
+            "text": "Tu as besoin d'un coup de main ?"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-mohamed-point-screen",
+          "actor": "mohamed",
+          "prop": null,
+          "action": "pointAt",
+          "scheduled": {
+            "start": 6.6,
+            "end": 8.8,
+            "duration": 2.2
+          },
+          "subsystems": [
+            "arm-near"
+          ],
+          "params": {
+            "target": "laptop.screen",
+            "duration": 0.55
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-laptop-solution-state",
+          "actor": null,
+          "prop": "laptop",
+          "action": "propAction",
+          "scheduled": {
+            "start": 6.7,
+            "end": 8.7,
+            "duration": 2
+          },
+          "subsystems": [
+            "prop-state"
+          ],
+          "params": {
+            "propId": "laptop",
+            "action": "setState",
+            "state": "pivot-table"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-mohamed-speak-solution",
+          "actor": "mohamed",
+          "prop": null,
+          "action": "speak",
+          "scheduled": {
+            "start": 6.7,
+            "end": 8.8,
+            "duration": 2.1
+          },
+          "subsystems": [
+            "speech",
+            "head"
+          ],
+          "params": {
+            "text": "Regarde, avec un Tableau Croisé Dynamique, on peut synthétiser toutes ces lignes rapidement."
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-caption-solution",
+          "actor": "mohamed",
+          "prop": null,
+          "action": "caption",
+          "scheduled": {
+            "start": 6.7,
+            "end": 8.8,
+            "duration": 2.1
+          },
+          "subsystems": [
+            "caption"
+          ],
+          "params": {
+            "text": "Regarde, avec un Tableau Croisé Dynamique, on peut synthétiser toutes ces lignes rapidement."
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-karim-look-screen",
+          "actor": "karim",
+          "prop": null,
+          "action": "lookAt",
+          "scheduled": {
+            "start": 6.8,
+            "end": 8.8,
+            "duration": 2
+          },
+          "subsystems": [
+            "gaze",
+            "head"
+          ],
+          "params": {
+            "target": "laptop.screen",
+            "duration": 0.4
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        }
+      ],
+      "anchorResolutions": [
+        {
+          "ref": "laptop.screen",
+          "resolved": {
+            "x": 525,
+            "y": 985
+          },
+          "type": "propAnchor",
+          "timestamp": 48
+        },
+        {
+          "ref": "laptop.screen",
+          "resolved": {
+            "x": 525,
+            "y": 985
+          },
+          "type": "propAnchor",
+          "timestamp": 48
+        }
+      ],
+      "concurrencyAllocations": [
+        {
+          "actor": "karim",
+          "interval": [
+            0,
+            0.6
+          ],
+          "subsystems": [
+            "breathing",
+            "blinking"
+          ]
+        },
+        {
+          "actor": "karim",
+          "interval": [
+            0.6,
+            3.4
+          ],
+          "subsystems": [
+            "arm-near",
+            "arm-far",
+            "head",
+            "expression"
+          ]
+        },
+        {
+          "actor": "karim",
+          "interval": [
+            1.2,
+            4
+          ],
+          "subsystems": [
+            "caption"
+          ]
+        },
+        {
+          "actor": "mohamed",
+          "interval": [
+            2.4,
+            4.8
+          ],
+          "subsystems": [
+            "locomotion"
+          ]
+        },
+        {
+          "actor": "mohamed",
+          "interval": [
+            4.9,
+            6.5
+          ],
+          "subsystems": [
+            "speech",
+            "head"
+          ]
+        },
+        {
+          "actor": "karim",
+          "interval": [
+            4.9,
+            6.5
+          ],
+          "subsystems": [
+            "gaze",
+            "head",
+            "expression"
+          ]
+        },
+        {
+          "actor": "mohamed",
+          "interval": [
+            5,
+            6.5
+          ],
+          "subsystems": [
+            "caption"
+          ]
+        },
+        {
+          "actor": "mohamed",
+          "interval": [
+            6.6,
+            8.8
+          ],
+          "subsystems": [
+            "arm-near"
+          ]
+        },
+        {
+          "actor": "mohamed",
+          "interval": [
+            6.7,
+            8.8
+          ],
+          "subsystems": [
+            "speech",
+            "head"
+          ]
+        },
+        {
+          "actor": "mohamed",
+          "interval": [
+            6.7,
+            8.8
+          ],
+          "subsystems": [
+            "caption"
+          ]
+        },
+        {
+          "actor": "karim",
+          "interval": [
+            6.8,
+            8.8
+          ],
+          "subsystems": [
+            "gaze",
+            "head"
+          ]
+        }
+      ]
+    },
+    "benchmark2": {
+      "version": "2.0.0",
+      "sceneId": "benchmark-second-scene",
+      "sceneTitle": "Scene 02: La Pause Café & L'Idée Brillante",
+      "generatedAt": "2026-11-09T12:45:00.025Z",
+      "compilationTimeMs": 64,
+      "summary": {
+        "totalEvents": 15,
+        "compiledEvents": 15,
+        "validationStatus": "PASSED",
+        "errorsCount": 0,
+        "warningsCount": 0
+      },
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": []
+      },
+      "instructionsExecutionMap": [
+        {
+          "id": "evt-s2-clock",
+          "actor": null,
+          "prop": "clock",
+          "action": "propAction",
+          "scheduled": {
+            "start": 0,
+            "end": 8.8,
+            "duration": 8.8
+          },
+          "subsystems": [
+            "prop-state"
+          ],
+          "params": {
+            "propId": "clock",
+            "action": "tick"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-s2-karim-happy-type",
+          "actor": "karim",
+          "prop": null,
+          "action": "type",
+          "scheduled": {
+            "start": 0.2,
+            "end": 1.4,
+            "duration": 1.2
+          },
+          "subsystems": [
+            "arm-near",
+            "arm-far"
+          ],
+          "params": {
+            "target": "laptop.keyboard",
+            "duration": 1.2
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-s2-karim-express-happy",
+          "actor": "karim",
+          "prop": null,
+          "action": "express",
+          "scheduled": {
+            "start": 0.2,
+            "end": 0.7,
+            "duration": 0.5
+          },
+          "subsystems": [
+            "expression"
+          ],
+          "params": {
+            "emotion": "happy"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-s2-karim-sit-idle",
+          "actor": "karim",
+          "prop": null,
+          "action": "idle",
+          "scheduled": {
+            "start": 1.4,
+            "end": 3.6,
+            "duration": 2.2
+          },
+          "subsystems": [
+            "breathing",
+            "blinking"
+          ],
+          "params": {
+            "breathing": true,
+            "blinking": true
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-s2-mohamed-walk",
+          "actor": "mohamed",
+          "prop": null,
+          "action": "walk",
+          "scheduled": {
+            "start": 1.5,
+            "end": 3.8,
+            "duration": 2.3
+          },
+          "subsystems": [
+            "locomotion"
+          ],
+          "params": {
+            "to": 855,
+            "startX": 1180,
+            "mode": "foot-locked"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-s2-mohamed-greet",
+          "actor": "mohamed",
+          "prop": null,
+          "action": "speak",
+          "scheduled": {
+            "start": 3.9,
+            "end": 5.6,
+            "duration": 1.7
+          },
+          "subsystems": [
+            "speech",
+            "head"
+          ],
+          "params": {
+            "text": "Alors Karim, ce fameux rapport est enfin prêt ?",
+            "gesture": "wave"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-s2-caption-mohamed-greet",
+          "actor": "mohamed",
+          "prop": null,
+          "action": "caption",
+          "scheduled": {
+            "start": 3.9,
+            "end": 5.6,
+            "duration": 1.7
+          },
+          "subsystems": [
+            "caption"
+          ],
+          "params": {
+            "text": "Alors Karim, ce fameux rapport est enfin prêt ?"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-s2-karim-listen-greet",
+          "actor": "karim",
+          "prop": null,
+          "action": "listenTo",
+          "scheduled": {
+            "start": 3.9,
+            "end": 5.6,
+            "duration": 1.7
+          },
+          "subsystems": [
+            "gaze",
+            "head",
+            "expression"
+          ],
+          "params": {
+            "speaker": "mohamed",
+            "responsiveNods": true
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-s2-karim-reply",
+          "actor": "karim",
+          "prop": null,
+          "action": "speak",
+          "scheduled": {
+            "start": 5.7,
+            "end": 7.5,
+            "duration": 1.8
+          },
+          "subsystems": [
+            "speech",
+            "head"
+          ],
+          "params": {
+            "text": "Totalement bouclé en 5 minutes grâce aux Tableaux Croisés !",
+            "gesture": "explain"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-s2-caption-karim-reply",
+          "actor": "karim",
+          "prop": null,
+          "action": "caption",
+          "scheduled": {
+            "start": 5.7,
+            "end": 7.5,
+            "duration": 1.8
+          },
+          "subsystems": [
+            "caption"
+          ],
+          "params": {
+            "text": "Totalement bouclé en 5 minutes grâce aux Tableaux Croisés !"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-s2-mohamed-listen-karim",
+          "actor": "mohamed",
+          "prop": null,
+          "action": "listenTo",
+          "scheduled": {
+            "start": 5.7,
+            "end": 7.5,
+            "duration": 1.8
+          },
+          "subsystems": [
+            "gaze",
+            "head",
+            "expression"
+          ],
+          "params": {
+            "speaker": "karim",
+            "responsiveNods": true
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-s2-mohamed-point-clock",
+          "actor": "mohamed",
+          "prop": null,
+          "action": "pointAt",
+          "scheduled": {
+            "start": 7.6,
+            "end": 8.8,
+            "duration": 1.2
+          },
+          "subsystems": [
+            "arm-near"
+          ],
+          "params": {
+            "target": "clock.face",
+            "duration": 0.55
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-s2-mohamed-speak-time",
+          "actor": "mohamed",
+          "prop": null,
+          "action": "speak",
+          "scheduled": {
+            "start": 7.6,
+            "end": 8.8,
+            "duration": 1.2
+          },
+          "subsystems": [
+            "speech",
+            "head"
+          ],
+          "params": {
+            "text": "Et regarde l'heure : tu as fini avec une heure d'avance !"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-s2-caption-clock",
+          "actor": "mohamed",
+          "prop": null,
+          "action": "caption",
+          "scheduled": {
+            "start": 7.6,
+            "end": 8.8,
+            "duration": 1.2
+          },
+          "subsystems": [
+            "caption"
+          ],
+          "params": {
+            "text": "Et regarde l'heure : tu as fini avec une heure d'avance !"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-s2-karim-look-clock",
+          "actor": "karim",
+          "prop": null,
+          "action": "lookAt",
+          "scheduled": {
+            "start": 7.7,
+            "end": 8.8,
+            "duration": 1.1
+          },
+          "subsystems": [
+            "gaze",
+            "head"
+          ],
+          "params": {
+            "target": "clock.face",
+            "duration": 0.35
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        }
+      ],
+      "anchorResolutions": [
+        {
+          "ref": "clock.face",
+          "resolved": {
+            "x": 380,
+            "y": 480
+          },
+          "type": "propAnchor",
+          "timestamp": 54
+        },
+        {
+          "ref": "clock.face",
+          "resolved": {
+            "x": 380,
+            "y": 480
+          },
+          "type": "propAnchor",
+          "timestamp": 55
+        }
+      ],
+      "concurrencyAllocations": [
+        {
+          "actor": "karim",
+          "interval": [
+            0.2,
+            1.4
+          ],
+          "subsystems": [
+            "arm-near",
+            "arm-far"
+          ]
+        },
+        {
+          "actor": "karim",
+          "interval": [
+            0.2,
+            0.7
+          ],
+          "subsystems": [
+            "expression"
+          ]
+        },
+        {
+          "actor": "karim",
+          "interval": [
+            1.4,
+            3.6
+          ],
+          "subsystems": [
+            "breathing",
+            "blinking"
+          ]
+        },
+        {
+          "actor": "mohamed",
+          "interval": [
+            1.5,
+            3.8
+          ],
+          "subsystems": [
+            "locomotion"
+          ]
+        },
+        {
+          "actor": "mohamed",
+          "interval": [
+            3.9,
+            5.6
+          ],
+          "subsystems": [
+            "speech",
+            "head"
+          ]
+        },
+        {
+          "actor": "mohamed",
+          "interval": [
+            3.9,
+            5.6
+          ],
+          "subsystems": [
+            "caption"
+          ]
+        },
+        {
+          "actor": "karim",
+          "interval": [
+            3.9,
+            5.6
+          ],
+          "subsystems": [
+            "gaze",
+            "head",
+            "expression"
+          ]
+        },
+        {
+          "actor": "karim",
+          "interval": [
+            5.7,
+            7.5
+          ],
+          "subsystems": [
+            "speech",
+            "head"
+          ]
+        },
+        {
+          "actor": "karim",
+          "interval": [
+            5.7,
+            7.5
+          ],
+          "subsystems": [
+            "caption"
+          ]
+        },
+        {
+          "actor": "mohamed",
+          "interval": [
+            5.7,
+            7.5
+          ],
+          "subsystems": [
+            "gaze",
+            "head",
+            "expression"
+          ]
+        },
+        {
+          "actor": "mohamed",
+          "interval": [
+            7.6,
+            8.8
+          ],
+          "subsystems": [
+            "arm-near"
+          ]
+        },
+        {
+          "actor": "mohamed",
+          "interval": [
+            7.6,
+            8.8
+          ],
+          "subsystems": [
+            "speech",
+            "head"
+          ]
+        },
+        {
+          "actor": "mohamed",
+          "interval": [
+            7.6,
+            8.8
+          ],
+          "subsystems": [
+            "caption"
+          ]
+        },
+        {
+          "actor": "karim",
+          "interval": [
+            7.7,
+            8.8
+          ],
+          "subsystems": [
+            "gaze",
+            "head"
+          ]
+        }
+      ]
+    }
+  }
+}

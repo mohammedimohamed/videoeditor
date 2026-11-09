@@ -1,0 +1,229 @@
+{
+  "version": "2.0.0",
+  "metadata": {
+    "id": "benchmark-second-scene",
+    "title": "Scene 02: La Pause Café & L'Idée Brillante",
+    "description": "A second distinct scene demonstrating declarative SDS reusability: coffee break celebration with clock pointing and mug reaching.",
+    "duration": 8.8,
+    "fps": 30,
+    "resolution": {
+      "width": 1080,
+      "height": 1920
+    }
+  },
+  "environment": {
+    "preset": "office",
+    "background": "office-modern"
+  },
+  "actors": [
+    {
+      "id": "karim",
+      "template": "employee",
+      "name": "Karim",
+      "role": "Financial Analyst",
+      "initialState": {
+        "pose": "seated",
+        "position": { "x": 320, "y": 1120 },
+        "facing": 1,
+        "expression": "happy"
+      }
+    },
+    {
+      "id": "mohamed",
+      "template": "mohamed",
+      "name": "Mohamed",
+      "role": "Excel Expert",
+      "initialState": {
+        "pose": "standing",
+        "position": { "x": 1180, "y": 1104 },
+        "facing": -1,
+        "expression": "neutral"
+      }
+    }
+  ],
+  "props": [
+    {
+      "id": "desk",
+      "template": "desk",
+      "initialState": { "state": "default" }
+    },
+    {
+      "id": "laptop",
+      "template": "laptop",
+      "initialState": { "state": "pivot-table" }
+    },
+    {
+      "id": "clock",
+      "template": "clock",
+      "initialState": { "state": "ticking" }
+    },
+    {
+      "id": "mug",
+      "template": "mug",
+      "initialState": { "state": "full" }
+    }
+  ],
+  "events": [
+    {
+      "id": "evt-s2-clock",
+      "prop": "clock",
+      "action": "propAction",
+      "timing": { "start": 0.0, "duration": 8.8 },
+      "params": {
+        "propId": "clock",
+        "action": "tick"
+      },
+      "description": "Office clock ticking."
+    },
+    {
+      "id": "evt-s2-karim-happy-type",
+      "actor": "karim",
+      "action": "type",
+      "timing": { "start": 0.2, "duration": 1.2 },
+      "params": {
+        "target": "laptop.keyboard",
+        "duration": 1.2
+      },
+      "description": "Karim finishing his pivot table formulas with quick confident typing."
+    },
+    {
+      "id": "evt-s2-karim-express-happy",
+      "actor": "karim",
+      "action": "express",
+      "timing": { "start": 0.2, "duration": 0.5 },
+      "params": {
+        "emotion": "happy"
+      },
+      "description": "Karim wears a proud, happy smile."
+    },
+    {
+      "id": "evt-s2-karim-sit-idle",
+      "actor": "karim",
+      "action": "idle",
+      "timing": { "start": 1.4, "duration": 2.2 },
+      "params": {
+        "breathing": true,
+        "blinking": true
+      },
+      "description": "Karim relaxes back in chair admiring his finished dashboard."
+    },
+    {
+      "id": "evt-s2-mohamed-walk",
+      "actor": "mohamed",
+      "action": "walk",
+      "timing": { "start": 1.5, "duration": 2.3 },
+      "params": {
+        "to": 855,
+        "startX": 1180,
+        "mode": "foot-locked"
+      },
+      "description": "Mohamed walks to the desk with foot-locked zero-sliding locomotion."
+    },
+    {
+      "id": "evt-s2-mohamed-greet",
+      "actor": "mohamed",
+      "action": "speak",
+      "timing": { "start": 3.9, "duration": 1.7 },
+      "params": {
+        "text": "Alors Karim, ce fameux rapport est enfin prêt ?",
+        "gesture": "wave"
+      },
+      "description": "Mohamed waves and asks about the report."
+    },
+    {
+      "id": "evt-s2-caption-mohamed-greet",
+      "action": "caption",
+      "actor": "mohamed",
+      "timing": { "start": 3.9, "duration": 1.7 },
+      "params": {
+        "text": "Alors Karim, ce fameux rapport est enfin prêt ?"
+      },
+      "description": "Mohamed dialogue caption."
+    },
+    {
+      "id": "evt-s2-karim-listen-greet",
+      "actor": "karim",
+      "action": "listenTo",
+      "timing": { "start": 3.9, "duration": 1.7 },
+      "params": {
+        "speaker": "mohamed",
+        "responsiveNods": true
+      },
+      "description": "Karim turns to Mohamed, smiling and nodding with satisfaction."
+    },
+    {
+      "id": "evt-s2-karim-reply",
+      "actor": "karim",
+      "action": "speak",
+      "timing": { "start": 5.7, "duration": 1.8 },
+      "params": {
+        "text": "Totalement bouclé en 5 minutes grâce aux Tableaux Croisés !",
+        "gesture": "explain"
+      },
+      "description": "Karim enthusiastically confirms the report is completed."
+    },
+    {
+      "id": "evt-s2-caption-karim-reply",
+      "action": "caption",
+      "actor": "karim",
+      "timing": { "start": 5.7, "duration": 1.8 },
+      "params": {
+        "text": "Totalement bouclé en 5 minutes grâce aux Tableaux Croisés !"
+      },
+      "description": "Karim dialogue caption."
+    },
+    {
+      "id": "evt-s2-mohamed-listen-karim",
+      "actor": "mohamed",
+      "action": "listenTo",
+      "timing": { "start": 5.7, "duration": 1.8 },
+      "params": {
+        "speaker": "karim",
+        "responsiveNods": true
+      },
+      "description": "Mohamed listens attentively with an approving smile."
+    },
+    {
+      "id": "evt-s2-mohamed-point-clock",
+      "actor": "mohamed",
+      "action": "pointAt",
+      "timing": { "start": 7.6, "duration": 1.2 },
+      "params": {
+        "target": "clock.face",
+        "duration": 0.55
+      },
+      "description": "Mohamed points high at the wall clock: plenty of time remaining before noon."
+    },
+    {
+      "id": "evt-s2-mohamed-speak-time",
+      "actor": "mohamed",
+      "action": "speak",
+      "timing": { "start": 7.6, "duration": 1.2 },
+      "params": {
+        "text": "Et regarde l'heure : tu as fini avec une heure d'avance !"
+      },
+      "description": "Mohamed highlights the time saved."
+    },
+    {
+      "id": "evt-s2-caption-clock",
+      "action": "caption",
+      "actor": "mohamed",
+      "timing": { "start": 7.6, "duration": 1.2 },
+      "params": {
+        "text": "Et regarde l'heure : tu as fini avec une heure d'avance !"
+      },
+      "description": "Clock time saved caption."
+    },
+    {
+      "id": "evt-s2-karim-look-clock",
+      "actor": "karim",
+      "action": "lookAt",
+      "timing": { "start": 7.7, "duration": 1.1 },
+      "params": {
+        "target": "clock.face",
+        "duration": 0.35
+      },
+      "description": "Karim looks up at the clock with delighted surprise."
+    }
+  ]
+}

@@ -1,0 +1,154 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://mohamed-excel.com/schemas/scene-direction/v2.0.0/scene-schema.json",
+  "title": "Mohamed Excel — Scene Direction Specification Schema",
+  "description": "Formal schema for declarative 2D character animation scene specifications.",
+  "type": "object",
+  "required": ["version", "metadata", "actors", "events"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^2\\.[0-9]+\\.[0-9]+$"
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["id", "title", "duration"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-zA-Z0-9_-]+$" },
+        "title": { "type": "string", "minLength": 1 },
+        "description": { "type": "string" },
+        "duration": { "type": "number", "minimum": 0.5 },
+        "fps": { "type": "integer", "default": 30, "minimum": 15, "maximum": 60 },
+        "resolution": {
+          "type": "object",
+          "properties": {
+            "width": { "type": "integer", "default": 1080 },
+            "height": { "type": "integer", "default": 1920 }
+          }
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "properties": {
+        "preset": { "type": "string", "enum": ["office", "studio", "empty"] },
+        "background": { "type": "string" },
+        "props": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "actors": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/actor"
+      }
+    },
+    "props": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/prop"
+      }
+    },
+    "events": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/event"
+      }
+    }
+  },
+  "definitions": {
+    "actor": {
+      "type": "object",
+      "required": ["id", "template"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "template": { "type": "string", "enum": ["employee", "mohamed"] },
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "initialState": {
+          "type": "object",
+          "properties": {
+            "position": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["x", "y"],
+                  "properties": {
+                    "x": { "type": "number" },
+                    "y": { "type": "number" }
+                  }
+                },
+                { "type": "string" }
+              ]
+            },
+            "facing": {
+              "oneOf": [
+                { "type": "integer", "enum": [-1, 1] },
+                { "type": "string", "enum": ["left", "right", "3/4-left", "3/4-right"] }
+              ]
+            },
+            "pose": { "type": "string", "enum": ["standing", "seated"] },
+            "expression": { "type": "string" },
+            "visible": { "type": "boolean", "default": true }
+          }
+        }
+      }
+    },
+    "prop": {
+      "type": "object",
+      "required": ["id"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "template": { "type": "string" },
+        "initialState": {
+          "type": "object",
+          "properties": {
+            "state": { "type": "string" },
+            "visible": { "type": "boolean", "default": true },
+            "position": {
+              "type": "object",
+              "properties": {
+                "x": { "type": "number" },
+                "y": { "type": "number" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "event": {
+      "type": "object",
+      "required": ["id", "action"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "actor": { "type": "string" },
+        "prop": { "type": "string" },
+        "action": { "type": "string" },
+        "timing": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "start": { "type": "number", "minimum": 0 },
+            "after": { "type": "string" },
+            "with": { "type": "string" },
+            "offset": { "type": "number" },
+            "duration": { "type": "number", "minimum": 0 }
+          }
+        },
+        "params": {
+          "type": "object"
+        },
+        "description": { "type": "string" }
+      }
+    }
+  }
+}
