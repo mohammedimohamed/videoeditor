@@ -35,14 +35,23 @@ export class ObjectController {
 
     // Transform state
     const initT = def.localTransform || { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 };
-    this.transform = {
+    const initVisible = options.initialVisible !== undefined ? options.initialVisible : (options.visible !== undefined ? options.visible : true);
+    const initOpacity = initVisible ? (options.opacity !== undefined ? options.opacity : 1) : 0;
+
+    this._transform = {
       x: options.x !== undefined ? options.x : (initT.x || 0),
       y: options.y !== undefined ? options.y : (initT.y || 0),
       rotation: options.rotation !== undefined ? options.rotation : (initT.rotation || 0),
       scaleX: options.scaleX !== undefined ? options.scaleX : (initT.scaleX || 1),
       scaleY: options.scaleY !== undefined ? options.scaleY : (initT.scaleY || 1),
-      opacity: options.opacity !== undefined ? options.opacity : 1
+      opacity: initOpacity
     };
+
+    if (this.element) {
+      if (!initVisible || initOpacity === 0) {
+        gsap.set(this.element, { opacity: 0 });
+      }
+    }
 
     // Attachment state
     this.attachment = {
@@ -57,6 +66,71 @@ export class ObjectController {
     this.state = options.initialState || (def.states ? def.states[0] : 'default');
   }
 
+  get transform() {
+    if (this.element && typeof gsap !== 'undefined') {
+      const curX = gsap.getProperty(this.element, "x");
+      const curY = gsap.getProperty(this.element, "y");
+      const curRot = gsap.getProperty(this.element, "rotation");
+      const curSx = gsap.getProperty(this.element, "scaleX");
+      const curSy = gsap.getProperty(this.element, "scaleY");
+      const curOp = gsap.getProperty(this.element, "opacity");
+      return {
+        x: curX !== null && curX !== undefined && !isNaN(curX) ? curX : this._transform.x,
+        y: curY !== null && curY !== undefined && !isNaN(curY) ? curY : this._transform.y,
+        rotation: curRot !== null && curRot !== undefined && !isNaN(curRot) ? curRot : this._transform.rotation,
+        scaleX: curSx !== null && curSx !== undefined && !isNaN(curSx) ? curSx : this._transform.scaleX,
+        scaleY: curSy !== null && curSy !== undefined && !isNaN(curSy) ? curSy : this._transform.scaleY,
+        opacity: curOp !== null && curOp !== undefined && !isNaN(curOp) ? curOp : this._transform.opacity
+      };
+    }
+    return this._transform;
+  }
+
+  set transform(val) {
+    this._transform = { ...this._transform, ...val };
+  }
+
+  /**
+   * Convert world coordinate to local parent coordinate space.
+   * If element has an SVG parent group with transforms (e.g. #office-desk),
+   * maps world point through parent's inverse CTM for 100% mathematical precision.
+   * 
+   * @param {number} worldX
+   * @param {number} worldY
+   * @returns {{x: number, y: number}}
+   */
+  getLocalFromWorld(worldX, worldY) {
+    if (!this.element) return { x: worldX, y: worldY };
+
+    // 1. Live DOM SVG evaluation
+    const parent = this.element.parentElement;
+    if (parent && typeof parent.getCTM === 'function' && parent !== this.element.ownerSVGElement) {
+      const svg = this.element.ownerSVGElement;
+      if (svg) {
+        const pt = svg.createSVGPoint();
+        pt.x = worldX;
+        pt.y = worldY;
+        const pCTM = parent.getCTM();
+        if (pCTM) {
+          const localPt = pt.matrixTransform(pCTM.inverse());
+          return { x: localPt.x, y: localPt.y };
+        }
+      }
+    }
+
+    // 2. Mathematical fallback if headless / pre-render
+    const parentId = this.parent || this.definition?.parent;
+    if (parentId && ASSET_REGISTRY.objects[parentId]) {
+      const pWorld = getWorldTransform(parentId);
+      return {
+        x: worldX - (pWorld.x || 0),
+        y: worldY - (pWorld.y || 0)
+      };
+    }
+
+    return { x: worldX, y: worldY };
+  }
+
   /**
    * 1. MOVE TO: Translate object to world coordinate or anchor target
    */
@@ -69,16 +143,25 @@ export class ObjectController {
     duration = 0.8,
     ease = "power2.inOut"
   } = {}) {
+    let destWorldX = null;
+    let destWorldY = null;
+
+    if (x !== null && y !== null) {
+      destWorldX = x;
+      destWorldY = y;
+    } else if (target) {
+      const resolved = resolveAnchor(target);
+      destWorldX = resolved.x;
+      destWorldY = resolved.y;
+    }
+
     let destX = this.transform.x;
     let destY = this.transform.y;
 
-    if (x !== null && y !== null) {
-      destX = x;
-      destY = y;
-    } else if (target) {
-      const resolved = resolveAnchor(target);
-      destX = resolved.x;
-      destY = resolved.y;
+    if (destWorldX !== null && destWorldY !== null) {
+      const localPt = this.getLocalFromWorld(destWorldX, destWorldY);
+      destX = localPt.x;
+      destY = localPt.y;
     }
 
     if (this.element) {
@@ -104,12 +187,14 @@ export class ObjectController {
     rotation = 0,
     duration = 0.5,
     ease = "power2.out",
-    transformOrigin = "50% 50%"
+    transformOrigin = null
   } = {}) {
+    const defaultOrigin = (this.id === 'mug' || this.element?.id === 'desk-mug') ? "0px 22px" : "50% 50%";
+    const tOrigin = transformOrigin || defaultOrigin;
     if (this.element) {
       tl.to(this.element, {
         rotation,
-        transformOrigin,
+        transformOrigin: tOrigin,
         duration,
         ease
       }, atTime);
@@ -166,6 +251,7 @@ export class ObjectController {
 
   /**
    * 5. FOLLOW PATH: Animate along curved 2D trajectory
+   * Converts world trajectory coordinates into local parent coordinate space.
    * @param {Array<{x: number, y: number}>|string} path Points or SVG path data
    */
   followPath({
@@ -177,9 +263,12 @@ export class ObjectController {
   } = {}) {
     if (!this.element || !Array.isArray(path) || path.length < 2) return tl;
 
-    const subDt = duration / (path.length - 1);
-    for (let i = 1; i < path.length; i++) {
-      const pt = path[i];
+    // Convert each trajectory waypoint to local parent coordinate space
+    const localPath = path.map(pt => this.getLocalFromWorld(pt.x, pt.y));
+
+    const subDt = duration / (localPath.length - 1);
+    for (let i = 1; i < localPath.length; i++) {
+      const pt = localPath[i];
       tl.to(this.element, {
         x: pt.x,
         y: pt.y,
@@ -188,7 +277,7 @@ export class ObjectController {
       }, atTime + (i - 1) * subDt);
     }
 
-    const lastPt = path[path.length - 1];
+    const lastPt = localPath[localPath.length - 1];
     this.transform.x = lastPt.x;
     this.transform.y = lastPt.y;
     return tl;
@@ -204,12 +293,25 @@ export class ObjectController {
     scaleX = null,
     scaleY = null,
     opacity = null,
+    isWorld = true,
     tl = null,
     atTime = null
   } = {}) {
     const updates = {};
-    if (x !== null) { updates.x = x; this.transform.x = x; }
-    if (y !== null) { updates.y = y; this.transform.y = y; }
+    if (x !== null && y !== null) {
+      const localPt = isWorld ? this.getLocalFromWorld(x, y) : { x, y };
+      updates.x = localPt.x;
+      updates.y = localPt.y;
+      this.transform.x = localPt.x;
+      this.transform.y = localPt.y;
+    } else if (x !== null) {
+      updates.x = x;
+      this.transform.x = x;
+    } else if (y !== null) {
+      updates.y = y;
+      this.transform.y = y;
+    }
+
     if (rotation !== null) { updates.rotation = rotation; this.transform.rotation = rotation; }
     if (scaleX !== null) { updates.scaleX = scaleX; this.transform.scaleX = scaleX; }
     if (scaleY !== null) { updates.scaleY = scaleY; this.transform.scaleY = scaleY; }
@@ -264,18 +366,20 @@ export class ObjectController {
   }
 
   open({ tl = gsap.timeline(), atTime = 0, duration = 0.5 } = {}) {
-    // e.g. Laptop screen opens upward
-    if (this.element) {
-      tl.to(this.element, { scaleY: 1, duration, ease: "power2.out", transformOrigin: "bottom center" }, atTime);
+    // Hinged screen unfolds upward around the hinge line at y=118
+    const screenEl = this.element?.querySelector('#laptop-screen-assembly') || this.element;
+    if (screenEl) {
+      tl.to(screenEl, { scaleY: 1, duration, ease: "power2.out", transformOrigin: "110px 118px" }, atTime);
     }
     this.state = 'open';
     return tl;
   }
 
   close({ tl = gsap.timeline(), atTime = 0, duration = 0.5 } = {}) {
-    // e.g. Laptop screen folds down
-    if (this.element) {
-      tl.to(this.element, { scaleY: 0.08, duration, ease: "power2.in", transformOrigin: "bottom center" }, atTime);
+    // Hinged screen folds down flat onto keyboard around hinge line at y=118
+    const screenEl = this.element?.querySelector('#laptop-screen-assembly') || this.element;
+    if (screenEl) {
+      tl.to(screenEl, { scaleY: 0.05, duration, ease: "power2.in", transformOrigin: "110px 118px" }, atTime);
     }
     this.state = 'closed';
     return tl;
@@ -283,7 +387,7 @@ export class ObjectController {
 
   /**
    * 8. ATTACH TO CHARACTER: Seamlessly attach object to character's hand
-   * Calculates world offset at contact timestamp so the object NEVER jumps or teleports.
+   * Zero position jump at contact timestamp; synchronous continuous lift with hand.
    * 
    * @param {CharacterController} actorController
    * @param {Object} options { tl, atTime, hand, socket, holdDuration, liftDelta }
@@ -293,7 +397,7 @@ export class ObjectController {
     atTime = 0,
     hand = 'near',
     socket = 'palm',
-    liftDelta = { x: 0, y: -45 },
+    liftDelta = { x: -20, y: -65 },
     duration = 0.6
   } = {}) {
     this.attachment.isHeld = true;
@@ -303,10 +407,79 @@ export class ObjectController {
 
     if (!this.element) return tl;
 
-    // Animate object following the hand lift
-    // Object lifts smoothly synchronously with character forearm lift
-    const targetLiftX = this.transform.x + liftDelta.x;
-    const targetLiftY = this.transform.y + liftDelta.y;
+    // Contact instant: starts exactly at current transform (zero jump, discontinuity <= 0.001px)
+    const side = (actorController?.name === 'mohamed') ? 'L' : (hand === 'near' ? 'L' : 'R');
+    const handEl = actorController?.rig?.parts?.[`hand${side}`];
+    const armEl = actorController?.rig?.parts?.[`arm${side}`];
+    const foreEl = actorController?.rig?.parts?.[`forearm${side}`];
+
+    if (handEl && armEl && foreEl && typeof gsap !== 'undefined') {
+      const svg = this.element.ownerSVGElement;
+      const parent = this.element.parentElement || this.element.ownerSVGElement;
+      const getSvgWorld = (el) => {
+        const pt = svg.createSVGPoint();
+        return pt.matrixTransform(el.getCTM());
+      };
+      const getLocal = (wx, wy) => {
+        const pt = svg.createSVGPoint();
+        pt.x = wx; pt.y = wy;
+        return pt.matrixTransform(parent.getCTM().inverse());
+      };
+
+      const reachAngles = actorController?.state?.lastReachAngles || {};
+      const startRotA = reachAngles.shoulderRot !== undefined ? reachAngles.shoulderRot : 88.36;
+      const startRotF = reachAngles.foreRot !== undefined ? reachAngles.foreRot : -88.77;
+      const endRotA = 120;
+      const endRotF = -105;
+
+      // Contact offset
+      gsap.set(armEl, { rotation: startRotA });
+      gsap.set(foreEl, { rotation: startRotF });
+      const h0 = getSvgWorld(handEl);
+      const m0 = getSvgWorld(this.element);
+      const offset0 = { x: m0.x - h0.x, y: m0.y - h0.y };
+
+      const steps = 10;
+      const waypoints = [];
+      for (let i = 0; i <= steps; i++) {
+        const u = i / steps;
+        const p = 1 - Math.pow(1 - u, 3); // GSAP power2.out cubic
+        const rotA = startRotA + (endRotA - startRotA) * p;
+        const rotF = startRotF + (endRotF - startRotF) * p;
+        gsap.set(armEl, { rotation: rotA });
+        gsap.set(foreEl, { rotation: rotF });
+        const h = getSvgWorld(handEl);
+        const targetWorld = { x: h.x + offset0.x, y: h.y + offset0.y };
+        const local = getLocal(targetWorld.x, targetWorld.y);
+        waypoints.push({ t: atTime + u * duration, local });
+      }
+
+      // Restore arm angles to pre-lift state
+      gsap.set(armEl, { rotation: startRotA });
+      gsap.set(foreEl, { rotation: startRotF });
+
+      const subDt = duration / steps;
+      for (let i = 1; i < waypoints.length; i++) {
+        const cur = waypoints[i];
+        tl.to(this.element, {
+          x: cur.local.x,
+          y: cur.local.y,
+          duration: subDt,
+          ease: "none"
+        }, atTime + (i - 1) * subDt);
+      }
+
+      const lastPt = waypoints[waypoints.length - 1].local;
+      this.transform.x = lastPt.x;
+      this.transform.y = lastPt.y;
+      return tl;
+    }
+
+    const startX = this.transform.x;
+    const startY = this.transform.y;
+
+    const targetLiftX = startX + liftDelta.x;
+    const targetLiftY = startY + liftDelta.y;
 
     tl.to(this.element, {
       x: targetLiftX,
@@ -321,7 +494,7 @@ export class ObjectController {
   }
 
   /**
-   * 9. DETACH FROM CHARACTER: Release object and place it stably at destination
+   * 9. DETACH FROM CHARACTER: Release object and settle stably at destination
    * 
    * @param {Object} options { tl, atTime, placeAt, duration, ease }
    */
@@ -339,13 +512,23 @@ export class ObjectController {
 
     if (!this.element) return tl;
 
-    let targetX = this.transform.x;
-    let targetY = this.transform.y;
+    let targetWorldX = null;
+    let targetWorldY = null;
 
     if (placeAt) {
       const resolved = resolveAnchor(placeAt);
-      targetX = resolved.x;
-      targetY = resolved.y;
+      const bottomAnchor = this.definition?.localAnchors?.bottom || { x: 14, y: 34 };
+      targetWorldX = resolved.x - bottomAnchor.x;
+      targetWorldY = resolved.y - bottomAnchor.y;
+    }
+
+    let targetX = this.transform.x;
+    let targetY = this.transform.y;
+
+    if (targetWorldX !== null && targetWorldY !== null) {
+      const localPt = this.getLocalFromWorld(targetWorldX, targetWorldY);
+      targetX = localPt.x;
+      targetY = localPt.y;
     }
 
     tl.to(this.element, {
@@ -354,15 +537,6 @@ export class ObjectController {
       duration,
       ease
     }, atTime);
-
-    // Subtle contact bounce on placement (realistic glass/ceramic contact)
-    tl.to(this.element, {
-      y: targetY - 2,
-      duration: 0.08,
-      yoyo: true,
-      repeat: 1,
-      ease: "sine.out"
-    }, atTime + duration);
 
     this.transform.x = targetX;
     this.transform.y = targetY;

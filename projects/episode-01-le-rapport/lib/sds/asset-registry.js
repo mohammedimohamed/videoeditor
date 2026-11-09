@@ -65,7 +65,7 @@ export const ASSET_REGISTRY = {
       id: "laptop",
       name: "Office Laptop",
       parent: "desk",
-      selector: "#office-laptop",
+      selector: "#desk-laptop, #office-laptop",
       localTransform: { x: 230, y: -115, rotation: 0, scaleX: 1, scaleY: 1 },
       dimensions: { width: 220, height: 140 },
       localAnchors: {
@@ -74,7 +74,8 @@ export const ASSET_REGISTRY = {
         screenTop: { x: 115, y: -20 },
         keyboard: { x: 140, y: 110 },        // World: x=550, y=1075
         touchpad: { x: 140, y: 125 },
-        dataRegion: { x: 115, y: 60 }        // World: x=525, y=1025
+        dataRegion: { x: 115, y: 60 },       // World: x=525, y=1025
+        hinge: { x: 110, y: 118 }            // World: x=520, y=1083
       },
       states: ["raw-data", "error-highlight", "formula-typing", "pivot-table", "closed"]
     },
@@ -85,13 +86,13 @@ export const ASSET_REGISTRY = {
       parent: "desk",
       selector: "#desk-mug",
       zIndex: 4,
-      localTransform: { x: 460, y: -25, rotation: 0, scaleX: 1, scaleY: 1 },
+      localTransform: { x: 490, y: -18, rotation: 0, scaleX: 1, scaleY: 1 },
       dimensions: { width: 38, height: 34 },
       localAnchors: {
-        handle: { x: 30, y: 15 },            // World: x=670, y=1070 (Grip target)
-        center: { x: 14, y: 17 },            // World: x=654, y=1072
-        top: { x: 14, y: 0 },
-        bottom: { x: 14, y: 34 },            // Desk contact surface
+        handle: { x: 33, y: 15 },            // World: x=703, y=1077 (Grip socket)
+        center: { x: 14, y: 17 },            // World: x=684, y=1079
+        top: { x: 14, y: 0 },                // World: x=684, y=1062
+        bottom: { x: 14, y: 34 },            // World: x=684, y=1096 (Desk contact surface)
         liquidSurface: { x: 14, y: 6 }
       },
       states: ["full", "empty", "held", "placed"]
@@ -225,7 +226,8 @@ ASSET_REGISTRY.props.laptop.anchors = {
   screenTop: { x: 525, y: 945 },
   keyboard: { x: 550, y: 1075 },
   touchpad: { x: 550, y: 1090 },
-  dataRegion: { x: 525, y: 1025 }
+  dataRegion: { x: 525, y: 1025 },
+  hinge: { x: 520, y: 1083 }
 };
 ASSET_REGISTRY.props.clock.anchors = {
   face: { x: 380, y: 480 },
@@ -236,50 +238,76 @@ ASSET_REGISTRY.props.chair.anchors = {
   backrest: { x: 260, y: 1020 }
 };
 ASSET_REGISTRY.props.mug.anchors = {
-  handle: { x: 640, y: 1055 },
-  center: { x: 640, y: 1055 },
-  top: { x: 640, y: 1040 },
-  bottom: { x: 640, y: 1072 }
+  handle: { x: 703, y: 1077 },
+  center: { x: 684, y: 1079 },
+  top: { x: 684, y: 1062 },
+  bottom: { x: 684, y: 1096 }
 };
 ASSET_REGISTRY.props.shelf.anchors = {
   unreachable: { x: 880, y: 450 }
 };
 
 /**
- * Apply 2D affine transformation to a local point
- * @param {{x: number, y: number, rotation: number, scaleX: number, scaleY: number}} transform
+ * Create a 2D affine transformation matrix [a, b, c, d, e, f]
+ * equivalent to SVGMatrix / getCTM().
+ */
+export function makeAffineMatrix(t = {}) {
+  const sx = t.scaleX !== undefined ? t.scaleX : 1;
+  const sy = t.scaleY !== undefined ? t.scaleY : 1;
+  const r = ((t.rotation || 0) * Math.PI) / 180;
+  const cos = Math.cos(r);
+  const sin = Math.sin(r);
+  return {
+    a: sx * cos,
+    b: sx * sin,
+    c: -sy * sin,
+    d: sy * cos,
+    e: t.x || 0,
+    f: t.y || 0
+  };
+}
+
+/**
+ * Multiply two 2D affine transformation matrices (m1 * m2).
+ */
+export function multiplyAffineMatrices(m1, m2) {
+  return {
+    a: m1.a * m2.a + m1.c * m2.b,
+    b: m1.b * m2.a + m1.d * m2.b,
+    c: m1.a * m2.c + m1.c * m2.d,
+    d: m1.b * m2.c + m1.d * m2.d,
+    e: m1.a * m2.e + m1.c * m2.f + m1.e,
+    f: m1.b * m2.e + m1.d * m2.f + m1.f
+  };
+}
+
+/**
+ * Apply 2D affine transformation to a local point.
+ * Supports both matrix representation and {x, y, rotation, scaleX, scaleY} representation.
+ * @param {Object} transformOrMatrix
  * @param {{x: number, y: number}} point
  * @returns {{x: number, y: number}}
  */
-export function applyTransform(transform, point) {
-  const sx = transform.scaleX !== undefined ? transform.scaleX : 1;
-  const sy = transform.scaleY !== undefined ? transform.scaleY : 1;
-  const rotRad = ((transform.rotation || 0) * Math.PI) / 180;
-  const tx = transform.x || 0;
-  const ty = transform.y || 0;
-
-  // Scale
-  const px = point.x * sx;
-  const py = point.y * sy;
-
-  // Rotate
-  const cos = Math.cos(rotRad);
-  const sin = Math.sin(rotRad);
-  const rx = px * cos - py * sin;
-  const ry = px * sin + py * cos;
-
-  // Translate
+export function applyTransform(transformOrMatrix, point) {
+  let m;
+  if (transformOrMatrix.a !== undefined && transformOrMatrix.d !== undefined) {
+    m = transformOrMatrix;
+  } else {
+    m = makeAffineMatrix(transformOrMatrix);
+  }
   return {
-    x: rx + tx,
-    y: ry + ty
+    x: m.a * point.x + m.c * point.y + m.e,
+    y: m.b * point.x + m.d * point.y + m.f
   };
 }
 
 /**
  * Compute the accumulated world transform for an object by traversing its parent chain.
+ * Uses exact 2D affine matrix multiplication matching SVG getCTM() down to floating point limits.
+ * 
  * @param {string} objectId
  * @param {Map<string, Object>} [runtimeObjects] Optional live ObjectControllers with runtime transforms
- * @returns {{x: number, y: number, rotation: number, scaleX: number, scaleY: number}}
+ * @returns {{x: number, y: number, rotation: number, scaleX: number, scaleY: number, a: number, b: number, c: number, d: number, e: number, f: number}}
  */
 export function getWorldTransform(objectId, runtimeObjects = null) {
   const chain = [];
@@ -301,18 +329,27 @@ export function getWorldTransform(objectId, runtimeObjects = null) {
     currentId = objDef.parent;
   }
 
-  // Accumulate parent chain transforms
-  let accum = { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 };
+  // Concatenate affine matrices from root to child
+  let accumMatrix = { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
   for (const t of chain) {
-    const pt = applyTransform(accum, { x: t.x || 0, y: t.y || 0 });
-    accum.x = pt.x;
-    accum.y = pt.y;
-    accum.rotation = (accum.rotation || 0) + (t.rotation || 0);
-    accum.scaleX = (accum.scaleX || 1) * (t.scaleX !== undefined ? t.scaleX : 1);
-    accum.scaleY = (accum.scaleY || 1) * (t.scaleY !== undefined ? t.scaleY : 1);
+    const m = makeAffineMatrix(t);
+    accumMatrix = multiplyAffineMatrices(accumMatrix, m);
   }
 
-  return accum;
+  // Decomposed properties for backward compatibility
+  const rotRad = Math.atan2(accumMatrix.b, accumMatrix.a);
+  const rotDeg = (rotRad * 180) / Math.PI;
+  const sx = Math.hypot(accumMatrix.a, accumMatrix.b);
+  const sy = Math.hypot(accumMatrix.c, accumMatrix.d);
+
+  return {
+    ...accumMatrix,
+    x: accumMatrix.e,
+    y: accumMatrix.f,
+    rotation: rotDeg,
+    scaleX: sx,
+    scaleY: sy
+  };
 }
 
 /**
@@ -409,7 +446,13 @@ export function resolveAnchor(ref, runtimeControllers = null, runtimeObjects = n
         // Check for specific sub-socket element (e.g. .mug-handle or #clock-face)
         const subEl = el.querySelector(`[data-socket="${anchorKey}"], .socket-${anchorKey}`);
         if (subEl) {
-          const pt = pointWorld(subEl);
+          let sx = localAnchor ? localAnchor.x : 0;
+          let sy = localAnchor ? localAnchor.y : 0;
+          if (subEl.hasAttribute('cx') && subEl.hasAttribute('cy')) {
+            sx = parseFloat(subEl.getAttribute('cx')) || 0;
+            sy = parseFloat(subEl.getAttribute('cy')) || 0;
+          }
+          const pt = pointWorld(subEl, sx, sy);
           return { x: pt.x, y: pt.y, name: ref, type: 'domSocket' };
         }
       }

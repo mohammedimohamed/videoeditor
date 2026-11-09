@@ -149,8 +149,8 @@ export function getOfficeEnvironmentSVG() {
       <!-- Ceramic Coffee Mug (Right) -->
       <g id="desk-mug" transform="translate(490, -18)">
         <rect x="0" y="0" width="28" height="34" rx="5" fill="#60A5FA" stroke="#1E293B" stroke-width="2.5" />
-        <!-- Mug Handle -->
-        <path d="M 28 6 C 38 6 38 24 28 24" stroke="#1E293B" stroke-width="3" fill="none" />
+        <!-- Mug Handle with Socket -->
+        <path data-socket="handle" class="socket-handle" d="M 28 6 C 38 6 38 24 28 24" stroke="#1E293B" stroke-width="3" fill="none" />
         <!-- Subtle Steam Curl -->
         <path d="M 8 -4 Q 12 -12 8 -18" stroke="#94A3B8" stroke-width="2" fill="none" opacity="0.6" stroke-linecap="round" />
         <path d="M 18 -6 Q 22 -14 18 -22" stroke="#94A3B8" stroke-width="2" fill="none" opacity="0.6" stroke-linecap="round" />
@@ -158,96 +158,101 @@ export function getOfficeEnvironmentSVG() {
 
       <!-- 6. Laptop with Excel Spreadsheet UI -->
       <g id="desk-laptop" transform="translate(230, -115)" filter="url(#screen-glow)" data-layout-ignore="true">
-        <!-- Keyboard Base Plate -->
+        <!-- Keyboard Base Plate (Fixed on desk) -->
         <polygon points="10,118 210,118 225,138 -5,138" fill="#E2E8F0" stroke="#1E293B" stroke-width="3.5" stroke-linejoin="round" />
         <!-- Trackpad -->
         <rect x="85" y="124" width="50" height="10" rx="2" fill="#CBD5E1" stroke="#94A3B8" stroke-width="1.5" />
+        <!-- Screen Hinge Line (Anchor point) -->
+        <circle id="laptop-hinge" data-socket="hinge" cx="110" cy="118" r="3" fill="#1E293B" opacity="0" />
 
-        <!-- Open Screen Display Case -->
-        <rect x="5" y="0" width="210" height="122" rx="7" fill="#0F172A" stroke="#1E293B" stroke-width="3.5" />
-        <!-- Web Camera Dot -->
-        <circle cx="110" cy="6" r="2" fill="#38BDF8" />
+        <!-- Hinged Screen Assembly (Folds down to hinge at y=118) -->
+        <g id="laptop-screen-assembly">
+          <!-- Open Screen Display Case -->
+          <rect x="5" y="0" width="210" height="122" rx="7" fill="#0F172A" stroke="#1E293B" stroke-width="3.5" />
+          <!-- Web Camera Dot -->
+          <circle cx="110" cy="6" r="2" fill="#38BDF8" />
 
-        <!-- Screen Surface -->
-        <rect x="12" y="14" width="196" height="102" fill="#FFFFFF" />
+          <!-- Screen Surface -->
+          <rect x="12" y="14" width="196" height="102" fill="#FFFFFF" />
 
-        <!-- EXCEL APP UI DISPLAY -->
-        <!-- Excel Green Ribbon Bar -->
-        <rect x="12" y="14" width="196" height="18" fill="#107C41" />
-        <!-- Excel Logo Icon -->
-        <rect x="16" y="17" width="12" height="12" rx="2" fill="#FFFFFF" />
-        <text x="22" y="26" font-family="'Segoe UI', system-ui, sans-serif" font-size="9" font-weight="900" fill="#107C41" text-anchor="middle">X</text>
-        <text x="34" y="26" font-family="'Segoe UI', system-ui, sans-serif" font-size="8.5" font-weight="700" fill="#FFFFFF">
-          Rapport_Ventes_Brutes.xlsx
-        </text>
-
-        <!-- Formula Bar -->
-        <rect x="12" y="32" width="196" height="10" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1" />
-        <text x="16" y="40" font-family="'Consolas', monospace" font-size="6.5" fill="#1E293B">
-          fx =SOMMEPROD($A$2:$A$5842...)
-        </text>
-
-        <!-- Column Headers (A, B, C, D) -->
-        <rect x="12" y="42" width="196" height="10" fill="#E2E8F0" />
-        <text x="26" y="50" font-family="monospace" font-size="6" font-weight="700" fill="#1E293B">A: Date</text>
-        <text x="68" y="50" font-family="monospace" font-size="6" font-weight="700" fill="#1E293B">B: Région</text>
-        <text x="114" y="50" font-family="monospace" font-size="6" font-weight="700" fill="#1E293B">C: Client</text>
-        <text x="165" y="50" font-family="monospace" font-size="6" font-weight="700" fill="#1E293B">D: Total DA</text>
-
-        <!-- Scrolling Raw Data Rows (Chaotic, Unsummarized) -->
-        <g id="laptop-scrolling-rows">
-          <g transform="translate(12, 53)">
-            <rect x="0" y="0" width="196" height="8" fill="#FFFFFF" />
-            <text x="4" y="6.5" font-family="monospace" font-size="5" fill="#1E293B">01/11/2026</text>
-            <text x="48" y="6.5" font-family="monospace" font-size="5" fill="#1E293B">Alger Centre</text>
-            <text x="96" y="6.5" font-family="monospace" font-size="5" fill="#1E293B">SARL Al-Badr</text>
-            <text x="156" y="6.5" font-family="monospace" font-size="5" fill="#1E293B">184 500 DA</text>
-
-            <rect x="0" y="8" width="196" height="8" fill="#F8FAFC" />
-            <text x="4" y="14.5" font-family="monospace" font-size="5" fill="#1E293B">01/11/2026</text>
-            <text x="48" y="14.5" font-family="monospace" font-size="5" fill="#1E293B">Oran Ouest</text>
-            <text x="96" y="14.5" font-family="monospace" font-size="5" fill="#1E293B">EURL Maghreb</text>
-            <text x="156" y="14.5" font-family="monospace" font-size="5" fill="#1E293B">92 400 DA</text>
-
-            <rect x="0" y="16" width="196" height="8" fill="#FFFFFF" />
-            <text x="4" y="22.5" font-family="monospace" font-size="5" fill="#1E293B">02/11/2026</text>
-            <text x="48" y="22.5" font-family="monospace" font-size="5" fill="#1E293B">Constantine</text>
-            <text x="96" y="22.5" font-family="monospace" font-size="5" fill="#1E293B">SNC Numidia</text>
-            <text x="156" y="22.5" font-family="monospace" font-size="5" fill="#1E293B">310 200 DA</text>
-
-            <rect x="0" y="24" width="196" height="8" fill="#F8FAFC" />
-            <text x="4" y="30.5" font-family="monospace" font-size="5" fill="#1E293B">02/11/2026</text>
-            <text x="48" y="30.5" font-family="monospace" font-size="5" fill="#1E293B">Annaba Est</text>
-            <text x="96" y="30.5" font-family="monospace" font-size="5" fill="#1E293B">ETS Seybouse</text>
-            <text x="156" y="30.5" font-family="monospace" font-size="5" fill="#1E293B">45 800 DA</text>
-
-            <rect x="0" y="32" width="196" height="8" fill="#FFFFFF" />
-            <text x="4" y="38.5" font-family="monospace" font-size="5" fill="#1E293B">03/11/2026</text>
-            <text x="48" y="38.5" font-family="monospace" font-size="5" fill="#1E293B">Sétif Sud</text>
-            <text x="96" y="38.5" font-family="monospace" font-size="5" fill="#1E293B">SARL Ain Fouara</text>
-            <text x="156" y="38.5" font-family="monospace" font-size="5" fill="#1E293B">128 900 DA</text>
-
-            <rect x="0" y="40" width="196" height="8" fill="#F8FAFC" />
-            <text x="4" y="46.5" font-family="monospace" font-size="5" fill="#1E293B">03/11/2026</text>
-            <text x="48" y="46.5" font-family="monospace" font-size="5" fill="#1E293B">Ouargla</text>
-            <text x="96" y="46.5" font-family="monospace" font-size="5" fill="#1E293B">Sahara Trading</text>
-            <text x="156" y="46.5" font-family="monospace" font-size="5" fill="#1E293B">540 000 DA</text>
-
-            <rect x="0" y="48" width="196" height="8" fill="#FFFFFF" />
-            <text x="4" y="54.5" font-family="monospace" font-size="5" fill="#1E293B">04/11/2026</text>
-            <text x="48" y="54.5" font-family="monospace" font-size="5" fill="#1E293B">Blida</text>
-            <text x="96" y="54.5" font-family="monospace" font-size="5" fill="#1E293B">Mitidja Agro</text>
-            <text x="156" y="54.5" font-family="monospace" font-size="5" fill="#1E293B">78 200 DA</text>
-          </g>
-        </g>
-
-        <!-- Red Alert Badge: 5 842 lignes non synthétisées -->
-        <g id="screen-alert-badge" transform="translate(18, 92)">
-          <rect x="0" y="0" width="125" height="18" rx="9" fill="#DC2626" />
-          <circle cx="8" cy="9" r="4" fill="#FFFFFF" />
-          <text x="18" y="13" font-family="'Segoe UI', sans-serif" font-size="8" font-weight="700" fill="#FFFFFF">
-            ⚠️ 5 842 lignes non filtrées !
+          <!-- EXCEL APP UI DISPLAY -->
+          <!-- Excel Green Ribbon Bar -->
+          <rect x="12" y="14" width="196" height="18" fill="#107C41" />
+          <!-- Excel Logo Icon -->
+          <rect x="16" y="17" width="12" height="12" rx="2" fill="#FFFFFF" />
+          <text x="22" y="26" font-family="'Segoe UI', system-ui, sans-serif" font-size="9" font-weight="900" fill="#107C41" text-anchor="middle">X</text>
+          <text x="34" y="26" font-family="'Segoe UI', system-ui, sans-serif" font-size="8.5" font-weight="700" fill="#FFFFFF">
+            Rapport_Ventes_Brutes.xlsx
           </text>
+
+          <!-- Formula Bar -->
+          <rect x="12" y="32" width="196" height="10" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1" />
+          <text x="16" y="40" font-family="'Consolas', monospace" font-size="6.5" fill="#1E293B">
+            fx =SOMMEPROD($A$2:$A$5842...)
+          </text>
+
+          <!-- Column Headers (A, B, C, D) -->
+          <rect x="12" y="42" width="196" height="10" fill="#E2E8F0" />
+          <text x="26" y="50" font-family="monospace" font-size="6" font-weight="700" fill="#1E293B">A: Date</text>
+          <text x="68" y="50" font-family="monospace" font-size="6" font-weight="700" fill="#1E293B">B: Région</text>
+          <text x="114" y="50" font-family="monospace" font-size="6" font-weight="700" fill="#1E293B">C: Client</text>
+          <text x="165" y="50" font-family="monospace" font-size="6" font-weight="700" fill="#1E293B">D: Total DA</text>
+
+          <!-- Scrolling Raw Data Rows (Chaotic, Unsummarized) -->
+          <g id="laptop-scrolling-rows">
+            <g transform="translate(12, 53)">
+              <rect x="0" y="0" width="196" height="8" fill="#FFFFFF" />
+              <text x="4" y="6.5" font-family="monospace" font-size="5" fill="#1E293B">01/11/2026</text>
+              <text x="48" y="6.5" font-family="monospace" font-size="5" fill="#1E293B">Alger Centre</text>
+              <text x="96" y="6.5" font-family="monospace" font-size="5" fill="#1E293B">SARL Al-Badr</text>
+              <text x="156" y="6.5" font-family="monospace" font-size="5" fill="#1E293B">184 500 DA</text>
+
+              <rect x="0" y="8" width="196" height="8" fill="#F8FAFC" />
+              <text x="4" y="14.5" font-family="monospace" font-size="5" fill="#1E293B">01/11/2026</text>
+              <text x="48" y="14.5" font-family="monospace" font-size="5" fill="#1E293B">Oran Ouest</text>
+              <text x="96" y="14.5" font-family="monospace" font-size="5" fill="#1E293B">EURL Maghreb</text>
+              <text x="156" y="14.5" font-family="monospace" font-size="5" fill="#1E293B">92 400 DA</text>
+
+              <rect x="0" y="16" width="196" height="8" fill="#FFFFFF" />
+              <text x="4" y="22.5" font-family="monospace" font-size="5" fill="#1E293B">02/11/2026</text>
+              <text x="48" y="22.5" font-family="monospace" font-size="5" fill="#1E293B">Constantine</text>
+              <text x="96" y="22.5" font-family="monospace" font-size="5" fill="#1E293B">SNC Numidia</text>
+              <text x="156" y="22.5" font-family="monospace" font-size="5" fill="#1E293B">310 200 DA</text>
+
+              <rect x="0" y="24" width="196" height="8" fill="#F8FAFC" />
+              <text x="4" y="30.5" font-family="monospace" font-size="5" fill="#1E293B">02/11/2026</text>
+              <text x="48" y="30.5" font-family="monospace" font-size="5" fill="#1E293B">Annaba Est</text>
+              <text x="96" y="30.5" font-family="monospace" font-size="5" fill="#1E293B">ETS Seybouse</text>
+              <text x="156" y="30.5" font-family="monospace" font-size="5" fill="#1E293B">45 800 DA</text>
+
+              <rect x="0" y="32" width="196" height="8" fill="#FFFFFF" />
+              <text x="4" y="38.5" font-family="monospace" font-size="5" fill="#1E293B">03/11/2026</text>
+              <text x="48" y="38.5" font-family="monospace" font-size="5" fill="#1E293B">Sétif Sud</text>
+              <text x="96" y="38.5" font-family="monospace" font-size="5" fill="#1E293B">SARL Ain Fouara</text>
+              <text x="156" y="38.5" font-family="monospace" font-size="5" fill="#1E293B">128 900 DA</text>
+
+              <rect x="0" y="40" width="196" height="8" fill="#F8FAFC" />
+              <text x="4" y="46.5" font-family="monospace" font-size="5" fill="#1E293B">03/11/2026</text>
+              <text x="48" y="46.5" font-family="monospace" font-size="5" fill="#1E293B">Ouargla</text>
+              <text x="96" y="46.5" font-family="monospace" font-size="5" fill="#1E293B">Sahara Trading</text>
+              <text x="156" y="46.5" font-family="monospace" font-size="5" fill="#1E293B">540 000 DA</text>
+
+              <rect x="0" y="48" width="196" height="8" fill="#FFFFFF" />
+              <text x="4" y="54.5" font-family="monospace" font-size="5" fill="#1E293B">04/11/2026</text>
+              <text x="48" y="54.5" font-family="monospace" font-size="5" fill="#1E293B">Blida</text>
+              <text x="96" y="54.5" font-family="monospace" font-size="5" fill="#1E293B">Mitidja Agro</text>
+              <text x="156" y="54.5" font-family="monospace" font-size="5" fill="#1E293B">78 200 DA</text>
+            </g>
+          </g>
+
+          <!-- Red Alert Badge: 5 842 lignes non synthétisées -->
+          <g id="screen-alert-badge" transform="translate(18, 92)">
+            <rect x="0" y="0" width="125" height="18" rx="9" fill="#DC2626" />
+            <circle cx="8" cy="9" r="4" fill="#FFFFFF" />
+            <text x="18" y="13" font-family="'Segoe UI', sans-serif" font-size="8" font-weight="700" fill="#FFFFFF">
+              ⚠️ 5 842 lignes non filtrées !
+            </text>
+          </g>
         </g>
       </g>
     </g>

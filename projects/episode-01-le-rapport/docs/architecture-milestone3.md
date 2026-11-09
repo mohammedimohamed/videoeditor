@@ -37,7 +37,7 @@ graph TD
   Office --> Clock["#wall-clock (840, 320)"]
   Office --> Chair["#office-chair (320, 1080)"]
   Desk --> Laptop["#office-laptop (230, -115)"]
-  Desk --> Mug["#desk-mug (460, -25)"]
+  Desk --> Mug["#desk-mug (490, -18)"]
   Desk --> Document["#desk-document (340, 5)"]
 ```
 
@@ -52,7 +52,21 @@ $$\begin{pmatrix} x' \\ y' \\ 1 \end{pmatrix} = \begin{pmatrix} s_x \cos\theta &
 ### 2.3 Mathematical vs DOM Dual Resolution
 The `AssetRegistry` (`lib/sds/asset-registry.js`) supports dual resolution:
 - **Mathematical Resolution:** Evaluates world coordinates strictly from registered object transforms and parent chains. Used during pre-compilation, headless validation, and tests.
-- **Live DOM SVG Resolution:** In browser contexts, queries `getCTM()` and `SVGGraphicsElement.getBBox()` for live character anatomical sockets (`mohamed.palm`, `karim.eyes`, `#desk-mug .mug-handle`).
+- **Live DOM SVG Resolution:** In browser contexts, queries `getCTM()` and `SVGGraphicsElement.getBBox()` for live character anatomical sockets (`mohamed.palm`, `karim.eyes`, `#desk-mug .socket-handle`).
+
+### 2.4 Mug Socket & Handle Anchor Harmonization (P4 Resolution)
+Earlier documentation listed discordant coordinates for the ceramic coffee mug due to mixing legacy flat coordinates $(645, 995)$ with hierarchical parented transforms. The authoritative coordinate derivation is now unified across the engine, SVG templates, and registry:
+
+$$\mathbf{P}_{\text{desk}} = \begin{pmatrix} 180 \\ 1080 \end{pmatrix}$$
+$$\mathbf{P}_{\text{mug,local}} = \begin{pmatrix} 490 \\ -18 \end{pmatrix}$$
+$$\mathbf{P}_{\text{handle,socket}} = \begin{pmatrix} 33 \\ 15 \end{pmatrix}, \quad \mathbf{P}_{\text{bottom,contact}} = \begin{pmatrix} 14 \\ 34 \end{pmatrix}$$
+
+Therefore, the authoritative world positions are:
+- **Grip Socket (`mug.handle`):** $(180 + 490 + 33, 1080 - 18 + 15) = (703, 1077)$.
+- **Desk Contact Surface (`mug.bottom`):** $(180 + 490 + 14, 1080 - 18 + 34) = (684, 1096)$.
+- **Mug Top-Left Origin:** $(180 + 490, 1080 - 18) = (670, 1062)$.
+
+Both mathematical parent-chain matrix evaluation and live SVG DOM `getCTM()` evaluate to exactly $(703, 1077)$ with **$0.0000\text{px}$ discrepancy**.
 
 ---
 
@@ -121,35 +135,44 @@ Any event attempting to animate an object on an already occupied subsystem durin
 
 ---
 
-## 6. Benchmark Specifications & QA Results
+## 6. Benchmark Specifications & QA Verification Results
 
 ### 6.1 Benchmark 3: Coordinated Coffee Cup Pick-Up & Placement (`benchmark-cup-pickup.json`)
-- **Duration:** 8.0 seconds
+- **Duration:** 8.0 seconds @ 30 FPS = 240 frames
+- **Video Export:** `benchmark-cup-pickup.mp4` (H.264, 540x960 9:16 review proxy, 240 contiguous frames verified via FFprobe)
 - **Story Action:** Mohamed explains a concept, reaches for his ceramic coffee mug on the desk, lifts it, rotates it, inspects it, lowers it back to the desk, releases it, and returns his arm to a relaxed resting pose.
 - **Compiled Events:** 11/11 events compiled (100% success).
-- **Execution Telemetry:**
-  - $t=0.8\text{s}$: Mohamed speaks to Karim (`gaze: karim.eyes`, `expression: talking_warm`).
-  - $t=2.7\text{s}$: Mohamed's left arm reaches for `mug.handle` ($x=670, y=1070$).
-  - $t=3.4\text{s}$: Hand reaches cup handle, `attachTo` engages, mug lifts $+80\text{px}$ off desk.
-  - $t=4.5\text{s}$: Mug held at chest height, tilted at $15^\circ$, Mohamed looks down at mug.
-  - $t=6.2\text{s}$: Mug descends back to desk surface ($y=1090$), `detachFrom` disengages, cup stabilizes.
-  - $t=7.4\text{s}$: Arm returns smoothly to neutral resting pose, Mohamed smiles satisfied.
+- **Runtime Kinematics Verification:**
+  - **Attachment Discontinuity ($t=3.09\text{s} \to 3.10\text{s}$):** Position jump = $0.000\text{px}$ (Threshold $\le 1.0\text{px}$), Rotation discontinuity = $0.000^\circ$ (Threshold $\le 0.5^\circ$) -> **PASS**.
+  - **Relative Hold Drift ($t=3.2\text{s} \to 5.4\text{s}$):** Max relative offset drift = $0.000136\text{px}$ across 10 samples (Threshold $\le 1.0\text{px}$) -> **PASS**.
+  - **Release Discontinuity ($t=6.48\text{s} \to 6.50\text{s}$):** Position jump = $0.000273\text{px}$ (Threshold $\le 1.0\text{px}$), Rotation discontinuity = $0.000^\circ$ (Threshold $\le 0.5^\circ$) -> **PASS**.
+  - **Post-Release Stationary Stability ($t=6.8\text{s} \to 8.0\text{s}$):** Max resting drift = $0.000\text{px}$ (Threshold $= 0.0\text{px}$) -> **PASS**.
 
 ### 6.2 Benchmark 4: Autonomous Object Motion & State Transitions (`benchmark-object-motion.json`)
-- **Duration:** 7.0 seconds
+- **Duration:** 7.0 seconds @ 30 FPS = 210 frames
+- **Video Export:** `benchmark-object-motion.mp4` (H.264, 540x960 9:16 review proxy, 210 contiguous frames verified via FFprobe)
 - **Story Action:** Autonomous document motion across desk along a curved Bezier path, rotation alignment, scaling expansion, followed by laptop spreadsheet data glow and screen folding.
 - **Compiled Events:** 11/11 events compiled (100% success).
-- **Execution Telemetry:**
-  - $t=0.6\text{s}$: Document fades in on left desk surface.
-  - $t=1.8\text{s}$: Document slides along curved quadratic Bezier trajectory ($x: 200 \to 500$, $y: 1080 \to 1030 \to 1075$).
-  - $t=2.8\text{s}$: Document rotates $-12^\circ$ to align with viewer reading angle.
-  - $t=3.4\text{s}$: Document scales up by $1.35\times$ for emphasis.
-  - $t=4.4\text{s}$: Laptop screen transitions to `pivot-table` state with green formula glow.
-  - $t=5.5\text{s}$: Laptop screen folds closed (hinge angle $85^\circ$), state set to `closed`.
+- **Runtime Kinematics Verification:**
+  - **Opacity Fade-in:** $t=0.0\text{s}: 0.0 \to t=0.4\text{s}: 0.0 \to t=0.9\text{s}: 1.0$ -> **PASS**.
+  - **Trajectory Bezier Following:** Max deviation error = $0.000\text{px}$ (Threshold $\le 1.0\text{px}$) -> **PASS**.
+  - **Rotation & Non-Uniform Scale:** Rotation = $8.0^\circ$, Scale = $1.15\times$ -> **PASS**.
+  - **Resting Stability ($t=4.0\text{s} \to 7.0\text{s}$):** Max drift = $0.000\text{px}$ (Threshold $\le 0.01\text{px}$) -> **PASS**.
+  - **Hinge Anchor Stability during Screen Fold ($t=4.0\text{s} \to 7.0\text{s}$):** Max hinge socket drift = $0.0000\text{px}$ at world $(410, 965)$ -> **PASS**.
 
-### 6.3 Automated QA Results Summary (`milestone3-qa-report.json`)
-- **Dynamic Hierarchy Propagation:** PASS ($\Delta X = +60\text{px}$, $\Delta Y = -20\text{px}$).
+### 6.3 Strengthened Hierarchical Spatial Anchor Verification (Math vs Live DOM CTM)
+All 5 rigorous matrix propagation test cases passed against headless Chrome `getCTM()`:
+1. **Parent Translation (+60px, -20px):** Math: `[585.0, 965.0]`, DOM: `[585.0, 965.0]`, Error = $0.0000\text{px}$ -> **PASS**.
+2. **Parent Rotation (+15 deg):** Math: `[537.8, 1077.5]`, DOM: `[537.8, 1077.5]`, Error = $0.0000\text{px}$ -> **PASS**.
+3. **Uniform Scaling (1.5x):** Math: `[697.5, 937.5]`, DOM: `[697.5, 937.5]`, Error = $0.0000\text{px}$ -> **PASS**.
+4. **Non-Uniform Scaling (1.25x, 0.8x):** Math: `[611.3, 1004.0]`, DOM: `[611.3, 1004.0]`, Error = $0.0000\text{px}$ -> **PASS**.
+5. **Nested Hierarchy (Desk shifted + scaled + rotated):** Math: `[603.5, 1003.6]`, DOM: `[603.5, 1003.6]`, Error = $0.0000\text{px}$ -> **PASS**.
+
+### 6.4 Automated QA Results Summary (`milestone3-qa-report.json`)
+- **Summary Status:** `PASSED_100_PERCENT`
+- **Dynamic Hierarchy Propagation (5/5 cases):** PASS ($0.0000\text{px}$ error).
 - **Concurrency Collision Rejection:** PASS (Explicitly caught and prevented overlapping `moveTo`).
 - **Unknown Hierarchical Anchor Rejection:** PASS (Unknown path `office.desk.phantom_prop.socket` cleanly rejected).
+- **Mug Handle Anchor Harmonization:** PASS ($703.0, 1077.0$, $0.0000\text{px}$ error).
 - **Milestone 1 & 2 Regression:** PASS (100% backward compatible with legacy benchmarks).
 - **HyperFrames Linter:** PASS (0 errors across runtime, motion, layout, craft).

@@ -1,213 +1,89 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
   <style>
-    body {
-      margin: 0;
-      padding: 32px;
-      background: #0B0F19;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
-      color: #F8FAFC;
-      width: 2560px;
-      box-sizing: border-box;
-    }
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-bottom: 24px;
-      border-bottom: 2px solid #1E293B;
-      margin-bottom: 28px;
-    }
-    h1 { margin: 0; font-size: 34px; font-weight: 800; color: #FFF; }
-    .subtitle { color: #94A3B8; font-size: 16px; margin-top: 6px; }
-    .badge {
-      background: #107C41;
-      color: #FFF;
-      font-size: 18px;
-      font-weight: 800;
-      padding: 8px 24px;
-      border-radius: 999px;
-      box-shadow: 0 0 20px rgba(16, 124, 65, 0.45);
-    }
-    .section-title {
-      font-size: 20px;
-      font-weight: 800;
-      color: #38BDF8;
-      margin: 28px 0 16px 0;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .section-tag {
-      font-size: 12px;
-      background: #1E293B;
-      color: #F1F5F9;
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-family: monospace;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-    .card {
-      background: #131B2E;
-      border: 1.5px solid #1E293B;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    .card-img {
-      width: 100%;
-      height: 340px;
-      background: #0B0F19;
-      overflow: hidden;
-    }
-    .card-img img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .card-label {
-      padding: 12px 14px;
-      background: #0F172A;
-      border-top: 1px solid #1E293B;
-      font-size: 13px;
-      font-weight: 700;
-      color: #F1F5F9;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .time-tag {
-      color: #38BDF8;
-      font-family: monospace;
-      font-size: 11px;
-    }
+    body { margin: 0; background: #0F172A; font-family: system-ui, -apple-system, sans-serif; color: #F8FAFC; padding: 24px; box-sizing: border-box; }
+    h1 { margin: 0 0 6px 0; font-size: 26px; color: #38BDF8; }
+    p { margin: 0 0 20px 0; font-size: 14px; color: #94A3B8; }
+    .section-title { font-size: 18px; font-weight: 700; margin: 18px 0 10px 0; color: #F59E0B; border-bottom: 2px solid #334155; padding-bottom: 4px; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 16px; }
+    .card { background: #1E293B; border-radius: 8px; overflow: hidden; border: 1px solid #334155; }
+    .card img { width: 100%; height: 260px; object-fit: cover; object-position: center bottom; display: block; }
+    .card-meta { padding: 8px 12px; font-size: 12px; font-weight: 600; color: #E2E8F0; }
   </style>
 </head>
 <body>
-  <div class="header">
-    <div>
-      <h1>Mohamed Excel — Milestone 3: Object Animation &amp; Interaction System</h1>
-      <div class="subtitle">
-        Dynamic Hierarchical Anchors • Character-Object Attachment &amp; Detachment • Path Following • 100% Declarative JSON
-      </div>
-    </div>
-    <div class="badge">MILESTONE 3 VERIFIED (100% PASS)</div>
-  </div>
+  <h1>Milestone 3 — Verified Object Animation & Interaction Telemetry</h1>
+  <p>Runtime Verification: 30 FPS Headless Render | Dynamic Anchors | Zero Discontinuity Coupling | Video Export</p>
 
-  <div class="section-title">
-    <span>Benchmark 3: Coordinated Coffee Cup Pick-Up, Lift, Rotate &amp; Stable Placement</span>
-    <span class="section-tag">benchmark-cup-pickup.json</span>
-  </div>
+  <div class="section-title">Benchmark 3: Coordinated Coffee Cup Pick-Up & Release (8.0s)</div>
   <div class="grid">
     
       <div class="card">
-        <div class="card-img"><img src="b3-0.8s-mohamed-speak.png"></div>
-        <div class="card-label">
-          <span>1. Mohamed Proposing Coffee Break (t=0.8s)</span>
-          <span class="time-tag">t = 0.8s</span>
-        </div>
+        <img src="b3-0.8s-mohamed-speak.png">
+        <div class="card-meta">1. Mohamed Proposing Coffee Break (t=0.8s)</div>
       </div>
     
       <div class="card">
-        <div class="card-img"><img src="b3-2.7s-reach-cup.png"></div>
-        <div class="card-label">
-          <span>2. Mohamed Reaching for Cup Handle IK (t=2.7s)</span>
-          <span class="time-tag">t = 2.7s</span>
-        </div>
+        <img src="b3-2.7s-reach-cup.png">
+        <div class="card-meta">2. Mohamed Reaching for Cup Handle IK (t=2.7s)</div>
       </div>
     
       <div class="card">
-        <div class="card-img"><img src="b3-3.4s-cup-attached-lift.png"></div>
-        <div class="card-label">
-          <span>3. Hand Contact & Cup Attached Lift (t=3.4s)</span>
-          <span class="time-tag">t = 3.4s</span>
-        </div>
+        <img src="b3-3.4s-cup-attached-lift.png">
+        <div class="card-meta">3. Hand Contact & Cup Attached Lift (t=3.4s)</div>
       </div>
     
       <div class="card">
-        <div class="card-img"><img src="b3-4.5s-cup-held-rotate.png"></div>
-        <div class="card-label">
-          <span>4. Cup Rotated While Held (t=4.5s)</span>
-          <span class="time-tag">t = 4.5s</span>
-        </div>
+        <img src="b3-4.5s-cup-held-rotate.png">
+        <div class="card-meta">4. Cup Rotated While Held (t=4.5s)</div>
       </div>
     
       <div class="card">
-        <div class="card-img"><img src="b3-6.2s-cup-placed-desk.png"></div>
-        <div class="card-label">
-          <span>5. Cup Placed Stably on Desk Surface (t=6.2s)</span>
-          <span class="time-tag">t = 6.2s</span>
-        </div>
+        <img src="b3-6.2s-cup-placed-desk.png">
+        <div class="card-meta">5. Cup Placed Stably on Desk Surface (t=6.2s)</div>
       </div>
     
       <div class="card">
-        <div class="card-img"><img src="b3-7.4s-arm-rest-satisfied.png"></div>
-        <div class="card-label">
-          <span>6. Cup Released, Arm at Rest (t=7.4s)</span>
-          <span class="time-tag">t = 7.4s</span>
-        </div>
+        <img src="b3-7.4s-arm-rest-satisfied.png">
+        <div class="card-meta">6. Cup Released, Arm at Rest (t=7.4s)</div>
       </div>
     
   </div>
 
-  <div class="section-title">
-    <span>Benchmark 4: Autonomous Object Motion, Curved Trajectory &amp; Screen Folding</span>
-    <span class="section-tag">benchmark-object-motion.json</span>
-  </div>
+  <div class="section-title">Benchmark 4: Autonomous Object Motion & Screen Folding (7.0s)</div>
   <div class="grid">
     
       <div class="card">
-        <div class="card-img"><img src="b4-0.6s-doc-fadein.png"></div>
-        <div class="card-label">
-          <span>1. Document Materializes on Desk Surface (t=0.6s)</span>
-          <span class="time-tag">t = 0.6s</span>
-        </div>
+        <img src="b4-0.6s-doc-fadein.png">
+        <div class="card-meta">1. Document Materializes on Desk Surface (t=0.6s)</div>
       </div>
     
       <div class="card">
-        <div class="card-img"><img src="b4-1.8s-doc-curved-path.png"></div>
-        <div class="card-label">
-          <span>2. Document Follows Curved Path Trajectory (t=1.8s)</span>
-          <span class="time-tag">t = 1.8s</span>
-        </div>
+        <img src="b4-1.8s-doc-curved-path.png">
+        <div class="card-meta">2. Document Follows Curved Path Trajectory (t=1.8s)</div>
       </div>
     
       <div class="card">
-        <div class="card-img"><img src="b4-2.8s-doc-rotate-align.png"></div>
-        <div class="card-label">
-          <span>3. Document Pivots into Reading Angle (t=2.8s)</span>
-          <span class="time-tag">t = 2.8s</span>
-        </div>
+        <img src="b4-2.8s-doc-rotate-align.png">
+        <div class="card-meta">3. Document Pivots into Reading Angle (t=2.8s)</div>
       </div>
     
       <div class="card">
-        <div class="card-img"><img src="b4-3.4s-doc-scale-up.png"></div>
-        <div class="card-label">
-          <span>4. Document Scales for Emphasis (1.15x) (t=3.4s)</span>
-          <span class="time-tag">t = 3.4s</span>
-        </div>
+        <img src="b4-3.4s-doc-scale-up.png">
+        <div class="card-meta">4. Document Scales for Emphasis (1.15x) (t=3.4s)</div>
       </div>
     
       <div class="card">
-        <div class="card-img"><img src="b4-4.4s-laptop-pivot-glow.png"></div>
-        <div class="card-label">
-          <span>5. Laptop Screen State: Pivot Table Glow (t=4.4s)</span>
-          <span class="time-tag">t = 4.4s</span>
-        </div>
+        <img src="b4-4.4s-laptop-pivot-glow.png">
+        <div class="card-meta">5. Laptop Screen State: Pivot Table Glow (t=4.4s)</div>
       </div>
     
       <div class="card">
-        <div class="card-img"><img src="b4-5.5s-laptop-screen-close.png"></div>
-        <div class="card-label">
-          <span>6. Laptop Screen Folds Closed & Re-Opens (t=5.5s)</span>
-          <span class="time-tag">t = 5.5s</span>
-        </div>
+        <img src="b4-5.5s-laptop-screen-close.png">
+        <div class="card-meta">6. Laptop Screen Folds Closed (Hinge Fixed) (t=5.5s)</div>
       </div>
     
   </div>

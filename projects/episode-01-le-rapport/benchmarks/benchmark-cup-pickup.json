@@ -147,7 +147,7 @@
       "params": {
         "objectId": "mug",
         "rotation": -15,
-        "transformOrigin": "bottom center"
+        "transformOrigin": "0px 22px"
       },
       "description": "Mohamed gently tilts the mug while holding it."
     },
@@ -159,7 +159,7 @@
       "params": {
         "objectId": "mug",
         "rotation": 0,
-        "transformOrigin": "bottom center"
+        "transformOrigin": "0px 22px"
       },
       "description": "Mug leveled back before placement."
     },

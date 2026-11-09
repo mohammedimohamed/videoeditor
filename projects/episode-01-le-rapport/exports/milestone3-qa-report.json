@@ -1,30 +1,382 @@
 {
   "milestone": "Milestone 3 — Object Animation & Interaction System",
   "version": "2.1.0",
-  "generatedAt": "2026-11-09T13:03:11.249Z",
+  "generatedAt": "2026-11-09T14:33:29.597Z",
   "tests": {
     "dynamicHierarchy": {
       "status": "PASS",
-      "deltaX": 60,
-      "deltaY": -20
+      "cases": [
+        {
+          "testCase": "Translation (+60px, -20px)",
+          "math": {
+            "x": 585,
+            "y": 965
+          },
+          "dom": {
+            "x": 585,
+            "y": 965
+          },
+          "discrepancyPx": 0,
+          "status": "PASS"
+        },
+        {
+          "testCase": "Rotation (+15 deg)",
+          "math": {
+            "x": 537.83,
+            "y": 1077.53
+          },
+          "dom": {
+            "x": 537.83,
+            "y": 1077.53
+          },
+          "discrepancyPx": 0,
+          "status": "PASS"
+        },
+        {
+          "testCase": "Uniform Scaling (1.5x)",
+          "math": {
+            "x": 697.5,
+            "y": 937.5
+          },
+          "dom": {
+            "x": 697.5,
+            "y": 937.5
+          },
+          "discrepancyPx": 0,
+          "status": "PASS"
+        },
+        {
+          "testCase": "Non-Uniform Scaling (1.25x, 0.8x)",
+          "math": {
+            "x": 611.25,
+            "y": 1004
+          },
+          "dom": {
+            "x": 611.25,
+            "y": 1004
+          },
+          "discrepancyPx": 0,
+          "status": "PASS"
+        },
+        {
+          "testCase": "Nested Hierarchy (Desk shifted + scaled + rotated)",
+          "math": {
+            "x": 603.53,
+            "y": 1003.63
+          },
+          "dom": {
+            "x": 603.53,
+            "y": 1003.63
+          },
+          "discrepancyPx": 0,
+          "status": "PASS"
+        }
+      ]
     },
     "resourceLocking": {
       "status": "PASS",
       "collisionPrevented": true,
       "unknownAnchorRejected": true
     },
-    "benchmark3": {
+    "mugAnchorHarmonization": {
       "status": "PASS",
-      "eventsCompiled": 11
-    },
-    "benchmark4": {
-      "status": "PASS",
-      "eventsCompiled": 11
+      "resolved": {
+        "x": 703,
+        "y": 1077,
+        "name": "mug.handle",
+        "type": "domSocket"
+      },
+      "dom": {
+        "x": 703,
+        "y": 1077
+      },
+      "discrepancyPx": 0
     },
     "regression": {
       "status": "PASS",
       "milestone1Compatible": true,
       "milestone2Compatible": true
+    }
+  },
+  "measurements": {
+    "benchmark3Kinematics": {
+      "attachment": {
+        "preAttach": {
+          "x": 670,
+          "y": 1062
+        },
+        "postAttach": {
+          "x": 670,
+          "y": 1062
+        },
+        "positionJumpPx": 0,
+        "rotationDiscontinuityDeg": 0,
+        "pass": true
+      },
+      "hold": {
+        "maxRelativeDriftPx": 0.00013647875839232116,
+        "pass": true,
+        "samples": [
+          {
+            "t": 3.2,
+            "mugX": 664.3615112304688,
+            "mugY": 1047.003662109375,
+            "handX": 690.0347900390625,
+            "handY": 1012.9192504882812,
+            "drift": 0
+          },
+          {
+            "t": 3.5,
+            "mugX": 659.9542236328125,
+            "mugY": 1018.3673095703125,
+            "handX": 685.6275634765625,
+            "handY": 984.2828369140625,
+            "drift": 0.00008631674575031098
+          },
+          {
+            "t": 3.8,
+            "mugX": 660.3449096679688,
+            "mugY": 1008.102294921875,
+            "handX": 686.0182495117188,
+            "handY": 974.017822265625,
+            "drift": 0.00008631674575031098
+          },
+          {
+            "t": 4,
+            "mugX": 660.48046875,
+            "mugY": 1006.713623046875,
+            "handX": 686.15380859375,
+            "handY": 972.6290893554688,
+            "drift": 0.00013647875839232116
+          },
+          {
+            "t": 4.2,
+            "mugX": 660.485107421875,
+            "mugY": 1006.6607666015625,
+            "handX": 686.158447265625,
+            "handY": 972.5762939453125,
+            "drift": 0.00008631674575031098
+          },
+          {
+            "t": 4.5,
+            "mugX": 660.485107421875,
+            "mugY": 1006.6607666015625,
+            "handX": 686.158447265625,
+            "handY": 972.5762939453125,
+            "drift": 0.00008631674575031098
+          },
+          {
+            "t": 4.8,
+            "mugX": 660.485107421875,
+            "mugY": 1006.6607666015625,
+            "handX": 686.158447265625,
+            "handY": 972.5762939453125,
+            "drift": 0.00008631674575031098
+          },
+          {
+            "t": 5,
+            "mugX": 660.485107421875,
+            "mugY": 1006.6607666015625,
+            "handX": 686.158447265625,
+            "handY": 972.5762939453125,
+            "drift": 0.00008631674575031098
+          },
+          {
+            "t": 5.2,
+            "mugX": 660.485107421875,
+            "mugY": 1006.6607666015625,
+            "handX": 686.158447265625,
+            "handY": 972.5762939453125,
+            "drift": 0.00008631674575031098
+          },
+          {
+            "t": 5.4,
+            "mugX": 660.485107421875,
+            "mugY": 1006.6607666015625,
+            "handX": 686.158447265625,
+            "handY": 972.5762939453125,
+            "drift": 0.00008631674575031098
+          }
+        ]
+      },
+      "release": {
+        "preDetach": {
+          "x": 626.0001220703125,
+          "y": 1055.999755859375
+        },
+        "postDetach": {
+          "x": 626,
+          "y": 1056
+        },
+        "releaseJumpPx": 0.0002729575167846423,
+        "rotationDiscontinuityDeg": 0,
+        "settlePosition": {
+          "x": 626,
+          "y": 1056
+        },
+        "pass": true
+      },
+      "postReleaseStationary": {
+        "maxDriftPx": 0,
+        "pass": true,
+        "samples": [
+          {
+            "t": 6.8,
+            "x": 626,
+            "y": 1056,
+            "drift": 0
+          },
+          {
+            "t": 7,
+            "x": 626,
+            "y": 1056,
+            "drift": 0
+          },
+          {
+            "t": 7.2,
+            "x": 626,
+            "y": 1056,
+            "drift": 0
+          },
+          {
+            "t": 7.4,
+            "x": 626,
+            "y": 1056,
+            "drift": 0
+          },
+          {
+            "t": 7.6,
+            "x": 626,
+            "y": 1056,
+            "drift": 0
+          },
+          {
+            "t": 7.8,
+            "x": 626,
+            "y": 1056,
+            "drift": 0
+          },
+          {
+            "t": 8,
+            "x": 626,
+            "y": 1056,
+            "drift": 0
+          }
+        ]
+      }
+    },
+    "benchmark4Kinematics": {
+      "fadeIn": {
+        "opacityT0": 0,
+        "opacityT04": 0,
+        "opacityT09": 1,
+        "pass": true
+      },
+      "trajectory": {
+        "maxErrorPx": 0,
+        "pass": true,
+        "samples": [
+          {
+            "t": 0.9,
+            "measured": {
+              "x": 190,
+              "y": 1085
+            },
+            "expected": {
+              "x": 190,
+              "y": 1085
+            },
+            "errorPx": 0
+          },
+          {
+            "t": 1.3,
+            "measured": {
+              "x": 260,
+              "y": 1070
+            },
+            "expected": {
+              "x": 260,
+              "y": 1070
+            },
+            "errorPx": 0
+          },
+          {
+            "t": 1.7,
+            "measured": {
+              "x": 340,
+              "y": 1065
+            },
+            "expected": {
+              "x": 340,
+              "y": 1065
+            },
+            "errorPx": 0
+          },
+          {
+            "t": 2.1,
+            "measured": {
+              "x": 420,
+              "y": 1072
+            },
+            "expected": {
+              "x": 420,
+              "y": 1072
+            },
+            "errorPx": 0
+          },
+          {
+            "t": 2.5,
+            "measured": {
+              "x": 480,
+              "y": 1085
+            },
+            "expected": {
+              "x": 480,
+              "y": 1085
+            },
+            "errorPx": 0
+          }
+        ]
+      },
+      "rotationAndScale": {
+        "rotationDeg": 8,
+        "scale": 1.15,
+        "pass": true
+      },
+      "restingStability": {
+        "maxDriftPx": 0,
+        "pass": true
+      },
+      "laptopHinge": {
+        "hingeWorld": {
+          "x": 410,
+          "y": 965
+        },
+        "maxHingeDriftPx": 0,
+        "pass": true
+      }
+    }
+  },
+  "exports": {
+    "benchmark3": {
+      "path": "C:\\source\\repos\\perso\\TWA\\videoEditing\\projects\\episode-01-le-rapport\\exports\\previews\\benchmark-cup-pickup.mp4",
+      "duration": 8,
+      "fps": "30/1",
+      "frameCount": 240,
+      "codec": "h264",
+      "width": 540,
+      "height": 960,
+      "valid": true
+    },
+    "benchmark4": {
+      "path": "C:\\source\\repos\\perso\\TWA\\videoEditing\\projects\\episode-01-le-rapport\\exports\\previews\\benchmark-object-motion.mp4",
+      "duration": 7,
+      "fps": "30/1",
+      "frameCount": 210,
+      "codec": "h264",
+      "width": 540,
+      "height": 960,
+      "valid": true
     }
   },
   "summary": {
@@ -42,8 +394,8 @@
       "version": "2.0.0",
       "sceneId": "benchmark-cup-pickup",
       "sceneTitle": "Benchmark 3: Coordinated Coffee Cup Pick-Up & Placement",
-      "generatedAt": "2026-11-09T13:03:11.883Z",
-      "compilationTimeMs": 54,
+      "generatedAt": "2026-11-09T14:33:31.032Z",
+      "compilationTimeMs": 53,
       "summary": {
         "totalEvents": 11,
         "compiledEvents": 11,
@@ -222,7 +574,7 @@
           "params": {
             "objectId": "mug",
             "rotation": -15,
-            "transformOrigin": "bottom center"
+            "transformOrigin": "0px 22px"
           },
           "status": "COMPILED",
           "tweenCount": 1
@@ -243,7 +595,7 @@
           "params": {
             "objectId": "mug",
             "rotation": 0,
-            "transformOrigin": "bottom center"
+            "transformOrigin": "0px 22px"
           },
           "status": "COMPILED",
           "tweenCount": 1
@@ -295,11 +647,11 @@
         {
           "ref": "mug.handle",
           "resolved": {
-            "x": 645,
-            "y": 995
+            "x": 703,
+            "y": 1077
           },
-          "type": "hierarchicalAnchor",
-          "timestamp": 45
+          "type": "domSocket",
+          "timestamp": 46
         }
       ],
       "concurrencyAllocations": [
@@ -397,8 +749,8 @@
       "version": "2.0.0",
       "sceneId": "benchmark-object-motion",
       "sceneTitle": "Benchmark 4: Autonomous Object Motion & State Transformations",
-      "generatedAt": "2026-11-09T13:03:45.098Z",
-      "compilationTimeMs": 45,
+      "generatedAt": "2026-11-09T14:33:56.287Z",
+      "compilationTimeMs": 42,
       "summary": {
         "totalEvents": 11,
         "compiledEvents": 11,
@@ -656,7 +1008,7 @@
             "y": 1090
           },
           "type": "hierarchicalAnchor",
-          "timestamp": 37
+          "timestamp": 35
         },
         {
           "ref": "laptop.screen",
@@ -665,7 +1017,7 @@
             "y": 985
           },
           "type": "hierarchicalAnchor",
-          "timestamp": 38
+          "timestamp": 36
         }
       ],
       "concurrencyAllocations": [

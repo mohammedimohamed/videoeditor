@@ -676,6 +676,7 @@ export class CharacterController {
 
     let shoulderRot = wrap((sol.shoulderAngleDeg - 90) * rotSign);
     let foreRot = wrap((sol.forearmAngleDeg - sol.shoulderAngleDeg) * rotSign);
+    this.state.lastReachAngles = { shoulderRot, foreRot };
 
     tl.to(armEl, {
       rotation: shoulderRot,

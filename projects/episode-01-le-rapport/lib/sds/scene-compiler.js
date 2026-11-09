@@ -190,12 +190,27 @@ export class SceneCompiler {
     for (const p of allProps) {
       const sel = objectSelectors[p.id] || objectSelectors[p.template] || `#${p.id}`;
       const el = rootEl.querySelector(sel);
+      const isVisible = p.initialState?.visible !== false;
       const objCtrl = new ObjectController(el, {
         id: p.id,
         name: p.name || p.id,
         type: p.template || 'prop',
-        initialState: p.initialState?.state || 'default'
+        parent: p.parent || null,
+        initialState: p.initialState?.state || 'default',
+        initialVisible: isVisible
       });
+
+      if (p.initialState?.position) {
+        objCtrl.setTransform({
+          x: p.initialState.position.x,
+          y: p.initialState.position.y,
+          isWorld: true
+        });
+      }
+      if (!isVisible) {
+        objCtrl.setTransform({ opacity: 0 });
+      }
+
       objects.set(p.id, objCtrl);
     }
 
@@ -551,12 +566,12 @@ export class SceneCompiler {
             // Forearm flexes upward holding cup
             const p = actCtrl.rig.parts;
             masterTimeline.to(p.armL, {
-              rotation: -52,
+              rotation: 120,
               duration: Math.max(0.4, liftDur),
               ease: "power2.out"
             }, contactTime);
             masterTimeline.to(p.forearmL, {
-              rotation: -115,
+              rotation: -105,
               duration: Math.max(0.4, liftDur),
               ease: "power2.out"
             }, contactTime);
@@ -586,13 +601,24 @@ export class SceneCompiler {
               ease: "power2.inOut"
             }, atTime);
 
-            // Sub-beat 2: Object lands on desk and detaches
+            // Sub-beat 2: Object lowers synchronously with arm to destination on desk
+            const bottomOffset = oCtrl.definition?.localAnchors?.bottom || { x: 14, y: 34 };
+            oCtrl.moveTo({
+              tl: masterTimeline,
+              atTime,
+              x: destPos.x - bottomOffset.x,
+              y: destPos.y - bottomOffset.y,
+              duration: lowerDur,
+              ease: "power2.inOut"
+            });
+
+            // Contact and detachment at landing
             const contactTime = atTime + lowerDur;
             oCtrl.detachFrom({
               tl: masterTimeline,
               atTime: contactTime,
               placeAt: placeTarget,
-              duration: 0.3
+              duration: 0.05
             });
 
             // Sub-beat 3: Hand returns to natural rest pose
