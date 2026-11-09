@@ -1,18 +1,20 @@
 /**
  * Mohamed Excel — Scene Direction System (SDS)
- * Action Registry & Subsystem Definitions
+ * Action Registry & Subsystem Definitions (v2.1.0)
  * 
  * Defines all declarative action capabilities supported by the animation system,
  * their parameter schemas, default behaviors, and subsystem resource locks.
  * 
  * Subsystem Locking Model:
- * Actions lock one or more character subsystems. Two actions requesting the
- * same subsystem at overlapping time intervals trigger a concurrency conflict
- * during validation. Non-overlapping subsystems (e.g., locomotion + gaze + speech)
+ * Actions lock one or more character or object subsystems. Two actions requesting
+ * the same subsystem on the same entity at overlapping time intervals trigger
+ * a concurrency conflict during validation. Non-overlapping subsystems
+ * (e.g., locomotion + gaze + speech, or character movement + independent object animation)
  * run concurrently without collision.
  */
 
 export const SUBSYSTEMS = {
+  // Character Subsystems
   LOCOMOTION: 'locomotion',       // Root translation, hips, legs, feet
   ARM_NEAR: 'arm-near',           // Foreground arm, forearm, hand
   ARM_FAR: 'arm-far',             // Background arm, forearm, hand
@@ -22,15 +24,26 @@ export const SUBSYSTEMS = {
   SPEECH: 'speech',               // Mouth viseme track and speech head cadence
   BREATHING: 'breathing',         // Secondary biological chest bounce
   BLINKING: 'blinking',           // Eyelid blink track
+
+  // Object & Prop Subsystems
   PROP_STATE: 'prop-state',       // Environmental object state
+  OBJECT_TRANSFORM: 'object-transform',   // Translation, rotation, scale, path
+  OBJECT_ATTACHMENT: 'object-attachment', // Holding / parent attachment state
+  OBJECT_VISIBILITY: 'object-visibility', // Opacity fade in/out
+  
+  // Scene Subsystems
   CAPTION: 'caption'              // Scene overlay dialogue bubble
 };
 
 export const ACTION_REGISTRY = {
-  version: "2.0.0",
+  version: "2.1.0",
 
   actions: {
-    // 1. Idle biological activity
+    // -------------------------------------------------------------
+    // 1. CHARACTER CORE ACTIONS
+    // -------------------------------------------------------------
+
+    // Idle biological activity
     idle: {
       name: "idle",
       targetType: "actor",
@@ -49,7 +62,7 @@ export const ACTION_REGISTRY = {
       }
     },
 
-    // 2. Grounded locomotion
+    // Grounded locomotion
     walk: {
       name: "walk",
       targetType: "actor",
@@ -57,7 +70,7 @@ export const ACTION_REGISTRY = {
       description: "Bipedal walk to an anchor or coordinate.",
       defaultParams: {
         to: null,
-        mode: "foot-locked", // 'foot-locked' | 'basic'
+        mode: "foot-locked",
         duration: null,
         speed: 135
       },
@@ -72,14 +85,14 @@ export const ACTION_REGISTRY = {
       }
     },
 
-    // 3. Facing orientation
+    // Facing orientation
     turn: {
       name: "turn",
       targetType: "actor",
       subsystems: [SUBSYSTEMS.LOCOMOTION],
       description: "Turn character to face left or right.",
       defaultParams: {
-        direction: "left", // 'left' | 'right' | -1 | 1
+        direction: "left",
         duration: 0.3
       },
       validateParams(params) {
@@ -88,7 +101,7 @@ export const ACTION_REGISTRY = {
       }
     },
 
-    // 4. Pointing gesture (Orientation task)
+    // Pointing gesture
     pointAt: {
       name: "pointAt",
       targetType: "actor",
@@ -107,7 +120,7 @@ export const ACTION_REGISTRY = {
       }
     },
 
-    // 5. Reaching contact (Physical contact task)
+    // Reaching contact
     reach: {
       name: "reach",
       targetType: "actor",
@@ -126,7 +139,7 @@ export const ACTION_REGISTRY = {
       }
     },
 
-    // 6. Gaze orientation
+    // Gaze orientation
     lookAt: {
       name: "lookAt",
       targetType: "actor",
@@ -143,14 +156,14 @@ export const ACTION_REGISTRY = {
       }
     },
 
-    // 7. Facial expression
+    // Facial expression
     express: {
       name: "express",
       targetType: "actor",
       subsystems: [SUBSYSTEMS.EXPRESSION],
       description: "Switch facial emotion and eyebrow posture.",
       defaultParams: {
-        emotion: "neutral", // 'neutral'|'worried'|'happy'|'curious'|'confident'|'frustrated'|'surprised'
+        emotion: "neutral",
         duration: 0.3
       },
       validateParams(params) {
@@ -162,7 +175,7 @@ export const ACTION_REGISTRY = {
       }
     },
 
-    // 8. Speech performance
+    // Speech performance
     speak: {
       name: "speak",
       targetType: "actor",
@@ -180,7 +193,7 @@ export const ACTION_REGISTRY = {
       }
     },
 
-    // 9. Active listening
+    // Active listening
     listenTo: {
       name: "listenTo",
       targetType: "actor",
@@ -197,14 +210,14 @@ export const ACTION_REGISTRY = {
       }
     },
 
-    // 10. Named gesture
+    // Named gesture
     gesture: {
       name: "gesture",
       targetType: "actor",
       subsystems: [SUBSYSTEMS.ARM_NEAR, SUBSYSTEMS.ARM_FAR],
       description: "Perform iconic stylized body gesture.",
       defaultParams: {
-        name: "explain", // 'explain'|'wave'|'handToForehead'|'typing'|'shrug'
+        name: "explain",
         duration: 1.0
       },
       validateParams(params) {
@@ -216,7 +229,7 @@ export const ACTION_REGISTRY = {
       }
     },
 
-    // 11. Typing at desk
+    // Typing at desk
     type: {
       name: "type",
       targetType: "actor",
@@ -231,7 +244,7 @@ export const ACTION_REGISTRY = {
       }
     },
 
-    // 12. Frustration sequence
+    // Frustration sequence
     frustrationSequence: {
       name: "frustrationSequence",
       targetType: "actor",
@@ -245,7 +258,7 @@ export const ACTION_REGISTRY = {
       }
     },
 
-    // 13. Seating actions
+    // Seating actions
     sitDown: {
       name: "sitDown",
       targetType: "actor",
@@ -273,7 +286,220 @@ export const ACTION_REGISTRY = {
       }
     },
 
-    // 14. Environmental prop actions
+    // -------------------------------------------------------------
+    // 2. OBJECT MANIPULATION & INTERACTION ACTIONS (MILESTONE 3)
+    // -------------------------------------------------------------
+
+    // Object translation
+    moveTo: {
+      name: "moveTo",
+      targetType: "object",
+      subsystems: [SUBSYSTEMS.OBJECT_TRANSFORM],
+      description: "Translate object to a target anchor or coordinate.",
+      defaultParams: {
+        target: null,
+        duration: 0.8,
+        ease: "power2.inOut"
+      },
+      validateParams(params) {
+        if (!params.target && params.x === undefined && params.y === undefined) {
+          return "moveTo requires 'target' (anchor name) or 'x' and 'y'";
+        }
+        return null;
+      }
+    },
+
+    // Object rotation
+    rotateTo: {
+      name: "rotateTo",
+      targetType: "object",
+      subsystems: [SUBSYSTEMS.OBJECT_TRANSFORM],
+      description: "Rotate object around its pivot.",
+      defaultParams: {
+        rotation: 0,
+        duration: 0.5,
+        ease: "power2.out",
+        transformOrigin: "50% 50%"
+      },
+      validateParams(params) {
+        if (params.rotation === undefined) return "rotateTo requires 'rotation' in degrees";
+        return null;
+      }
+    },
+
+    // Object scaling
+    scaleTo: {
+      name: "scaleTo",
+      targetType: "object",
+      subsystems: [SUBSYSTEMS.OBJECT_TRANSFORM],
+      description: "Scale object size along X and Y axes.",
+      defaultParams: {
+        scaleX: 1.0,
+        scaleY: null,
+        duration: 0.5,
+        ease: "power2.out"
+      },
+      validateParams(params) {
+        if (params.scaleX === undefined && params.scale === undefined) return "scaleTo requires 'scaleX' or 'scale'";
+        return null;
+      }
+    },
+
+    // Object curved path trajectory
+    followPath: {
+      name: "followPath",
+      targetType: "object",
+      subsystems: [SUBSYSTEMS.OBJECT_TRANSFORM],
+      description: "Move object along a sequence of 2D waypoints or curved path.",
+      defaultParams: {
+        path: [],
+        duration: 1.2,
+        ease: "power1.inOut"
+      },
+      validateParams(params) {
+        if (!Array.isArray(params.path) || params.path.length < 2) {
+          return "followPath requires 'path' array with at least 2 points";
+        }
+        return null;
+      }
+    },
+
+    // Instant transform pose
+    setTransform: {
+      name: "setTransform",
+      targetType: "object",
+      subsystems: [SUBSYSTEMS.OBJECT_TRANSFORM],
+      description: "Instantaneously set object position, rotation or scale.",
+      defaultParams: {},
+      validateParams(params) {
+        return null;
+      }
+    },
+
+    // Visibility actions
+    fadeIn: {
+      name: "fadeIn",
+      targetType: "object",
+      subsystems: [SUBSYSTEMS.OBJECT_VISIBILITY],
+      description: "Fade in object opacity to 1.",
+      defaultParams: { duration: 0.4 },
+      validateParams() { return null; }
+    },
+
+    fadeOut: {
+      name: "fadeOut",
+      targetType: "object",
+      subsystems: [SUBSYSTEMS.OBJECT_VISIBILITY],
+      description: "Fade out object opacity to 0.",
+      defaultParams: { duration: 0.4 },
+      validateParams() { return null; }
+    },
+
+    // Object State Actions
+    changeState: {
+      name: "changeState",
+      targetType: "object",
+      subsystems: [SUBSYSTEMS.OBJECT_STATE],
+      description: "Change visual state of an object (e.g. pivot-table, error-highlight).",
+      defaultParams: {
+        state: "default",
+        duration: 0.3
+      },
+      validateParams(params) {
+        if (!params.state) return "changeState requires 'state'";
+        return null;
+      }
+    },
+
+    open: {
+      name: "open",
+      targetType: "object",
+      subsystems: [SUBSYSTEMS.OBJECT_TRANSFORM, SUBSYSTEMS.OBJECT_STATE],
+      description: "Open an object (e.g. laptop lid, folder).",
+      defaultParams: { duration: 0.5 },
+      validateParams() { return null; }
+    },
+
+    close: {
+      name: "close",
+      targetType: "object",
+      subsystems: [SUBSYSTEMS.OBJECT_TRANSFORM, SUBSYSTEMS.OBJECT_STATE],
+      description: "Close an object (e.g. laptop lid, folder).",
+      defaultParams: { duration: 0.5 },
+      validateParams() { return null; }
+    },
+
+    // Coordinated Character-Object Pick-Up Interaction
+    pickUp: {
+      name: "pickUp",
+      targetType: "interaction",
+      actorSubsystems: [SUBSYSTEMS.ARM_NEAR, SUBSYSTEMS.GAZE],
+      objectSubsystems: [SUBSYSTEMS.OBJECT_ATTACHMENT, SUBSYSTEMS.OBJECT_TRANSFORM],
+      description: "Coordinated interaction: Character looks at object, reaches via 2-bone IK, contacts socket, attaches object, and lifts.",
+      defaultParams: {
+        actor: null,
+        object: null,
+        socket: "handle",
+        liftDelta: { x: 0, y: -45 },
+        duration: 1.4
+      },
+      validateParams(params) {
+        if (!params.actor) return "pickUp requires 'actor'";
+        if (!params.object) return "pickUp requires 'object'";
+        return null;
+      }
+    },
+
+    // Coordinated Character-Object Place Interaction
+    placeObject: {
+      name: "placeObject",
+      targetType: "interaction",
+      actorSubsystems: [SUBSYSTEMS.ARM_NEAR],
+      objectSubsystems: [SUBSYSTEMS.OBJECT_ATTACHMENT, SUBSYSTEMS.OBJECT_TRANSFORM],
+      description: "Coordinated interaction: Character lowers held object, places it stably on destination surface, detaches, and arm rests.",
+      defaultParams: {
+        actor: null,
+        object: null,
+        placeAt: "desk.surface",
+        duration: 1.2
+      },
+      validateParams(params) {
+        if (!params.actor) return "placeObject requires 'actor'";
+        if (!params.object) return "placeObject requires 'object'";
+        return null;
+      }
+    },
+
+    // Low-level attachment
+    attachTo: {
+      name: "attachTo",
+      targetType: "object",
+      subsystems: [SUBSYSTEMS.OBJECT_ATTACHMENT],
+      description: "Attach object to an actor socket with relative transform lock.",
+      defaultParams: {
+        actor: null,
+        socket: "palm",
+        duration: 0.4
+      },
+      validateParams(params) {
+        if (!params.actor && !params.target) return "attachTo requires 'actor' or 'target'";
+        return null;
+      }
+    },
+
+    detachFrom: {
+      name: "detachFrom",
+      targetType: "object",
+      subsystems: [SUBSYSTEMS.OBJECT_ATTACHMENT],
+      description: "Detach object from current holder, preserving world position or placing at anchor.",
+      defaultParams: {
+        placeAt: null,
+        duration: 0.4
+      },
+      validateParams() { return null; }
+    },
+
+    // Environmental prop actions (Legacy compatibility)
     propAction: {
       name: "propAction",
       targetType: "prop",
@@ -281,7 +507,7 @@ export const ACTION_REGISTRY = {
       description: "Trigger prop state changes or procedural animations.",
       defaultParams: {
         propId: null,
-        action: "setState", // 'setState' | 'scroll' | 'tick' | 'show' | 'hide'
+        action: "setState",
         state: null,
         duration: 1.0,
         value: null
@@ -293,7 +519,7 @@ export const ACTION_REGISTRY = {
       }
     },
 
-    // 15. Subtitle caption overlay
+    // Subtitle caption overlay
     caption: {
       name: "caption",
       targetType: "scene",

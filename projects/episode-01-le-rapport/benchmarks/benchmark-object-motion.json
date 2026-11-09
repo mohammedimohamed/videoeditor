@@ -1,0 +1,176 @@
+{
+  "version": "2.1.0",
+  "metadata": {
+    "id": "benchmark-object-motion",
+    "title": "Benchmark 4: Autonomous Object Motion & State Transformations",
+    "description": "Demonstrates object-only animation: report folder curved trajectory translation, in-place rotation, scaling, laptop screen folding and pivot table state transition without character attachment.",
+    "duration": 7.0,
+    "fps": 30,
+    "resolution": {
+      "width": 1080,
+      "height": 1920
+    }
+  },
+  "environment": {
+    "preset": "office",
+    "background": "office-modern"
+  },
+  "actors": [
+    {
+      "id": "karim",
+      "template": "employee",
+      "name": "Karim",
+      "role": "Financial Analyst",
+      "initialState": {
+        "pose": "seated",
+        "position": { "x": 320, "y": 1120 },
+        "facing": 1,
+        "expression": "curious"
+      }
+    }
+  ],
+  "props": [
+    {
+      "id": "desk",
+      "template": "desk",
+      "initialState": { "state": "default" }
+    },
+    {
+      "id": "laptop",
+      "template": "laptop",
+      "initialState": { "state": "raw-data" }
+    },
+    {
+      "id": "doc_report",
+      "template": "document",
+      "name": "Audit Report Folder",
+      "parent": "desk",
+      "initialState": {
+        "state": "default",
+        "position": { "x": 190, "y": 1085 },
+        "visible": false
+      }
+    },
+    {
+      "id": "clock",
+      "template": "clock",
+      "initialState": { "state": "ticking" }
+    }
+  ],
+  "events": [
+    {
+      "id": "evt-obj-clock",
+      "prop": "clock",
+      "action": "propAction",
+      "timing": { "start": 0.0, "duration": 7.0 },
+      "params": {
+        "propId": "clock",
+        "action": "tick"
+      },
+      "description": "Office clock ticking."
+    },
+    {
+      "id": "evt-doc-fadein",
+      "object": "doc_report",
+      "action": "fadeIn",
+      "timing": { "start": 0.4, "duration": 0.5 },
+      "description": "Document folder materializes on the left edge of the desk."
+    },
+    {
+      "id": "evt-doc-curved-motion",
+      "object": "doc_report",
+      "action": "followPath",
+      "timing": { "start": 0.9, "duration": 1.6 },
+      "params": {
+        "path": [
+          { "x": 190, "y": 1085 },
+          { "x": 260, "y": 1070 },
+          { "x": 340, "y": 1065 },
+          { "x": 420, "y": 1072 },
+          { "x": 480, "y": 1085 }
+        ],
+        "ease": "power1.inOut"
+      },
+      "description": "Document slides smoothly along an arched path across the desk plate."
+    },
+    {
+      "id": "evt-karim-track-doc",
+      "actor": "karim",
+      "action": "lookAt",
+      "timing": { "start": 1.0, "duration": 1.8 },
+      "params": {
+        "target": "desk.surface.centerArea",
+        "duration": 0.4
+      },
+      "description": "Karim watches the document move across the desk."
+    },
+    {
+      "id": "evt-doc-rotate-align",
+      "object": "doc_report",
+      "action": "rotateTo",
+      "timing": { "start": 2.5, "duration": 0.6 },
+      "params": {
+        "rotation": 8,
+        "transformOrigin": "center center",
+        "ease": "power2.out"
+      },
+      "description": "Document pivots into convenient reading angle."
+    },
+    {
+      "id": "evt-doc-scale-highlight",
+      "object": "doc_report",
+      "action": "scaleTo",
+      "timing": { "start": 3.1, "duration": 0.6 },
+      "params": {
+        "scale": 1.15,
+        "ease": "back.out(1.5)"
+      },
+      "description": "Document expands slightly for clarity."
+    },
+    {
+      "id": "evt-laptop-pivot-state",
+      "object": "laptop",
+      "action": "changeState",
+      "timing": { "start": 3.8, "duration": 0.8 },
+      "params": {
+        "state": "pivot-table"
+      },
+      "description": "Laptop screen transitions to glowing Pivot Table solution."
+    },
+    {
+      "id": "evt-karim-look-laptop",
+      "actor": "karim",
+      "action": "lookAt",
+      "timing": { "start": 3.9, "duration": 1.5 },
+      "params": {
+        "target": "laptop.screen",
+        "duration": 0.35
+      },
+      "description": "Karim directs attention to laptop screen."
+    },
+    {
+      "id": "evt-karim-express-happy",
+      "actor": "karim",
+      "action": "express",
+      "timing": { "start": 4.0, "duration": 0.5 },
+      "params": {
+        "emotion": "happy"
+      },
+      "description": "Karim expresses delight at the summary."
+    },
+    {
+      "id": "evt-laptop-close-lid",
+      "object": "laptop",
+      "action": "close",
+      "timing": { "start": 5.2, "duration": 0.6 },
+      "description": "Laptop screen folds closed."
+    },
+    {
+      "id": "evt-laptop-open-lid",
+      "object": "laptop",
+      "action": "open",
+      "timing": { "start": 5.9, "duration": 0.6 },
+      "description": "Laptop screen springs back open."
+    }
+  ]
+}

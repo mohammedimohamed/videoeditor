@@ -1,21 +1,22 @@
 /**
  * Mohamed Excel — Scene Direction System (SDS)
- * Scene Compiler & Timeline Generator
+ * Scene Compiler & Timeline Generator (v2.1.0)
  * 
  * Compiles validated declarative scene direction specifications (JSON)
- * into deterministic, executable GSAP master timelines using the existing
- * CharacterController, CharacterRig, EnvironmentTemplates, and IK solver.
+ * into deterministic, executable GSAP master timelines using CharacterController,
+ * CharacterRig, ObjectController, EnvironmentTemplates, and authoritative IK solvers.
  * 
- * Guarantees:
- * 1. Zero scene-specific JavaScript written by the director.
- * 2. Automated actor, prop, and layer mounting.
- * 3. Dynamic and static anchor resolution.
- * 4. Multi-track concurrency without conflicting transform overwrites.
- * 5. Full execution tracing and reporting.
+ * Milestone 3 Extensions:
+ * 1. ObjectController instantiation for all props & interactive objects.
+ * 2. Coordinated character-object interactions (pickUp, placeObject, attachTo, detachFrom).
+ * 3. Object-only animation (moveTo, rotateTo, scaleTo, followPath, open, close, changeState).
+ * 4. Hierarchical anchor resolution & dynamic socket tracking.
+ * 5. Full backward compatibility with Milestone 2 specifications.
  */
 
 import { CharacterRig } from '../rigging/character-rig.js';
 import { CharacterController } from '../rigging/character-controller.js';
+import { ObjectController } from './object-controller.js';
 import { getEmployeeSVG, getMohamedSVG } from '../rigging/character-templates.js';
 import { getOfficeEnvironmentSVG } from '../rigging/environment-templates.js';
 import { setupSittingPose, animateFrustrationSequence } from '../rigging/behavior-library.js';
@@ -33,7 +34,7 @@ export class SceneCompiler {
    * Compile a declarative scene JSON specification into an executable GSAP timeline.
    * @param {Object} spec Scene specification
    * @param {Element|string} container Target DOM root element
-   * @returns {{ timeline: gsap.core.Timeline, tracer: ExecutionTracer, controllers: Map<string, CharacterController>, validation: Object }}
+   * @returns {{ timeline: gsap.core.Timeline, tracer: ExecutionTracer, controllers: Map<string, CharacterController>, objects: Map<string, ObjectController>, validation: Object }}
    */
   compile(spec, container) {
     const rootEl = typeof container === 'string' ? document.querySelector(container) : container;
@@ -75,14 +76,29 @@ export class SceneCompiler {
     deskLayer.style.zIndex = '3';
     rootEl.appendChild(deskLayer);
 
+    let deskSvg = null;
     const deskGroup = envLayer.querySelector('#office-desk');
     if (deskGroup) {
-      const deskSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      deskSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       deskSvg.setAttribute("viewBox", "0 0 1080 1920");
       deskSvg.setAttribute("width", "1080");
       deskSvg.setAttribute("height", "1920");
       deskSvg.appendChild(deskGroup);
       deskLayer.appendChild(deskSvg);
+
+      // Inject Document prop if not already in SVG
+      if (!deskGroup.querySelector('#desk-document')) {
+        const docGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        docGroup.setAttribute("id", "desk-document");
+        docGroup.setAttribute("transform", "translate(340, 5)");
+        docGroup.innerHTML = `
+          <rect width="68" height="46" rx="4" fill="#FEF3C7" stroke="#1E293B" stroke-width="2.5"/>
+          <line x1="8" y1="12" x2="60" y2="12" stroke="#D97706" stroke-width="2"/>
+          <line x1="8" y1="22" x2="44" y2="22" stroke="#D97706" stroke-width="2"/>
+          <line x1="8" y1="32" x2="52" y2="32" stroke="#D97706" stroke-width="2"/>
+        `;
+        deskGroup.appendChild(docGroup);
+      }
     }
 
     // 3. Mount Actors & Instantiate CharacterControllers
@@ -124,7 +140,6 @@ export class SceneCompiler {
       if (init.pose === 'seated') {
         setupSittingPose(ctrl.rig, { x: 320, y: 1120 });
       } else {
-        // Position
         let initX = 855;
         let initY = 1104;
         if (init.position) {
@@ -146,14 +161,12 @@ export class SceneCompiler {
         ctrl.state.y = initY;
       }
 
-      // Facing orientation
       if (init.facing !== undefined) {
         let dir = 1;
         if (init.facing === -1 || init.facing === 'left' || init.facing === '3/4-left') dir = -1;
         ctrl.turnTo(dir, { duration: 0 });
       }
 
-      // Initial facial expression
       if (init.expression) {
         ctrl.express(init.expression, { duration: 0 });
       }
@@ -161,7 +174,42 @@ export class SceneCompiler {
       controllers.set(actorDef.id, ctrl);
     }
 
-    // 4. Captions Overlay Container (z-index 10)
+    // 4. Instantiate ObjectControllers for Props & Environmental Objects
+    const objects = new Map();
+    const objectSelectors = {
+      desk: '#office-desk',
+      laptop: '#desk-laptop, #office-laptop',
+      mug: '#desk-mug, #office-coffee-mug',
+      clock: '#wall-clock, #office-wall-clock',
+      chair: '#office-chair',
+      document: '#desk-document',
+      doc_report: '#desk-document'
+    };
+
+    const allProps = [...(spec.props || []), ...(spec.objects || [])];
+    for (const p of allProps) {
+      const sel = objectSelectors[p.id] || objectSelectors[p.template] || `#${p.id}`;
+      const el = rootEl.querySelector(sel);
+      const objCtrl = new ObjectController(el, {
+        id: p.id,
+        name: p.name || p.id,
+        type: p.template || 'prop',
+        initialState: p.initialState?.state || 'default'
+      });
+      objects.set(p.id, objCtrl);
+    }
+
+    // Also register default environmental objects if not explicitly in props
+    for (const [k, sel] of Object.entries(objectSelectors)) {
+      if (!objects.has(k)) {
+        const el = rootEl.querySelector(sel);
+        if (el) {
+          objects.set(k, new ObjectController(el, { id: k, name: k }));
+        }
+      }
+    }
+
+    // 5. Captions Overlay Container (z-index 10)
     const captionsContainer = document.createElement('div');
     captionsContainer.id = 'captions-container';
     captionsContainer.style.position = 'absolute';
@@ -176,7 +224,7 @@ export class SceneCompiler {
     captionsContainer.style.pointerEvents = 'none';
     rootEl.appendChild(captionsContainer);
 
-    // 5. Construct Master GSAP Timeline
+    // 6. Construct Master GSAP Timeline
     const masterTimeline = gsap.timeline({ paused: true });
 
     // Sort events by resolved start time
@@ -186,7 +234,7 @@ export class SceneCompiler {
       return tA - tB;
     });
 
-    // 6. Translate Instructions to GSAP
+    // 7. Translate Instructions to GSAP
     for (const evt of sortedEvents) {
       const timing = validation.schedule.get(evt.id);
       if (!timing) continue;
@@ -196,9 +244,13 @@ export class SceneCompiler {
       const params = evt.params || {};
 
       const ctrl = evt.actor ? controllers.get(evt.actor) : null;
+      const objTargetId = evt.object || evt.prop || params.objectId || params.propId || params.object;
+      const objCtrl = objTargetId ? objects.get(objTargetId) : null;
+
       let tweenCount = 1;
 
       switch (evt.action) {
+        // --- Character Core Actions ---
         case 'idle': {
           ctrl.idle({
             tl: masterTimeline,
@@ -216,7 +268,7 @@ export class SceneCompiler {
           if (typeof targetRef === 'number') {
             targetX = targetRef;
           } else {
-            const resolved = resolveAnchor(targetRef, controllers);
+            const resolved = resolveAnchor(targetRef, controllers, objects);
             targetX = resolved.x;
             tracer.logAnchorResolution(targetRef, resolved);
           }
@@ -242,7 +294,7 @@ export class SceneCompiler {
         case 'pointAt': {
           let targetCoord = { x: 525, y: 985 };
           if (params.target) {
-            targetCoord = resolveAnchor(params.target, controllers);
+            targetCoord = resolveAnchor(params.target, controllers, objects);
             tracer.logAnchorResolution(params.target, targetCoord);
           }
 
@@ -258,7 +310,7 @@ export class SceneCompiler {
         case 'reach': {
           let targetCoord = { x: 640, y: 1055 };
           if (params.target) {
-            targetCoord = resolveAnchor(params.target, controllers);
+            targetCoord = resolveAnchor(params.target, controllers, objects);
             tracer.logAnchorResolution(params.target, targetCoord);
           }
 
@@ -277,7 +329,7 @@ export class SceneCompiler {
             if (controllers.has(params.target)) {
               targetEntity = controllers.get(params.target);
             } else {
-              targetEntity = resolveAnchor(params.target, controllers);
+              targetEntity = resolveAnchor(params.target, controllers, objects);
               tracer.logAnchorResolution(params.target, targetEntity);
             }
           }
@@ -349,7 +401,7 @@ export class SceneCompiler {
         case 'sitDown': {
           let chairPos = { x: 320, y: 1120 };
           if (params.chair) {
-            chairPos = resolveAnchor(params.chair, controllers);
+            chairPos = resolveAnchor(params.chair, controllers, objects);
           }
           ctrl.sitDown({
             chairX: chairPos.x,
@@ -370,6 +422,216 @@ export class SceneCompiler {
           break;
         }
 
+        // --- Milestone 3: Object Transform & State Actions ---
+        case 'moveTo': {
+          if (objCtrl) {
+            objCtrl.moveTo({
+              tl: masterTimeline,
+              atTime,
+              target: params.target,
+              x: params.x,
+              y: params.y,
+              duration,
+              ease: params.ease || "power2.inOut"
+            });
+          }
+          break;
+        }
+
+        case 'rotateTo': {
+          if (objCtrl) {
+            objCtrl.rotateTo({
+              tl: masterTimeline,
+              atTime,
+              rotation: params.rotation || 0,
+              duration,
+              ease: params.ease || "power2.out",
+              transformOrigin: params.transformOrigin || "50% 50%"
+            });
+          }
+          break;
+        }
+
+        case 'scaleTo': {
+          if (objCtrl) {
+            objCtrl.scaleTo({
+              tl: masterTimeline,
+              atTime,
+              scaleX: params.scaleX !== undefined ? params.scaleX : (params.scale || 1),
+              scaleY: params.scaleY !== undefined ? params.scaleY : (params.scale || 1),
+              duration,
+              ease: params.ease || "power2.out"
+            });
+          }
+          break;
+        }
+
+        case 'followPath': {
+          if (objCtrl) {
+            objCtrl.followPath({
+              tl: masterTimeline,
+              atTime,
+              path: params.path || [],
+              duration,
+              ease: params.ease || "power1.inOut"
+            });
+          }
+          break;
+        }
+
+        case 'fadeIn': {
+          if (objCtrl) objCtrl.fadeIn({ tl: masterTimeline, atTime, duration });
+          break;
+        }
+
+        case 'fadeOut': {
+          if (objCtrl) objCtrl.fadeOut({ tl: masterTimeline, atTime, duration });
+          break;
+        }
+
+        case 'setTransform': {
+          if (objCtrl) {
+            objCtrl.setTransform({ ...params, tl: masterTimeline, atTime });
+          }
+          break;
+        }
+
+        case 'changeState': {
+          if (objCtrl) {
+            objCtrl.changeState({
+              tl: masterTimeline,
+              atTime,
+              state: params.state || 'default',
+              duration
+            });
+          }
+          break;
+        }
+
+        case 'open': {
+          if (objCtrl) objCtrl.open({ tl: masterTimeline, atTime, duration });
+          break;
+        }
+
+        case 'close': {
+          if (objCtrl) objCtrl.close({ tl: masterTimeline, atTime, duration });
+          break;
+        }
+
+        // --- Milestone 3: Character-Object Coordinated Interactions ---
+        case 'pickUp': {
+          const actCtrl = controllers.get(evt.actor || params.actor);
+          const oCtrl = objects.get(evt.object || params.object);
+
+          if (actCtrl && oCtrl) {
+            const socketName = `${oCtrl.id}.${params.socket || 'handle'}`;
+            const targetPos = resolveAnchor(socketName, controllers, objects);
+
+            // Sub-beat 1: Gaze convergence on object
+            actCtrl.lookAt(targetPos, { tl: masterTimeline, atTime, duration: 0.35 });
+
+            // Sub-beat 2: Physical reach to handle via analytical IK
+            const reachDur = 0.5;
+            actCtrl.reachTo(targetPos, {
+              tl: masterTimeline,
+              atTime: atTime + 0.1,
+              duration: reachDur
+            });
+
+            // Sub-beat 3: Object attach & lift synchronously with forearm flexion
+            const contactTime = atTime + 0.1 + reachDur;
+            const liftDur = duration - (contactTime - atTime);
+            oCtrl.attachTo(actCtrl, {
+              tl: masterTimeline,
+              atTime: contactTime,
+              liftDelta: params.liftDelta || { x: -20, y: -65 },
+              duration: Math.max(0.4, liftDur)
+            });
+
+            // Forearm flexes upward holding cup
+            const p = actCtrl.rig.parts;
+            masterTimeline.to(p.armL, {
+              rotation: -52,
+              duration: Math.max(0.4, liftDur),
+              ease: "power2.out"
+            }, contactTime);
+            masterTimeline.to(p.forearmL, {
+              rotation: -115,
+              duration: Math.max(0.4, liftDur),
+              ease: "power2.out"
+            }, contactTime);
+          }
+          break;
+        }
+
+        case 'placeObject': {
+          const actCtrl = controllers.get(evt.actor || params.actor);
+          const oCtrl = objects.get(evt.object || params.object);
+
+          if (actCtrl && oCtrl) {
+            const placeTarget = params.placeAt || "desk.surface.rightArea";
+            const destPos = resolveAnchor(placeTarget, controllers, objects);
+
+            // Sub-beat 1: Lower arm towards surface
+            const lowerDur = duration * 0.55;
+            const p = actCtrl.rig.parts;
+            masterTimeline.to(p.armL, {
+              rotation: -28,
+              duration: lowerDur,
+              ease: "power2.inOut"
+            }, atTime);
+            masterTimeline.to(p.forearmL, {
+              rotation: -45,
+              duration: lowerDur,
+              ease: "power2.inOut"
+            }, atTime);
+
+            // Sub-beat 2: Object lands on desk and detaches
+            const contactTime = atTime + lowerDur;
+            oCtrl.detachFrom({
+              tl: masterTimeline,
+              atTime: contactTime,
+              placeAt: placeTarget,
+              duration: 0.3
+            });
+
+            // Sub-beat 3: Hand returns to natural rest pose
+            const restDur = duration - lowerDur - 0.1;
+            masterTimeline.to([p.armL, p.forearmL, p.handL], {
+              rotation: 0,
+              duration: Math.max(0.3, restDur),
+              ease: "power2.out"
+            }, contactTime + 0.15);
+          }
+          break;
+        }
+
+        case 'attachTo': {
+          const actCtrl = controllers.get(params.actor || params.target);
+          if (objCtrl && actCtrl) {
+            objCtrl.attachTo(actCtrl, {
+              tl: masterTimeline,
+              atTime,
+              socket: params.socket || 'palm',
+              duration
+            });
+          }
+          break;
+        }
+
+        case 'detachFrom': {
+          if (objCtrl) {
+            objCtrl.detachFrom({
+              tl: masterTimeline,
+              atTime,
+              placeAt: params.placeAt,
+              duration
+            });
+          }
+          break;
+        }
+
+        // --- Prop & Scene Actions (Legacy Compatibility) ---
         case 'propAction': {
           const propId = evt.prop || params.propId || params.prop;
           const propAction = params.action || 'setState';
@@ -398,10 +660,8 @@ export class SceneCompiler {
                 }, atTime);
               }
             } else if (propAction === 'setState' && params.state === 'pivot-table') {
-              // Transition laptop screen to Pivot Table solution
               const screenGroup = document.querySelector('#office-laptop');
               if (screenGroup) {
-                // Subtle screen illumination pulse
                 masterTimeline.to(screenGroup, {
                   filter: "drop-shadow(0 0 16px rgba(16, 124, 65, 0.45))",
                   duration: 0.4,
@@ -444,7 +704,6 @@ export class SceneCompiler {
 
           captionsContainer.appendChild(captionDiv);
 
-          // Animate caption in
           masterTimeline.to(captionDiv, {
             opacity: 1,
             y: 0,
@@ -452,7 +711,6 @@ export class SceneCompiler {
             ease: "power2.out"
           }, atTime);
 
-          // Animate caption out at end of interval
           masterTimeline.to(captionDiv, {
             opacity: 0,
             y: -10,
@@ -480,11 +738,19 @@ export class SceneCompiler {
     window.__timelines[spec.metadata.id] = masterTimeline;
     window.__timelines['scene-player'] = masterTimeline;
     window.__sceneExecutionTracer = tracer;
+    window.__compiledScene = {
+      spec,
+      controllers,
+      objects,
+      timeline: masterTimeline,
+      validation
+    };
 
     return {
       timeline: masterTimeline,
       tracer,
       controllers,
+      objects,
       validation
     };
   }

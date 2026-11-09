@@ -1,14 +1,14 @@
 /**
  * Mohamed Excel — Scene Direction System (SDS)
- * Scene Specification Validator
+ * Scene Specification Validator (v2.1.0)
  * 
  * Performs comprehensive static and semantic validation of scene direction specifications:
- * 1. Structural schema compliance (JSON Schema v2.0.0).
- * 2. Actor and Prop entity resolution.
- * 3. Authoritative spatial anchor resolution.
- * 4. Dependency graph resolution & cycle detection.
- * 5. Multi-track subsystem concurrency conflict detection.
- * 6. Biomechanical & physical stage constraints.
+ * 1. Structural schema compliance (JSON Schema v2.1.0).
+ * 2. Actor and Object/Prop entity resolution.
+ * 3. Authoritative spatial anchor resolution (static & hierarchical).
+ * 4. Dependency graph resolution & cycle detection (DAG topological sort).
+ * 5. Multi-track subsystem concurrency conflict detection for characters and objects.
+ * 6. Biomechanical & physical stage constraints (reachability limit 240px, floor plane).
  */
 
 import { ASSET_REGISTRY, resolveAnchor } from './asset-registry.js';
@@ -75,17 +75,23 @@ export class SceneValidator {
       actorMap.set(actor.id, actor);
     }
 
-    const propMap = new Map();
-    if (spec.props) {
-      for (const prop of spec.props) {
-        if (!prop.id) {
-          errors.push('Every prop must have an "id".');
-          continue;
-        }
-        if (propMap.has(prop.id)) {
-          errors.push(`Duplicate prop id: "${prop.id}".`);
-        }
-        propMap.set(prop.id, prop);
+    const objectMap = new Map();
+    const allProps = [...(spec.props || []), ...(spec.objects || [])];
+    for (const prop of allProps) {
+      if (!prop.id) {
+        errors.push('Every prop/object must have an "id".');
+        continue;
+      }
+      if (objectMap.has(prop.id)) {
+        errors.push(`Duplicate prop/object id: "${prop.id}".`);
+      }
+      objectMap.set(prop.id, prop);
+    }
+
+    // Also recognize pre-registered environmental objects in ASSET_REGISTRY
+    for (const [k, v] of Object.entries(ASSET_REGISTRY.objects)) {
+      if (!objectMap.has(k)) {
+        objectMap.set(k, v);
       }
     }
 
@@ -102,26 +108,35 @@ export class SceneValidator {
       }
       eventMap.set(evt.id, evt);
 
-      // Validate Action
+      // Validate Action existence
       const actionDef = ACTION_REGISTRY.actions[evt.action];
       if (!actionDef) {
         errors.push(`Event "${evt.id}": Unknown action "${evt.action}".`);
         continue;
       }
 
-      // Validate Target Actor/Prop
+      // Validate Target Actor / Object
       if (actionDef.targetType === 'actor') {
         if (!evt.actor) {
           errors.push(`Event "${evt.id}": Action "${evt.action}" requires an "actor".`);
         } else if (!actorMap.has(evt.actor)) {
           errors.push(`Event "${evt.id}": Actor "${evt.actor}" does not exist in scene.actors.`);
         }
-      } else if (actionDef.targetType === 'prop') {
-        const propTarget = evt.prop || (evt.params && (evt.params.propId || evt.params.prop));
-        if (!propTarget) {
-          errors.push(`Event "${evt.id}": Action "${evt.action}" requires a "prop" or params.propId.`);
-        } else if (!propMap.has(propTarget) && !ASSET_REGISTRY.props[propTarget]) {
-          errors.push(`Event "${evt.id}": Prop "${propTarget}" does not exist in scene.props or ASSET_REGISTRY.`);
+      } else if (actionDef.targetType === 'object' || actionDef.targetType === 'prop') {
+        const objTarget = evt.object || evt.prop || (evt.params && (evt.params.objectId || evt.params.propId || evt.params.prop));
+        if (!objTarget) {
+          errors.push(`Event "${evt.id}": Action "${evt.action}" requires an "object" or "prop".`);
+        } else if (!objectMap.has(objTarget)) {
+          errors.push(`Event "${evt.id}": Object "${objTarget}" does not exist in scene.props/objects or ASSET_REGISTRY.`);
+        }
+      } else if (actionDef.targetType === 'interaction') {
+        const act = evt.actor || (evt.params && evt.params.actor);
+        const obj = evt.object || evt.prop || (evt.params && evt.params.object);
+        if (!act || !actorMap.has(act)) {
+          errors.push(`Event "${evt.id}": Interaction action "${evt.action}" requires valid "actor".`);
+        }
+        if (!obj || !objectMap.has(obj)) {
+          errors.push(`Event "${evt.id}": Interaction action "${evt.action}" requires valid "object".`);
         }
       }
 
@@ -133,17 +148,15 @@ export class SceneValidator {
       }
 
       // Validate Spatial Anchors in Params
-      const anchorKeys = ['to', 'target', 'chair', 'speaker'];
+      const anchorKeys = ['to', 'target', 'chair', 'speaker', 'placeAt'];
       for (const k of anchorKeys) {
         if (params[k]) {
           const ref = params[k];
-          // If speaker, check actor
           if (k === 'speaker') {
             if (!actorMap.has(ref)) {
               errors.push(`Event "${evt.id}": Speaker "${ref}" does not exist in scene.actors.`);
             }
           } else {
-            // Anchor lookup check
             try {
               resolveAnchor(ref);
             } catch (err) {
@@ -219,14 +232,31 @@ export class SceneValidator {
       }
 
       const end = start + duration;
+
+      // Extract actor & object subsystems
+      let actorSubsystems = [];
+      let objectSubsystems = [];
+
+      if (actionDef.targetType === 'interaction') {
+        actorSubsystems = actionDef.actorSubsystems || [];
+        objectSubsystems = actionDef.objectSubsystems || [];
+      } else if (actionDef.targetType === 'actor') {
+        actorSubsystems = actionDef.subsystems || [];
+      } else if (actionDef.targetType === 'object' || actionDef.targetType === 'prop') {
+        objectSubsystems = actionDef.subsystems || [];
+      }
+
       const result = {
         id: evtId,
-        actor: evt.actor || null,
+        actor: evt.actor || (evt.params && evt.params.actor) || null,
+        object: evt.object || evt.prop || (evt.params && (evt.params.object || evt.params.propId)) || null,
         action: evt.action,
         start,
         end,
         duration,
-        subsystems: actionDef.subsystems || []
+        actorSubsystems,
+        objectSubsystems,
+        subsystems: [...actorSubsystems, ...objectSubsystems]
       };
 
       schedule.set(evtId, result);
@@ -255,38 +285,66 @@ export class SceneValidator {
     }
 
     // 5. Concurrency & Subsystem Conflict Detection
-    // Group events by actor and evaluate interval overlaps on locked subsystems
+    // 5a. Actor Subsystems
     const actorEvents = new Map();
     for (const actorId of actorMap.keys()) {
       actorEvents.set(actorId, []);
+    }
+
+    // 5b. Object Subsystems
+    const objEvents = new Map();
+    for (const objId of objectMap.keys()) {
+      objEvents.set(objId, []);
     }
 
     for (const [evtId, timing] of schedule.entries()) {
       if (timing.actor && actorEvents.has(timing.actor)) {
         actorEvents.get(timing.actor).push(timing);
       }
+      if (timing.object && objEvents.has(timing.object)) {
+        objEvents.get(timing.object).push(timing);
+      }
     }
 
+    // Check Actor Collisions
     for (const [actorId, evts] of actorEvents.entries()) {
-      // Compare each pair of events on this actor
       for (let i = 0; i < evts.length; i++) {
         for (let j = i + 1; j < evts.length; j++) {
           const e1 = evts[i];
           const e2 = evts[j];
-
-          // Check temporal overlap: max(start1, start2) < min(end1, end2)
           const overlapStart = Math.max(e1.start, e2.start);
           const overlapEnd = Math.min(e1.end, e2.end);
 
           if (overlapStart < overlapEnd - 0.01) {
-            // Check subsystem collision
-            for (const sub of e1.subsystems) {
-              // Breathing and blinking are ambient and permitted to coexist with gestures
+            for (const sub of e1.actorSubsystems) {
               if (sub === SUBSYSTEMS.BREATHING || sub === SUBSYSTEMS.BLINKING) continue;
-
-              if (e2.subsystems.includes(sub)) {
+              if (e2.actorSubsystems.includes(sub)) {
                 errors.push(
                   `Concurrency collision on actor "${actorId}": Subsystem "${sub}" locked simultaneously by ` +
+                  `event "${e1.id}" [${e1.start.toFixed(2)}s - ${e1.end.toFixed(2)}s] and ` +
+                  `event "${e2.id}" [${e2.start.toFixed(2)}s - ${e2.end.toFixed(2)}s].`
+                );
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Check Object Collisions
+    for (const [objId, evts] of objEvents.entries()) {
+      for (let i = 0; i < evts.length; i++) {
+        for (let j = i + 1; j < evts.length; j++) {
+          const e1 = evts[i];
+          const e2 = evts[j];
+          const overlapStart = Math.max(e1.start, e2.start);
+          const overlapEnd = Math.min(e1.end, e2.end);
+
+          if (overlapStart < overlapEnd - 0.01) {
+            for (const sub of e1.objectSubsystems) {
+              if (e2.objectSubsystems.includes(sub)) {
+                errors.push(
+                  `Concurrency collision on object "${objId}": Subsystem "${sub}" locked simultaneously by ` +
                   `event "${e1.id}" [${e1.start.toFixed(2)}s - ${e1.end.toFixed(2)}s] and ` +
                   `event "${e2.id}" [${e2.start.toFixed(2)}s - ${e2.end.toFixed(2)}s].`
                 );

@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://mohamed-excel.com/schemas/scene-direction/v2.0.0/scene-schema.json",
-  "title": "Mohamed Excel — Scene Direction Specification Schema",
-  "description": "Formal schema for declarative 2D character animation scene specifications.",
+  "$id": "https://mohamed-excel.com/schemas/scene-direction/v2.1.0/scene-schema.json",
+  "title": "Mohamed Excel — Scene Direction Specification Schema (v2.1.0)",
+  "description": "Formal schema for declarative 2D character and interactive object animation scene specifications.",
   "type": "object",
   "required": ["version", "metadata", "actors", "events"],
   "additionalProperties": false,
@@ -49,6 +49,12 @@
       }
     },
     "props": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/prop"
+      }
+    },
+    "objects": {
       "type": "array",
       "items": {
         "$ref": "#/definitions/prop"
@@ -108,6 +114,26 @@
       "properties": {
         "id": { "type": "string" },
         "template": { "type": "string" },
+        "name": { "type": "string" },
+        "parent": { "type": "string" },
+        "zIndex": { "type": "integer" },
+        "dimensions": {
+          "type": "object",
+          "properties": {
+            "width": { "type": "number" },
+            "height": { "type": "number" }
+          }
+        },
+        "localTransform": {
+          "type": "object",
+          "properties": {
+            "x": { "type": "number" },
+            "y": { "type": "number" },
+            "rotation": { "type": "number" },
+            "scaleX": { "type": "number" },
+            "scaleY": { "type": "number" }
+          }
+        },
         "initialState": {
           "type": "object",
           "properties": {
@@ -132,6 +158,7 @@
         "id": { "type": "string" },
         "actor": { "type": "string" },
         "prop": { "type": "string" },
+        "object": { "type": "string" },
         "action": { "type": "string" },
         "timing": {
           "type": "object",

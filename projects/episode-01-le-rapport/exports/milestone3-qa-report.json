@@ -1,0 +1,707 @@
+{
+  "milestone": "Milestone 3 — Object Animation & Interaction System",
+  "version": "2.1.0",
+  "generatedAt": "2026-11-09T13:03:11.249Z",
+  "tests": {
+    "dynamicHierarchy": {
+      "status": "PASS",
+      "deltaX": 60,
+      "deltaY": -20
+    },
+    "resourceLocking": {
+      "status": "PASS",
+      "collisionPrevented": true,
+      "unknownAnchorRejected": true
+    },
+    "benchmark3": {
+      "status": "PASS",
+      "eventsCompiled": 11
+    },
+    "benchmark4": {
+      "status": "PASS",
+      "eventsCompiled": 11
+    },
+    "regression": {
+      "status": "PASS",
+      "milestone1Compatible": true,
+      "milestone2Compatible": true
+    }
+  },
+  "summary": {
+    "status": "PASSED_100_PERCENT",
+    "allTestsPassed": true,
+    "benchmarksVerified": [
+      "benchmark-cup-pickup.json",
+      "benchmark-object-motion.json",
+      "benchmark-interaction.json",
+      "benchmark-second-scene.json"
+    ]
+  },
+  "benchmarks": {
+    "benchmark3": {
+      "version": "2.0.0",
+      "sceneId": "benchmark-cup-pickup",
+      "sceneTitle": "Benchmark 3: Coordinated Coffee Cup Pick-Up & Placement",
+      "generatedAt": "2026-11-09T13:03:11.883Z",
+      "compilationTimeMs": 54,
+      "summary": {
+        "totalEvents": 11,
+        "compiledEvents": 11,
+        "validationStatus": "PASSED",
+        "errorsCount": 0,
+        "warningsCount": 0
+      },
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": []
+      },
+      "instructionsExecutionMap": [
+        {
+          "id": "evt-clock-ambient",
+          "actor": null,
+          "prop": "clock",
+          "action": "propAction",
+          "scheduled": {
+            "start": 0,
+            "end": 8,
+            "duration": 8
+          },
+          "subsystems": [
+            "prop-state"
+          ],
+          "params": {
+            "propId": "clock",
+            "action": "tick"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-mohamed-idle-start",
+          "actor": "mohamed",
+          "prop": null,
+          "action": "idle",
+          "scheduled": {
+            "start": 0,
+            "end": 0.8,
+            "duration": 0.8
+          },
+          "subsystems": [
+            "breathing",
+            "blinking"
+          ],
+          "params": {
+            "breathing": true,
+            "blinking": true
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-mohamed-speak-coffee",
+          "actor": "mohamed",
+          "prop": null,
+          "action": "speak",
+          "scheduled": {
+            "start": 0.8,
+            "end": 2.4,
+            "duration": 1.6
+          },
+          "subsystems": [
+            "speech",
+            "head"
+          ],
+          "params": {
+            "text": "Une bonne pause café après ce rapport !"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-caption-coffee",
+          "actor": "mohamed",
+          "prop": null,
+          "action": "caption",
+          "scheduled": {
+            "start": 0.8,
+            "end": 2.4,
+            "duration": 1.6
+          },
+          "subsystems": [],
+          "params": {
+            "text": "Une bonne pause café après ce rapport !"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-karim-listen-coffee",
+          "actor": "karim",
+          "prop": null,
+          "action": "listenTo",
+          "scheduled": {
+            "start": 0.8,
+            "end": 2.4,
+            "duration": 1.6
+          },
+          "subsystems": [
+            "gaze",
+            "head",
+            "expression"
+          ],
+          "params": {
+            "speaker": "mohamed",
+            "responsiveNods": true
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-mohamed-pickup-cup",
+          "actor": "mohamed",
+          "prop": null,
+          "action": "pickUp",
+          "scheduled": {
+            "start": 2.5,
+            "end": 4.1,
+            "duration": 1.6
+          },
+          "subsystems": [
+            "arm-near",
+            "gaze",
+            "object-attachment",
+            "object-transform"
+          ],
+          "params": {
+            "actor": "mohamed",
+            "object": "mug",
+            "socket": "handle",
+            "liftDelta": {
+              "x": -25,
+              "y": -75
+            }
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-karim-look-mug",
+          "actor": "karim",
+          "prop": null,
+          "action": "lookAt",
+          "scheduled": {
+            "start": 3,
+            "end": 4.5,
+            "duration": 1.5
+          },
+          "subsystems": [
+            "gaze",
+            "head"
+          ],
+          "params": {
+            "target": "mug.handle",
+            "duration": 0.4
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-mohamed-rotate-cup",
+          "actor": null,
+          "prop": null,
+          "action": "rotateTo",
+          "scheduled": {
+            "start": 4.2,
+            "end": 4.8,
+            "duration": 0.6
+          },
+          "subsystems": [
+            "object-transform"
+          ],
+          "params": {
+            "objectId": "mug",
+            "rotation": -15,
+            "transformOrigin": "bottom center"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-mohamed-rotate-back",
+          "actor": null,
+          "prop": null,
+          "action": "rotateTo",
+          "scheduled": {
+            "start": 4.9,
+            "end": 5.4,
+            "duration": 0.5
+          },
+          "subsystems": [
+            "object-transform"
+          ],
+          "params": {
+            "objectId": "mug",
+            "rotation": 0,
+            "transformOrigin": "bottom center"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-mohamed-place-cup",
+          "actor": "mohamed",
+          "prop": null,
+          "action": "placeObject",
+          "scheduled": {
+            "start": 5.5,
+            "end": 7.3,
+            "duration": 1.8
+          },
+          "subsystems": [
+            "arm-near",
+            "object-attachment",
+            "object-transform"
+          ],
+          "params": {
+            "actor": "mohamed",
+            "object": "mug",
+            "placeAt": "desk.surface.rightArea"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-mohamed-smile-finish",
+          "actor": "mohamed",
+          "prop": null,
+          "action": "express",
+          "scheduled": {
+            "start": 7.3,
+            "end": 8,
+            "duration": 0.7
+          },
+          "subsystems": [
+            "expression"
+          ],
+          "params": {
+            "emotion": "confident"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        }
+      ],
+      "anchorResolutions": [
+        {
+          "ref": "mug.handle",
+          "resolved": {
+            "x": 645,
+            "y": 995
+          },
+          "type": "hierarchicalAnchor",
+          "timestamp": 45
+        }
+      ],
+      "concurrencyAllocations": [
+        {
+          "actor": "mohamed",
+          "interval": [
+            0,
+            0.8
+          ],
+          "subsystems": [
+            "breathing",
+            "blinking"
+          ]
+        },
+        {
+          "actor": "mohamed",
+          "interval": [
+            0.8,
+            2.4
+          ],
+          "subsystems": [
+            "speech",
+            "head"
+          ]
+        },
+        {
+          "actor": "mohamed",
+          "interval": [
+            0.8,
+            2.4
+          ],
+          "subsystems": []
+        },
+        {
+          "actor": "karim",
+          "interval": [
+            0.8,
+            2.4
+          ],
+          "subsystems": [
+            "gaze",
+            "head",
+            "expression"
+          ]
+        },
+        {
+          "actor": "mohamed",
+          "interval": [
+            2.5,
+            4.1
+          ],
+          "subsystems": [
+            "arm-near",
+            "gaze",
+            "object-attachment",
+            "object-transform"
+          ]
+        },
+        {
+          "actor": "karim",
+          "interval": [
+            3,
+            4.5
+          ],
+          "subsystems": [
+            "gaze",
+            "head"
+          ]
+        },
+        {
+          "actor": "mohamed",
+          "interval": [
+            5.5,
+            7.3
+          ],
+          "subsystems": [
+            "arm-near",
+            "object-attachment",
+            "object-transform"
+          ]
+        },
+        {
+          "actor": "mohamed",
+          "interval": [
+            7.3,
+            8
+          ],
+          "subsystems": [
+            "expression"
+          ]
+        }
+      ]
+    },
+    "benchmark4": {
+      "version": "2.0.0",
+      "sceneId": "benchmark-object-motion",
+      "sceneTitle": "Benchmark 4: Autonomous Object Motion & State Transformations",
+      "generatedAt": "2026-11-09T13:03:45.098Z",
+      "compilationTimeMs": 45,
+      "summary": {
+        "totalEvents": 11,
+        "compiledEvents": 11,
+        "validationStatus": "PASSED",
+        "errorsCount": 0,
+        "warningsCount": 0
+      },
+      "validation": {
+        "valid": true,
+        "errors": [],
+        "warnings": []
+      },
+      "instructionsExecutionMap": [
+        {
+          "id": "evt-obj-clock",
+          "actor": null,
+          "prop": "clock",
+          "action": "propAction",
+          "scheduled": {
+            "start": 0,
+            "end": 7,
+            "duration": 7
+          },
+          "subsystems": [
+            "prop-state"
+          ],
+          "params": {
+            "propId": "clock",
+            "action": "tick"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-doc-fadein",
+          "actor": null,
+          "prop": null,
+          "action": "fadeIn",
+          "scheduled": {
+            "start": 0.4,
+            "end": 0.9,
+            "duration": 0.5
+          },
+          "subsystems": [
+            "object-visibility"
+          ],
+          "params": {},
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-doc-curved-motion",
+          "actor": null,
+          "prop": null,
+          "action": "followPath",
+          "scheduled": {
+            "start": 0.9,
+            "end": 2.5,
+            "duration": 1.6
+          },
+          "subsystems": [
+            "object-transform"
+          ],
+          "params": {
+            "path": [
+              {
+                "x": 190,
+                "y": 1085
+              },
+              {
+                "x": 260,
+                "y": 1070
+              },
+              {
+                "x": 340,
+                "y": 1065
+              },
+              {
+                "x": 420,
+                "y": 1072
+              },
+              {
+                "x": 480,
+                "y": 1085
+              }
+            ],
+            "ease": "power1.inOut"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-karim-track-doc",
+          "actor": "karim",
+          "prop": null,
+          "action": "lookAt",
+          "scheduled": {
+            "start": 1,
+            "end": 2.8,
+            "duration": 1.8
+          },
+          "subsystems": [
+            "gaze",
+            "head"
+          ],
+          "params": {
+            "target": "desk.surface.centerArea",
+            "duration": 0.4
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-doc-rotate-align",
+          "actor": null,
+          "prop": null,
+          "action": "rotateTo",
+          "scheduled": {
+            "start": 2.5,
+            "end": 3.1,
+            "duration": 0.6
+          },
+          "subsystems": [
+            "object-transform"
+          ],
+          "params": {
+            "rotation": 8,
+            "transformOrigin": "center center",
+            "ease": "power2.out"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-doc-scale-highlight",
+          "actor": null,
+          "prop": null,
+          "action": "scaleTo",
+          "scheduled": {
+            "start": 3.1,
+            "end": 3.7,
+            "duration": 0.6
+          },
+          "subsystems": [
+            "object-transform"
+          ],
+          "params": {
+            "scale": 1.15,
+            "ease": "back.out(1.5)"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-laptop-pivot-state",
+          "actor": null,
+          "prop": null,
+          "action": "changeState",
+          "scheduled": {
+            "start": 3.8,
+            "end": 4.6,
+            "duration": 0.8
+          },
+          "subsystems": [
+            null
+          ],
+          "params": {
+            "state": "pivot-table"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-karim-look-laptop",
+          "actor": "karim",
+          "prop": null,
+          "action": "lookAt",
+          "scheduled": {
+            "start": 3.9,
+            "end": 5.4,
+            "duration": 1.5
+          },
+          "subsystems": [
+            "gaze",
+            "head"
+          ],
+          "params": {
+            "target": "laptop.screen",
+            "duration": 0.35
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-karim-express-happy",
+          "actor": "karim",
+          "prop": null,
+          "action": "express",
+          "scheduled": {
+            "start": 4,
+            "end": 4.5,
+            "duration": 0.5
+          },
+          "subsystems": [
+            "expression"
+          ],
+          "params": {
+            "emotion": "happy"
+          },
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-laptop-close-lid",
+          "actor": null,
+          "prop": null,
+          "action": "close",
+          "scheduled": {
+            "start": 5.2,
+            "end": 5.8,
+            "duration": 0.6
+          },
+          "subsystems": [
+            "object-transform",
+            null
+          ],
+          "params": {},
+          "status": "COMPILED",
+          "tweenCount": 1
+        },
+        {
+          "id": "evt-laptop-open-lid",
+          "actor": null,
+          "prop": null,
+          "action": "open",
+          "scheduled": {
+            "start": 5.9,
+            "end": 6.5,
+            "duration": 0.6
+          },
+          "subsystems": [
+            "object-transform",
+            null
+          ],
+          "params": {},
+          "status": "COMPILED",
+          "tweenCount": 1
+        }
+      ],
+      "anchorResolutions": [
+        {
+          "ref": "desk.surface.centerArea",
+          "resolved": {
+            "x": 450,
+            "y": 1090
+          },
+          "type": "hierarchicalAnchor",
+          "timestamp": 37
+        },
+        {
+          "ref": "laptop.screen",
+          "resolved": {
+            "x": 525,
+            "y": 985
+          },
+          "type": "hierarchicalAnchor",
+          "timestamp": 38
+        }
+      ],
+      "concurrencyAllocations": [
+        {
+          "actor": "karim",
+          "interval": [
+            1,
+            2.8
+          ],
+          "subsystems": [
+            "gaze",
+            "head"
+          ]
+        },
+        {
+          "actor": "karim",
+          "interval": [
+            3.9,
+            5.4
+          ],
+          "subsystems": [
+            "gaze",
+            "head"
+          ]
+        },
+        {
+          "actor": "karim",
+          "interval": [
+            4,
+            4.5
+          ],
+          "subsystems": [
+            "expression"
+          ]
+        }
+      ]
+    }
+  }
+}

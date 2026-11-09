@@ -1,0 +1,190 @@
+{
+  "version": "2.1.0",
+  "metadata": {
+    "id": "benchmark-cup-pickup",
+    "title": "Benchmark 3: Coordinated Coffee Cup Pick-Up & Placement",
+    "description": "Demonstrates coordinated character-object interaction: Mohamed reaches for the coffee cup, contacts handle, lifts, rotates, places it on the desk, releases, and returns arm to rest.",
+    "duration": 8.0,
+    "fps": 30,
+    "resolution": {
+      "width": 1080,
+      "height": 1920
+    }
+  },
+  "environment": {
+    "preset": "office",
+    "background": "office-modern"
+  },
+  "actors": [
+    {
+      "id": "mohamed",
+      "template": "mohamed",
+      "name": "Mohamed",
+      "role": "Excel Expert",
+      "initialState": {
+        "pose": "standing",
+        "position": { "x": 855, "y": 1104 },
+        "facing": -1,
+        "expression": "neutral"
+      }
+    },
+    {
+      "id": "karim",
+      "template": "employee",
+      "name": "Karim",
+      "role": "Financial Analyst",
+      "initialState": {
+        "pose": "seated",
+        "position": { "x": 320, "y": 1120 },
+        "facing": 1,
+        "expression": "happy"
+      }
+    }
+  ],
+  "props": [
+    {
+      "id": "desk",
+      "template": "desk",
+      "initialState": { "state": "default" }
+    },
+    {
+      "id": "mug",
+      "template": "mug",
+      "name": "Ceramic Coffee Mug",
+      "parent": "desk",
+      "initialState": { "state": "full" }
+    },
+    {
+      "id": "clock",
+      "template": "clock",
+      "initialState": { "state": "ticking" }
+    }
+  ],
+  "events": [
+    {
+      "id": "evt-clock-ambient",
+      "prop": "clock",
+      "action": "propAction",
+      "timing": { "start": 0.0, "duration": 8.0 },
+      "params": {
+        "propId": "clock",
+        "action": "tick"
+      },
+      "description": "Wall clock ticking in background."
+    },
+    {
+      "id": "evt-mohamed-idle-start",
+      "actor": "mohamed",
+      "action": "idle",
+      "timing": { "start": 0.0, "duration": 0.8 },
+      "params": {
+        "breathing": true,
+        "blinking": true
+      },
+      "description": "Mohamed standing naturally beside the desk."
+    },
+    {
+      "id": "evt-mohamed-speak-coffee",
+      "actor": "mohamed",
+      "action": "speak",
+      "timing": { "start": 0.8, "duration": 1.6 },
+      "params": {
+        "text": "Une bonne pause café après ce rapport !"
+      },
+      "description": "Mohamed announces coffee break."
+    },
+    {
+      "id": "evt-caption-coffee",
+      "action": "caption",
+      "actor": "mohamed",
+      "timing": { "start": 0.8, "duration": 1.6 },
+      "params": {
+        "text": "Une bonne pause café après ce rapport !"
+      },
+      "description": "Coffee dialogue subtitle."
+    },
+    {
+      "id": "evt-karim-listen-coffee",
+      "actor": "karim",
+      "action": "listenTo",
+      "timing": { "start": 0.8, "duration": 1.6 },
+      "params": {
+        "speaker": "mohamed",
+        "responsiveNods": true
+      },
+      "description": "Karim nods enthusiastically in agreement."
+    },
+    {
+      "id": "evt-mohamed-pickup-cup",
+      "action": "pickUp",
+      "actor": "mohamed",
+      "object": "mug",
+      "timing": { "start": 2.5, "duration": 1.6 },
+      "params": {
+        "actor": "mohamed",
+        "object": "mug",
+        "socket": "handle",
+        "liftDelta": { "x": -25, "y": -75 }
+      },
+      "description": "Mohamed reaches for mug handle via analytical IK, contacts handle, attaches cup, and lifts."
+    },
+    {
+      "id": "evt-karim-look-mug",
+      "actor": "karim",
+      "action": "lookAt",
+      "timing": { "start": 3.0, "duration": 1.5 },
+      "params": {
+        "target": "mug.handle",
+        "duration": 0.4
+      },
+      "description": "Karim watches Mohamed lift the coffee cup."
+    },
+    {
+      "id": "evt-mohamed-rotate-cup",
+      "object": "mug",
+      "action": "rotateTo",
+      "timing": { "start": 4.2, "duration": 0.6 },
+      "params": {
+        "objectId": "mug",
+        "rotation": -15,
+        "transformOrigin": "bottom center"
+      },
+      "description": "Mohamed gently tilts the mug while holding it."
+    },
+    {
+      "id": "evt-mohamed-rotate-back",
+      "object": "mug",
+      "action": "rotateTo",
+      "timing": { "start": 4.9, "duration": 0.5 },
+      "params": {
+        "objectId": "mug",
+        "rotation": 0,
+        "transformOrigin": "bottom center"
+      },
+      "description": "Mug leveled back before placement."
+    },
+    {
+      "id": "evt-mohamed-place-cup",
+      "action": "placeObject",
+      "actor": "mohamed",
+      "object": "mug",
+      "timing": { "start": 5.5, "duration": 1.8 },
+      "params": {
+        "actor": "mohamed",
+        "object": "mug",
+        "placeAt": "desk.surface.rightArea"
+      },
+      "description": "Mohamed lowers cup to desk surface, releases attachment with contact settle, and returns arm to rest."
+    },
+    {
+      "id": "evt-mohamed-smile-finish",
+      "actor": "mohamed",
+      "action": "express",
+      "timing": { "start": 7.3, "duration": 0.7 },
+      "params": {
+        "emotion": "confident"
+      },
+      "description": "Mohamed smiles with relaxed satisfaction."
+    }
+  ]
+}
