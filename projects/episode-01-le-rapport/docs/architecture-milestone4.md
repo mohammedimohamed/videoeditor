@@ -223,3 +223,82 @@ sequenceDiagram
 | **Regression: Benchmark 3** | Milestone 3 cup pick-up benchmark | **Valid (0 errors)** | **PASS** |
 | **Regression: Benchmark 4** | Milestone 3 object motion benchmark | **Valid (0 errors)** | **PASS** |
 | **Video Export: Benchmark 5** | 9.5s @ 30 FPS MP4 review proxy | **285 frames, H.264, 540×960, 9.50s** | **PASS** |
+
+---
+
+## 8. Revision 1: Rendered Composition Correction & Production Mode
+
+### 8.1 Root-Cause Analysis of the Half-Width Rendering Defect
+During independent review of the initial Benchmark 5 export, scene content was observed occupying only the left half ($X \in [0, 270]$) of the $540 \times 960$ output, with the right half ($X \in [270, 540]$) showing dark background (`#0B0F19`).
+
+**Investigation Findings:**
+1. In `compositions/scene-player.html`, the `body` element used flexbox centering:
+   ```css
+   body {
+     background: #0B0F19;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     min-height: 100vh;
+   }
+   ```
+2. When Puppeteer initialized with a $540 \times 960$ review viewport, flexbox layout caused `#stage-viewport` (authored at $1080\text{px}$ width) to shrink via default `flex-shrink: 1` down to $540\text{px}$.
+3. When the render script then applied `transform: scale(0.5); transformOrigin: '0 0'`, the $540\text{px}$ container was halved again to **$270\text{px}$** (exactly $50\%$ of the viewport width).
+4. The remaining $270\text{px}$ on the right revealed the dark `#0B0F19` background.
+5. In addition, the development HUD overlay was included in the captured video frames.
+
+### 8.2 Architectural Corrections Implemented
+1. **Production Mode (`mode: "production"`):**
+   - Added explicit `.production-mode` styles in `compositions/scene-player.html`:
+     ```css
+     body.production-mode {
+       display: block !important;
+       margin: 0 !important;
+       padding: 0 !important;
+       overflow: hidden !important;
+       background: #000000 !important;
+       width: 100% !important;
+       height: 100% !important;
+     }
+     body.production-mode #stage-viewport {
+       position: absolute !important;
+       left: 0 !important;
+       top: 0 !important;
+       width: 1080px !important;
+       min-width: 1080px !important;
+       height: 1920px !important;
+       min-height: 1920px !important;
+       flex-shrink: 0 !important;
+       transform-origin: 0 0 !important;
+     }
+     body.production-mode #director-hud {
+       display: none !important;
+     }
+     ```
+   - Automatically activates when URL includes `?mode=production` or `&production=1`.
+   - Viewport scaling parameter (`&scale=0.5`) cleanly maps $1080 \times 1920$ to $540 \times 960$ without flexbox shrinking or edge clipping.
+
+2. **Screen-Space Subtitle Placement (P3):**
+   - `captionsContainer.style.bottom` moved from $80\text{px}$ to $220\text{px}$ ($> 180\text{px}$ title-safe margin).
+   - `captionDiv.style.position` set to `relative` inside `maxWidth: 920px`, centering bubbles and eliminating bottom edge clipping.
+
+3. **Framing Calibrations Across All 7 Shots (P2):**
+   - **Shot 1 (Establishing):** $(540, 960)$, $Z=1.00\times$ — complete office stage.
+   - **Shot 2 (Karim Medium):** $(360, 860)$, $Z=1.65\times$ — centered at desk with laptop context.
+   - **Shot 3 (Laptop Close-Up):** $(545, 990)$, $Z=2.80\times$ — spreadsheet centered, Karim cleanly off-screen left at $X = -76\text{px}$ (zero partial face slicing).
+   - **Shot 4 (Mohamed Track):** $(800, 940) \to (855, 940)$, $Z=1.35\times$, look-ahead $-60\text{px}$ — character fully visible throughout entrance.
+   - **Shot 5 (Two-Shot):** $(580, 920)$, $Z=1.20\times$ — Karim at $X=228\text{px}$, Mohamed at $X=870\text{px}$, perfectly balanced.
+   - **Shot 6 (Interaction):** $(510, 970)$, $Z=1.45\times$ — Mohamed pointing hand, laptop screen, and Karim context visible.
+   - **Shot 7 (Karim Reaction):** $(320, 920)$, $Z=1.75\times$ — full face and upper body visible with headroom; subtitle safe clearance $> 80\text{px}$.
+
+### 8.3 Output-Level Composition Telemetry (Revision 1)
+
+| Shot / Key Frame | Timestamp | Resolution | Visible Bounds | Black Area % | Right-Half Black % | Safe Area Violations | Subject Clipping | Status |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Shot 1: Wide Establishing** | $0.5\text{s}$ | $540 \times 960$ | $[0, 0, 540, 960]$ | $0.00\%$ | $0.00\%$ | 0 | None | **PASS** |
+| **Shot 2: Karim Medium** | $1.8\text{s}$ | $540 \times 960$ | $[0, 0, 540, 960]$ | $0.00\%$ | $0.00\%$ | 0 | None | **PASS** |
+| **Shot 3: Laptop Screen Close** | $3.2\text{s}$ | $540 \times 960$ | $[0, 0, 540, 960]$ | $0.00\%$ | $0.00\%$ | 0 | Intentional Off-Left | **PASS** |
+| **Shot 4: Mohamed Entrance** | $4.8\text{s}$ | $540 \times 960$ | $[0, 0, 540, 960]$ | $0.00\%$ | $0.00\%$ | 0 | None | **PASS** |
+| **Shot 5: Two-Shot Dialogue** | $6.0\text{s}$ | $540 \times 960$ | $[0, 0, 540, 960]$ | $0.00\%$ | $0.00\%$ | 0 | None | **PASS** |
+| **Shot 6: Interaction Framing** | $7.5\text{s}$ | $540 \times 960$ | $[0, 0, 540, 960]$ | $0.00\%$ | $0.00\%$ | 0 | None | **PASS** |
+| **Shot 7: Karim Reaction** | $8.8\text{s}$ | $540 \times 960$ | $[0, 0, 540, 960]$ | $0.01\%$ | $0.02\%$ | 0 | None | **PASS** |

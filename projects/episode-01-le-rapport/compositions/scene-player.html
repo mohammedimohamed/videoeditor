@@ -27,6 +27,35 @@
       color: #F8FAFC;
     }
 
+    /* Production Rendering Mode (No HUD, Strict Full-Frame) */
+    body.production-mode {
+      display: block !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+      background: #000000 !important;
+      min-height: auto !important;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    body.production-mode #director-hud {
+      display: none !important;
+    }
+
+    body.production-mode #stage-viewport {
+      position: absolute !important;
+      left: 0 !important;
+      top: 0 !important;
+      width: 1080px !important;
+      min-width: 1080px !important;
+      height: 1920px !important;
+      min-height: 1920px !important;
+      box-shadow: none !important;
+      flex-shrink: 0 !important;
+      transform-origin: 0 0 !important;
+    }
+
     #stage-viewport {
       position: relative;
       width: 1080px;
@@ -189,6 +218,19 @@
       const urlParams = new URLSearchParams(window.location.search);
       const sceneFile = urlParams.get('scene') || 'benchmark-interaction.json';
       const scenePath = `../benchmarks/${sceneFile}`;
+      const renderMode = urlParams.get('mode') || (urlParams.get('production') === '1' ? 'production' : 'director');
+      const scaleParam = parseFloat(urlParams.get('scale'));
+
+      if (renderMode === 'production') {
+        document.body.classList.add('production-mode');
+        const hud = document.getElementById('director-hud');
+        if (hud) hud.style.display = 'none';
+        const vp = document.getElementById('stage-viewport');
+        if (vp && !isNaN(scaleParam)) {
+          vp.style.transform = `scale(${scaleParam})`;
+          vp.style.transformOrigin = '0 0';
+        }
+      }
 
       // Update HUD active state
       if (sceneFile.includes('second-scene')) {

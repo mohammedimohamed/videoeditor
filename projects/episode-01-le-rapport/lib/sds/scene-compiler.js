@@ -268,9 +268,9 @@ export class SceneCompiler {
     const captionsContainer = document.createElement('div');
     captionsContainer.id = 'captions-container';
     captionsContainer.style.position = 'absolute';
-    captionsContainer.style.bottom = '80px';
-    captionsContainer.style.left = '60px';
-    captionsContainer.style.right = '60px';
+    captionsContainer.style.bottom = '220px';
+    captionsContainer.style.left = '80px';
+    captionsContainer.style.right = '80px';
     captionsContainer.style.zIndex = '10';
     captionsContainer.style.display = 'flex';
     captionsContainer.style.flexDirection = 'column';
@@ -779,10 +779,10 @@ export class SceneCompiler {
           captionDiv.style.fontWeight = '700';
           captionDiv.style.textAlign = 'center';
           captionDiv.style.boxShadow = '0 16px 36px rgba(0,0,0,0.35)';
-          captionDiv.style.maxWidth = '900px';
+          captionDiv.style.maxWidth = '920px';
           captionDiv.style.opacity = '0';
           captionDiv.style.transform = 'translateY(16px)';
-          captionDiv.style.position = 'absolute';
+          captionDiv.style.position = 'relative';
 
           const speakerColor = (evt.actor === 'mohamed') ? '#34D399' : '#60A5FA';
           const speakerName = (evt.actor === 'mohamed') ? 'Mohamed' : 'Karim';

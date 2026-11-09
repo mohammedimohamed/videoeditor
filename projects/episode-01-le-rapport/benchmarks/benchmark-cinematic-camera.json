@@ -146,6 +146,9 @@
       "params": {
         "target": "karim",
         "framing": "medium",
+        "x": 360,
+        "y": 860,
+        "zoom": 1.65,
         "ease": "power2.inOut"
       },
       "description": "Shot 2: Camera pushes in smoothly to a medium shot of Karim at his desk."
@@ -174,6 +177,9 @@
       "params": {
         "target": "laptop.screen",
         "framing": "object-close-up",
+        "x": 545,
+        "y": 990,
+        "zoom": 2.8,
         "ease": "power2.inOut"
       },
       "description": "Shot 3: Camera pushes in on the laptop screen showing complex Excel spreadsheet errors."
@@ -217,7 +223,8 @@
         "target": "mohamed",
         "framing": "medium",
         "lookAhead": -60,
-        "targetX": 855,
+        "toX": 855,
+        "zoom": 1.35,
         "ease": "power1.inOut"
       },
       "description": "Shot 4: Camera tracks Mohamed as he walks smoothly into the office."
@@ -233,6 +240,9 @@
       "params": {
         "targets": ["mohamed", "karim"],
         "framing": "two-shot",
+        "x": 580,
+        "y": 920,
+        "zoom": 1.2,
         "ease": "power2.inOut"
       },
       "description": "Shot 5: Camera frames both Mohamed and Karim in a balanced two-shot."
@@ -272,9 +282,12 @@
       "params": {
         "targets": ["mohamed.rightHand", "laptop.screen"],
         "framing": "interaction",
+        "x": 510,
+        "y": 970,
+        "zoom": 1.45,
         "ease": "power2.inOut"
       },
-      "description": "Shot 6: Camera frames the active hand gesture and laptop interaction."
+      "description": "Shot 6: Camera frames the active hand gesture, laptop screen, and Karim."
     },
     {
       "id": "evt-laptop-pivot-state",
@@ -300,6 +313,9 @@
       "params": {
         "target": "karim.head",
         "framing": "close-up",
+        "x": 320,
+        "y": 920,
+        "zoom": 1.75,
         "ease": "power2.out"
       },
       "description": "Shot 7: Close-up reaction shot on Karim as he understands and smiles with relief."
